@@ -44,6 +44,139 @@
 </head>
 
 <body class="bg-gray-50">
+
+
+
+
+
+
+
+
+
+
+
+@if(session('showWelcome'))
+<div id="welcomeOverlay" 
+     style="
+        position: fixed; 
+        inset: 0; 
+        z-index: 999999; 
+        background: #ffffff; 
+        display: flex; 
+        flex-direction: column;
+        align-items: center; 
+        justify-content: center;
+     ">
+    
+    <div style="position: relative; overflow: hidden; padding: 20px;">
+        <h1 id="welcomeText" 
+            style="
+                font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+                font-size: clamp(2.5rem, 7vw, 5rem);
+                font-weight: 800;
+                color: #111827;
+                margin: 0;
+                display: flex;
+                gap: 15px;
+                line-height: 1;
+            ">
+            <span style="opacity: 0; animation: slideUp 1.2s cubic-bezier(0.2, 0, 0.2, 1) forwards;">Welcome,</span>
+            <span style="
+                background: linear-gradient(135deg, #2563eb, #7c3aed);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                opacity: 0;
+                animation: slideUp 1.2s cubic-bezier(0.2, 0, 0.2, 1) 0.2s forwards;
+            ">
+                {{ auth()->user()->name }}
+            </span>
+        </h1>
+    </div>
+
+    <div style="
+        margin-top: 30px;
+        width: 40px;
+        height: 2px;
+        background: #e2e8f0;
+        position: relative;
+        overflow: hidden;
+        border-radius: 10px;
+    ">
+        <div style="
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            background: #2563eb;
+            left: -100%;
+            animation: loadingSlide 2.5s cubic-bezier(0.45, 0, 0.55, 1) forwards;
+        "></div>
+    </div>
+
+    <audio id="welcomeSound" preload="auto">
+        <source src="{{ asset('sounds/intro.mp3') }}" type="audio/mpeg">
+    </audio>
+</div>
+@endif
+
+<style>
+@keyframes slideUp {
+    0% { 
+        opacity: 0; 
+        transform: translateY(60px); 
+    }
+    100% { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+@keyframes loadingSlide {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.premium-exit {
+    opacity: 0 !important;
+    transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const overlay = document.getElementById('welcomeOverlay');
+    const sound = document.getElementById('welcomeSound');
+
+    if (!overlay) return;
+
+    document.body.style.overflow = 'hidden';
+
+    // Play sound
+    if(sound) {
+        setTimeout(() => { sound.play().catch(() => {}); }, 400);
+    }
+
+    // Keep it on screen for 3 seconds, then fade out
+    setTimeout(() => {
+        overlay.classList.add('premium-exit');
+        setTimeout(() => {
+            overlay.remove();
+            document.body.style.overflow = '';
+        }, 1200);
+    }, 3000);
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+    
     <div class="min-h-screen flex">
 
 
@@ -60,47 +193,19 @@
             <!-- Header -->
 
             <!-- Dashboard Content -->
-
-            <main>
+            
+            <div class="pb-24">
+                <main>
                 @yield('content')
-            </main>
+                </main>
+                
+            </div>
+            
            
         </div>
     </div>
 
-    <!-- Mobile Bottom Navigation -->
-    <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 shadow-lg">
-        <div class="flex justify-around items-center">
-            <a href="#" class="flex flex-col items-center gap-1 p-2 text-blue-600">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                </svg>
-                <span class="text-xs font-medium">Dashboard</span>
-            </a>
-            <a href="#" class="flex flex-col items-center gap-1 p-2 text-gray-500">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-                </svg>
-                <span class="text-xs font-medium">Clients</span>
-            </a>
-            <a href="#" class="flex flex-col items-center gap-1 p-2 text-gray-500">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
-                </svg>
-                <span class="text-xs font-medium">Campaigns</span>
-            </a>
-            <a href="#" class="flex flex-col items-center gap-1 p-2 text-gray-500">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                <span class="text-xs font-medium">Profile</span>
-            </a>
-        </div>
-    </div>
+
 
     <script>
         // Animation for cards on page load
@@ -113,6 +218,7 @@
             });
         });
     </script>
+
 </body>
 
 </html>

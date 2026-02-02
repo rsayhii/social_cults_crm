@@ -19,6 +19,7 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
+        'company_id',
         'name',
         'email',
         'password',
@@ -47,4 +48,43 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+
+    public function tasks()
+    {
+        return $this->belongsToMany(Task::class, 'task_user');
+    }
+
+
+    public function isTeam()
+{
+    return $this->roles()->whereNotIn('name', ['admin','client'])->exists();
+}
+
+
+
+
+public function attendanceRecords() 
+{ 
+    return $this->hasMany(AttendanceRecord::class); 
+}
+public function leaves() 
+{ 
+    return $this->hasMany(Leave::class); 
+}
+public function salarySlips() 
+{ 
+    return $this->hasMany(SalarySlip::class); 
+}
+
+
+public function company()
+{
+    return $this->belongsTo(Company::class);
+}
+
+
+
+
+
 }

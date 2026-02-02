@@ -24,7 +24,20 @@ class PermissionSeeder extends Seeder
             'besdex',
             'my leads',
             'proposal',
-            'my attendance'
+            'my attendance',
+            'todo',
+            'task',
+            'calender',
+            'links and remark',
+            'client serive interation',
+            'salary',
+            'invoice',
+            'report',
+            'notepad',
+            'contact',
+            'ticket records',
+            'ticket raise',
+
         ];
 
         foreach ($permissions as $permission) {

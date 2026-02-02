@@ -1,249 +1,706 @@
 @extends('components.layout')
 
+
+
 @section('content')
-     <div class="flex-1 overflow-auto p-6">
-                <div class="max-w-7xl mx-auto space-y-6">
-                    <!-- Page Header -->
-                    <div>
-                        <h2 class="text-2xl lg:text-3xl font-bold text-gray-900">Dashboard Overview</h2>
-                        <p class="text-gray-500 mt-2">Track your marketing performance and client relationships</p>
-                    </div>
 
-                    <!-- Stats Cards -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <!-- Revenue Card -->
-                        <div
-                            class="fade-in bg-white rounded-xl border border-gray-200 p-6 relative overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                            <div
-                                class="absolute top-0 right-0 w-24 h-24 transform translate-x-6 -translate-y-6 bg-green-500 rounded-full opacity-10">
-                            </div>
-                            <div class="flex justify-between items-start">
-                                <div class="flex-1">
-                                    <p class="text-sm font-medium text-gray-500 uppercase tracking-wide">Total Revenue
-                                    </p>
-                                    <h3 class="text-2xl font-bold mt-2 text-gray-900">$41,000</h3>
-                                    <div class="flex items-center mt-3">
-                                        <span class="text-sm font-semibold text-green-600">↑ 12.5%</span>
-                                        <span class="text-xs text-gray-500 ml-2">vs last month</span>
-                                    </div>
-                                </div>
-                                <div class="p-3 rounded-xl bg-green-100">
-                                    <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
 
-                        <!-- Clients Card -->
-                        <div
-                            class="fade-in bg-white rounded-xl border border-gray-200 p-6 relative overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                            <div
-                                class="absolute top-0 right-0 w-24 h-24 transform translate-x-6 -translate-y-6 bg-blue-500 rounded-full opacity-10">
-                            </div>
-                            <div class="flex justify-between items-start">
-                                <div class="flex-1">
-                                    <p class="text-sm font-medium text-gray-500 uppercase tracking-wide">Active Clients
-                                    </p>
-                                    <h3 class="text-2xl font-bold mt-2 text-gray-900">2</h3>
-                                    <div class="flex items-center mt-3">
-                                        <span class="text-sm font-semibold text-green-600">↑ 8.2%</span>
-                                        <span class="text-xs text-gray-500 ml-2">vs last month</span>
-                                    </div>
-                                </div>
-                                <div class="p-3 rounded-xl bg-blue-100">
-                                    <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
 
-                        <!-- Campaigns Card -->
-                        <div
-                            class="fade-in bg-white rounded-xl border border-gray-200 p-6 relative overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                            <div
-                                class="absolute top-0 right-0 w-24 h-24 transform translate-x-6 -translate-y-6 bg-purple-500 rounded-full opacity-10">
-                            </div>
-                            <div class="flex justify-between items-start">
-                                <div class="flex-1">
-                                    <p class="text-sm font-medium text-gray-500 uppercase tracking-wide">Active
-                                        Campaigns</p>
-                                    <h3 class="text-2xl font-bold mt-2 text-gray-900">3</h3>
-                                    <div class="flex items-center mt-3">
-                                        <span class="text-sm font-semibold text-green-600">↑ 15.3%</span>
-                                        <span class="text-xs text-gray-500 ml-2">vs last month</span>
-                                    </div>
-                                </div>
-                                <div class="p-3 rounded-xl bg-purple-100">
-                                    <svg class="w-6 h-6 text-purple-500" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-                        <!-- ROI Card -->
-                        <div
-                            class="fade-in bg-white rounded-xl border border-gray-200 p-6 relative overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                            <div
-                                class="absolute top-0 right-0 w-24 h-24 transform translate-x-6 -translate-y-6 bg-orange-500 rounded-full opacity-10">
-                            </div>
-                            <div class="flex justify-between items-start">
-                                <div class="flex-1">
-                                    <p class="text-sm font-medium text-gray-500 uppercase tracking-wide">Average ROI</p>
-                                    <h3 class="text-2xl font-bold mt-2 text-gray-900">24.5%</h3>
-                                    <div class="flex items-center mt-3">
-                                        <span class="text-sm font-semibold text-red-600">↓ 3.1%</span>
-                                        <span class="text-xs text-gray-500 ml-2">vs last month</span>
-                                    </div>
-                                </div>
-                                <div class="p-3 rounded-xl bg-orange-100">
-                                    <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                                    </svg>
-                                </div>
-                            </div>
+<div class="flex-1 overflow-auto p-3 sm:p-4 md:p-5 lg:p-6">
+    <div class="max-w-7xl mx-auto space-y-3 sm:space-y-4 md:space-y-5 lg:space-y-6">
+        <!-- Page Header -->
+        <div class="px-2 sm:px-3 md:px-0">
+            <h2 class="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 leading-tight">Dashboard Overview</h2>
+            <p class="text-xs sm:text-sm md:text-base text-gray-500 mt-1 sm:mt-1.5 md:mt-2 leading-relaxed">Track your marketing performance and client relationships</p>
+        </div>
+
+        <!-- Stats Cards - Mobile optimized grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6 px-2 sm:px-3 md:px-0">
+            <!-- Revenue Card -->
+            <div class="fade-in bg-white rounded-lg sm:rounded-xl border border-gray-200 p-3 sm:p-4 md:p-5 lg:p-6 relative overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                <div class="absolute top-0 right-0 w-12 h-12 sm:w-14 sm:h-14 md:w-20 md:h-20 lg:w-24 lg:h-24 transform translate-x-3 -translate-y-3 sm:translate-x-4 sm:-translate-y-4 md:translate-x-5 md:-translate-y-5 lg:translate-x-6 lg:-translate-y-6 bg-green-500 rounded-full opacity-10"></div>
+                <div class="flex justify-between items-start">
+                    <div class="flex-1 pr-2">
+                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Users</p>
+                        <h3 class="text-base sm:text-lg md:text-xl lg:text-2xl font-bold mt-1 sm:mt-1.5 md:mt-2 text-gray-900 leading-none">{{ $totalUsers }}</h3>
+                        <div class="flex items-center mt-1.5 sm:mt-2 md:mt-3">
+                            <span class="text-xs font-semibold text-green-600">↑ 12.5%</span>
+                            <span class="text-xs text-gray-500 ml-1">vs last month</span>
                         </div>
                     </div>
-
-                    <!-- Charts Section -->
-                    <div class="grid lg:grid-cols-2 gap-6">
-                        <!-- Revenue Chart -->
-                        <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
-                            <div class="p-6 border-b border-gray-200">
-                                <h3 class="text-lg font-semibold text-gray-900">Revenue Trends</h3>
-                            </div>
-                            <div class="p-6">
-                                <div class="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
-                                    <div class="text-center">
-                                        <svg class="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none"
-                                            stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                                        </svg>
-                                        <p class="text-gray-500 text-sm">Revenue chart visualization</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Pipeline Chart -->
-                        <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
-                            <div class="p-6 border-b border-gray-200">
-                                <h3 class="text-lg font-semibold text-gray-900">Sales Pipeline</h3>
-                            </div>
-                            <div class="p-6">
-                                <div class="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
-                                    <div class="text-center">
-                                        <svg class="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none"
-                                            stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                                        </svg>
-                                        <p class="text-gray-500 text-sm">Pipeline chart visualization</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Recent Activity -->
-                    <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
-                        <div class="p-6 border-b border-gray-200">
-                            <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                Recent Activity
-                            </h3>
-                        </div>
-                        <div class="p-6">
-                            <div class="space-y-4">
-                                <!-- Activity Item -->
-                                <div
-                                    class="flex items-start gap-4 pb-4 border-b border-gray-100 last:border-0 last:pb-0">
-                                    <div class="p-2 rounded-lg bg-blue-100">
-                                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                    </div>
-                                    <div class="flex-1">
-                                        <p class="text-sm font-medium text-gray-900">Call back</p>
-                                        <p class="text-xs text-gray-500 mt-1">Oct 17, 2025 • 11:49 AM</p>
-                                    </div>
-                                    <span
-                                        class="text-xs font-semibold px-2 py-1 bg-gray-100 text-gray-700 rounded-full">Task</span>
-                                </div>
-
-                                <!-- Activity Item -->
-                                <div
-                                    class="flex items-start gap-4 pb-4 border-b border-gray-100 last:border-0 last:pb-0">
-                                    <div class="p-2 rounded-lg bg-blue-100">
-                                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                    </div>
-                                    <div class="flex-1">
-                                        <p class="text-sm font-medium text-gray-900">Quarterly review call with
-                                            TechStartup</p>
-                                        <p class="text-xs text-gray-500 mt-1">Oct 16, 2025 • 6:24 PM</p>
-                                    </div>
-                                    <span
-                                        class="text-xs font-semibold px-2 py-1 bg-gray-100 text-gray-700 rounded-full">Task</span>
-                                </div>
-
-                                <!-- Activity Item -->
-                                <div
-                                    class="flex items-start gap-4 pb-4 border-b border-gray-100 last:border-0 last:pb-0">
-                                    <div class="p-2 rounded-lg bg-purple-100">
-                                        <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
-                                        </svg>
-                                    </div>
-                                    <div class="flex-1">
-                                        <p class="text-sm font-medium text-gray-900">Campaign: TechStartup LinkedIn Lead
-                                            Gen</p>
-                                        <p class="text-xs text-gray-500 mt-1">Oct 16, 2025 • 6:24 PM</p>
-                                    </div>
-                                    <span
-                                        class="text-xs font-semibold px-2 py-1 bg-purple-100 text-purple-700 rounded-full">Campaign</span>
-                                </div>
-
-                                <!-- Activity Item -->
-                                <div class="flex items-start gap-4">
-                                    <div class="p-2 rounded-lg bg-green-100">
-                                        <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                        </svg>
-                                    </div>
-                                    <div class="flex-1">
-                                        <p class="text-sm font-medium text-gray-900">New lead: TechStartup Inc</p>
-                                        <p class="text-xs text-gray-500 mt-1">Oct 16, 2025 • 6:24 PM</p>
-                                    </div>
-                                    <span
-                                        class="text-xs font-semibold px-2 py-1 bg-green-100 text-green-700 rounded-full">Client</span>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="p-1.5 sm:p-2 md:p-2.5 lg:p-3 rounded-lg sm:rounded-xl bg-green-100 ml-1 flex-shrink-0">
+                        <svg class="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5 lg:w-6 lg:h-6 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-7 8c0-2.67 5.33-4 7-4s7 1.33 7 4v2H5v-2z"/>
+                            <path opacity="0.6" d="M23 20v-2c0-2.21-3.13-4-7-4-1.85 0-3.44.59-4.59 1.52C10.26 14.39 9.03 14 7.5 14c-3.87 0-7 1.79-7 4v2h10.5c.28-1.05 1.54-1.85 3-1.98 1.46-.13 2.72.57 3 1.98z"/>
+                        </svg>
                     </div>
                 </div>
             </div>
+
+            <!-- Active Clients Card -->
+            <div class="fade-in bg-white rounded-lg sm:rounded-xl border border-gray-200 p-3 sm:p-4 md:p-5 lg:p-6 relative overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                <div class="absolute top-0 right-0 w-12 h-12 sm:w-14 sm:h-14 md:w-20 md:h-20 lg:w-24 lg:h-24 transform translate-x-3 -translate-y-3 sm:translate-x-4 sm:-translate-y-4 md:translate-x-5 md:-translate-y-5 lg:translate-x-6 lg:-translate-y-6 bg-blue-500 rounded-full opacity-10"></div>
+                <div class="flex justify-between items-start">
+                    <div class="flex-1 pr-2">
+                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Present Today</p>
+                        <h3 class="text-base sm:text-lg md:text-xl lg:text-2xl font-bold mt-1 sm:mt-1.5 md:mt-2 text-gray-900 leading-none">{{ $presentToday }}</h3>
+                        <div class="flex items-center mt-1.5 sm:mt-2 md:mt-3">
+                            <span class="text-xs font-semibold text-green-600">↑ 8.2%</span>
+                            <span class="text-xs text-gray-500 ml-1">vs yesterday</span>
+                        </div>
+                    </div>
+                    <div class="p-1.5 sm:p-2 md:p-2.5 lg:p-3 rounded-lg sm:rounded-xl bg-blue-100 ml-1 flex-shrink-0">
+                        <svg class="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5 lg:w-6 lg:h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Campaigns Card (Total Clients) -->
+            <div class="fade-in bg-white rounded-lg sm:rounded-xl border border-gray-200 p-3 sm:p-4 md:p-5 lg:p-6 relative overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                <div class="absolute top-0 right-0 w-12 h-12 sm:w-14 sm:h-14 md:w-20 md:h-20 lg:w-24 lg:h-24 transform translate-x-3 -translate-y-3 sm:translate-x-4 sm:-translate-y-4 md:translate-x-5 md:-translate-y-5 lg:translate-x-6 lg:-translate-y-6 bg-purple-500 rounded-full opacity-10"></div>
+                <div class="flex justify-between items-start">
+                    <div class="flex-1 pr-2">
+                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Clients</p>
+                        <h3 class="text-base sm:text-lg md:text-xl lg:text-2xl font-bold mt-1 sm:mt-1.5 md:mt-2 text-gray-900 leading-none">{{ $totalClients }}</h3>
+                        <div class="flex items-center mt-1.5 sm:mt-2 md:mt-3">
+                            <span class="text-xs font-semibold text-green-600">↑ 15.3%</span>
+                            <span class="text-xs text-gray-500 ml-1">vs last month</span>
+                        </div>
+                    </div>
+                    <div class="p-1.5 sm:p-2 md:p-2.5 lg:p-3 rounded-lg sm:rounded-xl bg-purple-100 ml-1 flex-shrink-0">
+                        <svg class="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5 lg:w-6 lg:h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 0h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ROI Card (Total Contacts) -->
+            <div class="fade-in bg-white rounded-lg sm:rounded-xl border border-gray-200 p-3 sm:p-4 md:p-5 lg:p-6 relative overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                <div class="absolute top-0 right-0 w-12 h-12 sm:w-14 sm:h-14 md:w-20 md:h-20 lg:w-24 lg:h-24 transform translate-x-3 -translate-y-3 sm:translate-x-4 sm:-translate-y-4 md:translate-x-5 md:-translate-y-5 lg:translate-x-6 lg:-translate-y-6 bg-orange-500 rounded-full opacity-10"></div>
+                <div class="flex justify-between items-start">
+                    <div class="flex-1 pr-2">
+                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Contacts</p>
+                        <h3 class="text-base sm:text-lg md:text-xl lg:text-2xl font-bold mt-1 sm:mt-1.5 md:mt-2 text-gray-900 leading-none">{{ $totalContacts }}</h3>
+                        <div class="flex items-center mt-1.5 sm:mt-2 md:mt-3">
+                            <span class="text-xs font-semibold text-red-600">↓ 3.1%</span>
+                            <span class="text-xs text-gray-500 ml-1">vs last month</span>
+                        </div>
+                    </div>
+                    <div class="p-1.5 sm:p-2 md:p-2.5 lg:p-3 rounded-lg sm:rounded-xl bg-orange-100 ml-1 flex-shrink-0">
+                        <svg class="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5 lg:w-6 lg:h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M15 7a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M12 14a5 5 0 0 0 5-5"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section - Stack on mobile, side-by-side on larger screens -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-5 lg:gap-6 px-2 sm:px-3 md:px-0">
+            <!-- Users Chart -->
+            <div class="bg-white rounded-lg sm:rounded-xl border border-gray-200 shadow-sm">
+                <div class="p-3 sm:p-4 md:p-5 lg:p-6 border-b border-gray-200">
+                    <h3 class="text-sm sm:text-base md:text-lg font-semibold text-gray-900 leading-tight">Users (last 12 months)</h3>
+                </div>
+                <div class="p-3 sm:p-4 md:p-5 lg:p-6">
+                    <div class="relative h-40 sm:h-48 md:h-56 lg:h-64">
+                        <canvas id="usersChart" class="w-full h-full"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attendance Chart -->
+            <div class="bg-white rounded-lg sm:rounded-xl border border-gray-200 shadow-sm">
+                <div class="p-3 sm:p-4 md:p-5 lg:p-6 border-b border-gray-200">
+                    <h3 class="text-sm sm:text-base md:text-lg font-semibold text-gray-900 leading-tight">Attendances (last 12 months)</h3>
+                </div>
+                <div class="p-3 sm:p-4 md:p-5 lg:p-6">
+                    <div class="relative h-40 sm:h-48 md:h-56 lg:h-64">
+                        <canvas id="attChart" class="w-full h-full"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="bg-white rounded-lg sm:rounded-xl border border-gray-200 shadow-sm mx-2 sm:mx-3 md:mx-0">
+            <div class="p-3 sm:p-4 md:p-5 lg:p-6 border-b border-gray-200">
+                <h3 class="text-sm sm:text-base md:text-lg font-semibold text-gray-900 flex items-center gap-1.5 sm:gap-2 leading-tight">
+                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-4.5 md:h-4.5 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Recent Activity
+                </h3>
+            </div>
+            <div class="p-3 sm:p-4 md:p-5 lg:p-6">
+                <div class="space-y-3 sm:space-y-4">
+                    @forelse($recentTasks as $task)
+                        <div class="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-3 pb-3 sm:pb-4 border-b border-gray-100 last:border-0 last:pb-0">
+                            <div class="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">
+                                <div class="p-1.5 sm:p-2 rounded-lg sm:rounded-lg bg-blue-100 flex-shrink-0">
+                                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-xs sm:text-sm font-medium text-gray-900 truncate">{{ $task->title ?? 'Untitled task' }}</p>
+                                    <p class="text-xs text-gray-500 mt-0.5 sm:mt-1 leading-relaxed">{{ \Carbon\Carbon::parse($task->created_at)->format('M d, Y • h:i A') }}</p>
+                                </div>
+                            </div>
+                            <span class="text-xs font-semibold px-1.5 sm:px-2 py-0.5 sm:py-1 bg-gray-100 text-gray-700 rounded-full self-start sm:self-auto mt-1 sm:mt-0">
+                                {{ $task->type ?? 'Task' }}
+                            </span>
+                        </div>
+                    @empty
+                        <p class="text-xs sm:text-sm text-gray-500 text-center py-3 sm:py-4">No recent tasks found.</p>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js CDN + initialization -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Prevent zoom on mobile
+    document.addEventListener('touchstart', function(event) {
+        if (event.touches.length > 1) {
+            event.preventDefault();
+        }
+    }, { passive: false });
+
+    // Prevent double-tap zoom
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function(event) {
+        const now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) {
+            event.preventDefault();
+        }
+        lastTouchEnd = now;
+    }, false);
+
+    // Ensure font size is 16px for inputs to prevent iOS zoom
+    document.addEventListener('DOMContentLoaded', function() {
+        const style = document.createElement('style');
+        style.textContent = `
+            @media screen and (max-width: 767px) {
+                input, select, textarea {
+                    font-size: 16px !important;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    });
+
+    (function () {
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            const usersLabels = @json($usersChartLabels);
+            const usersData   = @json($usersChartData);
+            const attLabels = @json($attChartLabels);
+            const attData   = @json($attChartData);
+
+            // Calculate responsive font sizes based on screen width
+            const getChartFontSize = () => {
+                const width = window.innerWidth;
+                if (width < 640) return 9;   // Mobile
+                if (width < 768) return 10;  // Small tablet
+                if (width < 1024) return 11; // Tablet
+                return 12;                   // Desktop
+            };
+
+            const getTooltipFontSize = () => {
+                const width = window.innerWidth;
+                if (width < 640) return 10;  // Mobile
+                if (width < 768) return 11;  // Small tablet
+                if (width < 1024) return 12; // Tablet
+                return 13;                   // Desktop
+            };
+
+            // Set initial font sizes
+            Chart.defaults.font.size = getChartFontSize();
+            Chart.defaults.plugins.tooltip.bodyFont.size = getTooltipFontSize();
+            Chart.defaults.plugins.tooltip.titleFont.size = getTooltipFontSize();
+
+            // Users chart
+            const ctxUsers = document.getElementById('usersChart');
+            if (ctxUsers) {
+                new Chart(ctxUsers.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: usersLabels,
+                        datasets: [{
+                            label: 'New users',
+                            data: usersData,
+                            fill: true,
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderColor: 'rgb(59, 130, 246)',
+                            tension: 0.3,
+                            borderWidth: 2,
+                            pointBackgroundColor: 'rgb(59, 130, 246)',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: window.innerWidth < 640 ? 3 : (window.innerWidth < 768 ? 3.5 : 4),
+                            pointHoverRadius: window.innerWidth < 640 ? 4 : (window.innerWidth < 768 ? 5 : 6)
+                        }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        responsive: true,
+                        plugins: {
+                            legend: { 
+                                display: false,
+                                labels: {
+                                    font: {
+                                        size: getChartFontSize()
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                                padding: window.innerWidth < 640 ? 8 : 10,
+                                titleFont: {
+                                    size: getTooltipFontSize()
+                                },
+                                bodyFont: {
+                                    size: getTooltipFontSize()
+                                }
+                            }
+                        },
+                        scales: {
+                            y: { 
+                                beginAtZero: true,
+                                ticks: {
+                                    font: {
+                                        size: getChartFontSize()
+                                    },
+                                    padding: window.innerWidth < 640 ? 4 : 8
+                                },
+                                grid: {
+                                    drawBorder: false
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    maxRotation: window.innerWidth < 640 ? 45 : (window.innerWidth < 768 ? 30 : 0),
+                                    font: {
+                                        size: getChartFontSize()
+                                    },
+                                    padding: window.innerWidth < 640 ? 4 : 8
+                                },
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        },
+                        interaction: {
+                            intersect: false,
+                            mode: 'nearest'
+                        },
+                        elements: {
+                            line: {
+                                tension: 0.3
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Attendance chart
+            const ctxAtt = document.getElementById('attChart');
+            if (ctxAtt) {
+                new Chart(ctxAtt.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: attLabels,
+                        datasets: [{
+                            label: 'Attendance entries',
+                            data: attData,
+                            backgroundColor: 'rgba(139, 92, 246, 0.7)',
+                            borderColor: 'rgb(139, 92, 246)',
+                            borderWidth: 1,
+                            borderRadius: window.innerWidth < 640 ? 2 : 4
+                        }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        responsive: true,
+                        plugins: {
+                            legend: { 
+                                display: false,
+                                labels: {
+                                    font: {
+                                        size: getChartFontSize()
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                                padding: window.innerWidth < 640 ? 8 : 10,
+                                titleFont: {
+                                    size: getTooltipFontSize()
+                                },
+                                bodyFont: {
+                                    size: getTooltipFontSize()
+                                }
+                            }
+                        },
+                        scales: {
+                            y: { 
+                                beginAtZero: true,
+                                ticks: {
+                                    font: {
+                                        size: getChartFontSize()
+                                    },
+                                    padding: window.innerWidth < 640 ? 4 : 8
+                                },
+                                grid: {
+                                    drawBorder: false
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    maxRotation: window.innerWidth < 640 ? 45 : (window.innerWidth < 768 ? 30 : 0),
+                                    font: {
+                                        size: getChartFontSize()
+                                    },
+                                    padding: window.innerWidth < 640 ? 4 : 8
+                                },
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        },
+                        interaction: {
+                            intersect: false,
+                            mode: 'nearest'
+                        }
+                    }
+                });
+            }
+
+            // Update chart font sizes on window resize
+            let resizeTimer;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(function() {
+                    const chartFontSize = getChartFontSize();
+                    const tooltipFontSize = getTooltipFontSize();
+                    
+                    Chart.defaults.font.size = chartFontSize;
+                    Chart.defaults.plugins.tooltip.bodyFont.size = tooltipFontSize;
+                    Chart.defaults.plugins.tooltip.titleFont.size = tooltipFontSize;
+                    
+                    // Update existing charts if any
+                    Chart.instances.forEach((chart) => {
+                        chart.options.plugins.tooltip.titleFont.size = tooltipFontSize;
+                        chart.options.plugins.tooltip.bodyFont.size = tooltipFontSize;
+                        chart.options.scales.x.ticks.font.size = chartFontSize;
+                        chart.options.scales.y.ticks.font.size = chartFontSize;
+                        chart.update('none');
+                    });
+                }, 250);
+            });
+            
+            // Handle orientation change
+            window.addEventListener('orientationchange', function() {
+                setTimeout(function() {
+                    Chart.instances.forEach((chart) => {
+                        chart.resize();
+                    });
+                }, 300);
+            });
+        });
+    })();
+</script>
+
+<!-- Additional responsive CSS for very small screens -->
+<style>
+    /* Mobile-first responsive design */
+    * {
+        -webkit-tap-highlight-color: transparent;
+        box-sizing: border-box;
+    }
+    
+    html, body {
+        overflow-x: hidden;
+        width: 100%;
+        position: relative;
+        -webkit-text-size-adjust: 100%;
+        -moz-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+        text-size-adjust: 100%;
+    }
+    
+    /* Extra small screens (less than 375px) */
+    @media (max-width: 374px) {
+        .flex-1 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+        
+        .grid-cols-2 {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            gap: 0.5rem !important;
+        }
+        
+        .p-3 {
+            padding: 0.75rem !important;
+        }
+        
+        h2 {
+            font-size: 1.125rem !important;
+        }
+        
+        h3 {
+            font-size: 0.875rem !important;
+        }
+    }
+    
+    /* Small screens (375px - 639px) */
+    @media (min-width: 375px) and (max-width: 639px) {
+        .grid-cols-2 {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            gap: 0.75rem !important;
+        }
+        
+        .p-3 {
+            padding: 0.875rem !important;
+        }
+    }
+    
+    /* Mobile optimizations */
+    @media (max-width: 639px) {
+        /* Ensure touch targets are at least 44px */
+        button, 
+        [role="button"],
+        input[type="button"],
+        input[type="submit"],
+        input[type="reset"] {
+            min-height: 44px;
+            min-width: 44px;
+        }
+        
+        /* Improve text readability */
+        p, span, div {
+            line-height: 1.5;
+        }
+        
+        /* Reduce padding on very small screens */
+        .space-y-3 > * + * {
+            margin-top: 0.5rem !important;
+        }
+        
+        /* Optimize chart containers */
+        .h-40 {
+            height: 10rem !important;
+        }
+        
+        /* Adjust card spacing */
+        .gap-3 {
+            gap: 0.5rem !important;
+        }
+        
+        /* Improve badge visibility */
+        .px-1\\.5 {
+            padding-left: 0.375rem !important;
+            padding-right: 0.375rem !important;
+        }
+        
+        .py-0\\.5 {
+            padding-top: 0.125rem !important;
+            padding-bottom: 0.125rem !important;
+        }
+    }
+    
+    /* Tablet optimizations (640px - 767px) */
+    @media (min-width: 640px) and (max-width: 767px) {
+        .sm\:p-4 {
+            padding: 1rem !important;
+        }
+        
+        .sm\:text-base {
+            font-size: 1rem !important;
+        }
+        
+        .sm\:h-48 {
+            height: 12rem !important;
+        }
+        
+        .grid-cols-2 {
+            gap: 1rem !important;
+        }
+    }
+    
+    /* Medium screens (768px - 1023px) */
+    @media (min-width: 768px) and (max-width: 1023px) {
+        .md\:p-5 {
+            padding: 1.25rem !important;
+        }
+        
+        .md\:text-xl {
+            font-size: 1.25rem !important;
+        }
+        
+        .md\:h-56 {
+            height: 14rem !important;
+        }
+        
+        .md\:gap-5 {
+            gap: 1.25rem !important;
+        }
+    }
+    
+    /* Large screens (1024px and above) */
+    @media (min-width: 1024px) {
+        .lg\:p-6 {
+            padding: 1.5rem !important;
+        }
+        
+        .lg\:text-2xl {
+            font-size: 1.5rem !important;
+        }
+        
+        .lg\:h-64 {
+            height: 16rem !important;
+        }
+        
+        .lg\:gap-6 {
+            gap: 1.5rem !important;
+        }
+    }
+    
+    /* Prevent iOS zoom on input focus */
+    @media screen and (max-width: 767px) {
+        input, select, textarea {
+            font-size: 16px !important;
+        }
+    }
+    
+    /* Smooth transitions */
+    .transition-shadow {
+        transition: box-shadow 0.2s ease-in-out;
+    }
+    
+    /* Fade-in animation */
+    .fade-in {
+        animation: fadeIn 0.3s ease-out;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Improve readability on small screens */
+    @media (max-width: 639px) {
+        .text-gray-500 {
+            font-size: 0.6875rem !important; /* 11px */
+        }
+        
+        .text-xs {
+            font-size: 0.6875rem !important; /* 11px */
+        }
+        
+        /* Adjust icon sizes for mobile */
+        .w-4 {
+            width: 1rem !important;
+        }
+        
+        .h-4 {
+            height: 1rem !important;
+        }
+        
+        /* Adjust spacing between elements */
+        .space-y-3 > * + * {
+            margin-top: 0.75rem !important;
+        }
+        
+        /* Improve card layouts */
+        .flex-1 {
+            min-width: 0; /* Prevent flex item overflow */
+        }
+        
+        /* Truncate long text */
+        .truncate {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
+    
+    /* Fix for very small height screens */
+    @media (max-height: 600px) {
+        .h-40 {
+            height: 8rem !important;
+        }
+        
+        .sm\:h-48 {
+            height: 10rem !important;
+        }
+        
+        .md\:h-56 {
+            height: 12rem !important;
+        }
+        
+        .lg\:h-64 {
+            height: 14rem !important;
+        }
+    }
+    
+    /* Ensure proper width constraints */
+    .max-w-7xl {
+        max-width: 100% !important;
+    }
+    
+    @media (min-width: 640px) {
+        .max-w-7xl {
+            max-width: 640px !important;
+        }
+    }
+    
+    @media (min-width: 768px) {
+        .max-w-7xl {
+            max-width: 768px !important;
+        }
+    }
+    
+    @media (min-width: 1024px) {
+        .max-w-7xl {
+            max-width: 1024px !important;
+        }
+    }
+    
+    @media (min-width: 1280px) {
+        .max-w-7xl {
+            max-width: 1280px !important;
+        }
+    }
+    
+    @media (min-width: 1536px) {
+        .max-w-7xl {
+            max-width: 1536px !important;
+        }
+    }
+</style>
 @endsection

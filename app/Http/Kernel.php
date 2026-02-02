@@ -17,7 +17,6 @@ class Kernel extends HttpKernel
 
     protected $middlewareGroups = [
         'web' => [
-            // \App\Http\Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
@@ -31,15 +30,19 @@ class Kernel extends HttpKernel
         ],
     ];
 
-    protected $routeMiddleware = [
+    // ✅ Laravel 10+ uses THIS
+    protected $middlewareAliases = [
         'auth' => \App\Http\Middleware\Authenticate::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
 
-        // Spatie middlewares
+        // Spatie
         'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
         'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
         'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+
+        // ✅ Your custom middleware
+        'company.access' => \App\Http\Middleware\CheckCompanyAccess::class,
     ];
 }

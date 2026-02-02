@@ -1,0 +1,116 @@
+[
+    {
+        "title": "Makar Sankranti",
+        "date": "2025-01-14",
+        "category": "Indian Festival",
+        "description": "Harvest festival celebrated across India"
+    },
+    {
+        "title": "Republic Day",
+        "date": "2025-01-26",
+        "category": "National Holiday",
+        "description": "Indian Republic Day"
+    },
+    {
+        "title": "Maha Shivratri",
+        "date": "2025-02-26",
+        "category": "Indian Festival",
+        "description": "Festival dedicated to Lord Shiva"
+    },
+    {
+        "title": "Holi",
+        "date": "2025-03-14",
+        "category": "Indian Festival",
+        "description": "Festival of Colors"
+    },
+    {
+        "title": "Ram Navami",
+        "date": "2025-04-06",
+        "category": "Indian Festival",
+        "description": "Birth of Lord Rama"
+    },
+    {
+        "title": "Eid al-Fitr",
+        "date": "2025-03-31",
+        "category": "Indian Festival",
+        "description": "Muslim festival marking end of Ramadan"
+    },
+    {
+        "title": "Raksha Bandhan",
+        "date": "2025-08-09",
+        "category": "Indian Festival",
+        "description": "Celebration of brother-sister bond"
+    },
+    {
+        "title": "Janmashtami",
+        "date": "2025-08-16",
+        "category": "Indian Festival",
+        "description": "Birth of Lord Krishna"
+    },
+    {
+        "title": "Ganesh Chaturthi",
+        "date": "2025-08-27",
+        "category": "Indian Festival",
+        "description": "Festival of Lord Ganesha"
+    },
+    {
+        "title": "Gandhi Jayanti",
+        "date": "2025-10-02",
+        "category": "National Holiday",
+        "description": "Birth anniversary of Mahatma Gandhi"
+    },
+    {
+        "title": "Dussehra",
+        "date": "2025-10-12",
+        "category": "Indian Festival",
+        "description": "Victory of good over evil"
+    },
+    {
+        "title": "Diwali",
+        "date": "2025-10-20",
+        "category": "Indian Festival",
+        "description": "Festival of Lights"
+    },
+    {
+        "title": "Bhai Dooj",
+        "date": "2025-10-22",
+        "category": "Indian Festival",
+        "description": "Celebration of sibling bond"
+    },
+    {
+        "title": "Christmas",
+        "date": "2025-12-25",
+        "category": "Indian Festival",
+        "description": "Christian festival celebrating the birth of Jesus"
+    },
+    {
+        "title": "holi",
+        "date": "2025-12-18",
+        "category": "Indian Festival",
+        "description": "Harvest festival celebrated across India"
+    },
+     {
+        "title": "Diwali",
+        "date": "2025-12-21",
+        "category": "Indian Festival",
+        "description": "Harvest festival celebrated across India"
+    },
+     {
+        "title": "Diwali",
+        "date": "2026-02-15",
+        "category": "Indian Festival",
+        "description": "Harvest festival celebrated across India"
+    },
+     {
+        "title": "new year",
+        "date": "2026-01-01",
+        "category": "Indian Festival",
+        "description": "Harvest festival celebrated across India"
+    },
+     {
+        "title": "rahul ka birthday",
+        "date": "2026-11-15",
+        "category": "Indian Festival",
+        "description": "Harvest festival celebrated across India"
+    }
+]

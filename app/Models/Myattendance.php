@@ -1,60 +1,116 @@
 <?php
+// app/Models/MyAttendance.php
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Myattendance extends Model
+class MyAttendance extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
+         'company_id',
+        'employee_id',
         'date',
-        'check_in',
-        'check_out',
+        'punch_in',
+        'punch_out',
+        'lunch_start',
+        'lunch_end',
+        'work_hours',
+        'break_hours',
+        'location',
+        'latitude',
+        'longitude',
+        'accuracy',
+        'distance',
+        'is_within_range',
         'status',
-        'break_time',
-        'late_minutes',
-        'overtime_minutes',
-        'production_hours',
-        'total_hours'
+        'overtime_seconds',
     ];
 
     protected $casts = [
         'date' => 'date',
-        'check_in' => 'datetime',
-        'check_out' => 'datetime',
+        'punch_in' => 'datetime',
+        'punch_out' => 'datetime',
+        'lunch_start' => 'datetime',
+        'lunch_end' => 'datetime',
+        'is_within_range' => 'boolean',
+        'distance' => 'decimal:2',
+        'accuracy' => 'decimal:2',
+        'latitude' => 'decimal:8',
+        'longitude' => 'decimal:8',
     ];
 
-    public function user()
+
+      protected static function booted()
     {
-        return $this->belongsTo(User::class);
+        static::creating(function ($attendance) {
+            if (auth()->check()) {
+                $attendance->company_id = auth()->user()->company_id;
+            }
+        });
     }
 
-    // Calculate production hours
-    public function getProductionHoursAttribute($value)
+    // Relationship: Belongs to Employee
+    public function employee()
     {
-        if ($this->check_in && $this->check_out) {
-            $totalMinutes = $this->check_out->diffInMinutes($this->check_in);
-            $breakMinutes = $this->break_time ? (int)$this->break_time : 0;
-            $productionMinutes = $totalMinutes - $breakMinutes;
-            
-            return floor($productionMinutes / 60) . 'h ' . ($productionMinutes % 60) . 'm';
-        }
-        
-        return $value;
+        return $this->belongsTo(User::class, 'employee_id');
     }
 
-    // Calculate total hours
-    public function getTotalHoursAttribute($value)
+    // Scope for current month
+    public function scopeForMonth($query, $month, $year = null)
     {
-        if ($this->check_in && $this->check_out) {
-            $totalMinutes = $this->check_out->diffInMinutes($this->check_in);
-            return floor($totalMinutes / 60) . 'h ' . ($totalMinutes % 60) . 'm';
-        }
-        
-        return $value;
+        $year = $year ?? now()->year;
+        return $query->whereYear('date', $year)->whereMonth('date', $month);
     }
+
+    // Calculate work hours
+    // public function getCalculatedWorkHoursAttribute()
+    // {
+    //     if (!$this->punch_in || !$this->punch_out) return '00:00';
+
+    //     $total = $this->punch_out->diffInSeconds($this->punch_in);
+    //     if ($this->lunch_start && $this->lunch_end) {
+    //         $break = $this->lunch_end->diffInSeconds($this->lunch_start);
+    //         $total -= $break;
+    //     }
+
+    //     $hours = floor($total / 3600);
+    //     $minutes = floor(($total % 3600) / 60);
+    //     return sprintf('%02d:%02d', $hours, $minutes);
+    // }
+
+    // Calculate break hours
+    public function getCalculatedBreakHoursAttribute()
+    {
+        if (!$this->lunch_start || !$this->lunch_end) return '00:00';
+
+        $break = $this->lunch_end->diffInSeconds($this->lunch_start);
+        $hours = floor($break / 3600);
+        $minutes = floor(($break % 3600) / 60);
+        return sprintf('%02d:%02d', $hours, $minutes);
+    }
+
+    // In MyAttendance.php model
+public function breaks()
+{
+    return $this->hasMany(MyAttendanceBreak::class, 'attendance_id');
+}
+
+public function getTotalBreakSecondsAttribute()
+{
+    return $this->breaks->sum('break_seconds');
+}
+
+public function getCalculatedWorkHoursAttribute()
+{
+    if (!$this->punch_in || !$this->punch_out) return '00:00';
+
+    $total = $this->punch_out->diffInSeconds($this->punch_in);
+    $total -= $this->total_break_seconds; // Subtract all breaks
+
+    return gmdate('H:i', max($total, 0));
+}
 }

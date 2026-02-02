@@ -17,18 +17,18 @@ class LoginController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'name' => 'required|string',
+            'email' => 'required|email',
             'password' => 'required|string',
         ]);
 
         if (Auth::attempt($credentials, $request->filled('remember'))) {
             $request->session()->regenerate();
 
-            return redirect()->intended('/dashboard');
+            return redirect()->route('dashboard')->with('showWelcome', true);
         }
 
         return back()->withErrors([
-            'name' => 'The provided credentials do not match our records.',
+            'email' => 'The provided credentials do not match our records.',
         ])->withInput()->with('form', 'login');
     }
 
@@ -39,6 +39,6 @@ class LoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect('/login');
     }
 }

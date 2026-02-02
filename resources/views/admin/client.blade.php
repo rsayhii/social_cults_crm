@@ -36,50 +36,133 @@
 <!-- Import Modal -->
 <div id="import-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
     <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+        
+        <!-- Header -->
         <div class="flex items-center justify-between p-6 border-b">
             <h3 class="text-lg font-semibold text-slate-900">Import Clients from Excel</h3>
             <button id="close-import-modal" class="text-slate-400 hover:text-slate-600">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
                     <path d="M18 6 6 18"></path>
                     <path d="m6 6 12 12"></path>
                 </svg>
             </button>
         </div>
-        
+
+        <!-- Form -->
         <form id="import-form" enctype="multipart/form-data">
             @csrf
+
             <div class="p-6 space-y-4">
+
+                <!-- File Upload -->
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Excel/CSV File</label>
-                    <input type="file" name="excel_file" id="excel_file" accept=".xlsx,.xls,.csv" 
-                           class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" required>
-                    <p class="text-xs text-slate-500 mt-2">Supported formats: .xlsx, .xls, .csv</p>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">
+                        Excel / CSV File
+                    </label>
+
+                    <input type="file"
+                           name="excel_file"
+                           id="excel_file"
+                           accept=".xlsx,.xls,.csv"
+                           class="block w-full text-sm text-slate-500
+                                  file:mr-4 file:py-2 file:px-4
+                                  file:rounded-full file:border-0
+                                  file:text-sm file:font-semibold
+                                  file:bg-indigo-50 file:text-indigo-700
+                                  hover:file:bg-indigo-100"
+                           required>
+
+                    <div class="flex justify-between items-center mt-2">
+                        <p class="text-xs text-slate-500">
+                            Supported formats: .xlsx, .xls, .csv
+                        </p>
+
+                        <!-- Sample File Download -->
+                        <a href="{{ asset('samples/clients_import_sample.csv') }}"
+                           download
+                           class="text-xs font-medium text-indigo-600 hover:text-indigo-800">
+                            Download Sample File
+                        </a>
+                    </div>
                 </div>
-                
-                <div class="bg-slate-50 p-4 rounded-lg">
-                    <h4 class="text-sm font-medium text-slate-700 mb-2">Expected Columns:</h4>
-                    <ul class="text-xs text-slate-600 space-y-1">
-                        <li><strong>Required:</strong> company_name, contact_person, email</li>
-                        <li><strong>Optional:</strong> phone, status, priority, industry, budget, source, next_follow_up, notes</li>
-                    </ul>
-                </div>
+
+                <!-- Expected Columns -->
+<div class="bg-slate-50 border border-slate-200 p-4 rounded-lg text-xs text-slate-600 space-y-3">
+
+    <div>
+        <p class="font-semibold text-slate-800 mb-1">Required Columns</p>
+        <div class="flex flex-wrap gap-2">
+            <span class="px-2 py-1 bg-red-100 text-red-700 rounded">company_name</span>
+            <span class="px-2 py-1 bg-red-100 text-red-700 rounded">contact_person</span>
+            <span class="px-2 py-1 bg-red-100 text-red-700 rounded">email</span>
+        </div>
+    </div>
+
+    <div>
+        <p class="font-semibold text-slate-800 mb-1">Optional Columns</p>
+        <div class="flex flex-wrap gap-2">
+            <span class="px-2 py-1 bg-slate-200 text-slate-700 rounded">phone</span>
+            <span class="px-2 py-1 bg-slate-200 text-slate-700 rounded">status</span>
+            <span class="px-2 py-1 bg-slate-200 text-slate-700 rounded">priority</span>
+            <span class="px-2 py-1 bg-slate-200 text-slate-700 rounded">industry</span>
+            <span class="px-2 py-1 bg-slate-200 text-slate-700 rounded">budget</span>
+            <span class="px-2 py-1 bg-slate-200 text-slate-700 rounded">source</span>
+            <span class="px-2 py-1 bg-slate-200 text-slate-700 rounded">next_follow_up</span>
+            <span class="px-2 py-1 bg-slate-200 text-slate-700 rounded">notes</span>
+        </div>
+    </div>
+
+    <div class="flex items-start gap-2 text-slate-500">
+        <span>⚠️</span>
+        <p>
+            Column names must <strong>match exactly</strong> as shown in the sample file.
+            Extra or renamed columns may cause rows to be skipped.
+        </p>
+    </div>
+
+</div>
+
             </div>
-            
+
+            <!-- Footer -->
             <div class="flex justify-end gap-3 p-6 border-t">
-                <button type="button" id="cancel-import" class="px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900">
+                <button type="button"
+                        id="cancel-import"
+                        class="px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900">
                     Cancel
                 </button>
-                <button type="submit" id="submit-import" class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md shadow-lg shadow-green-500/30">
-                    <svg id="import-spinner" class="hidden animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+
+                <button type="submit"
+                        id="submit-import"
+                        class="inline-flex items-center px-4 py-2
+                               bg-green-600 hover:bg-green-700
+                               text-white text-sm font-medium
+                               rounded-md shadow-lg shadow-green-500/30">
+
+                    <svg id="import-spinner"
+                         class="hidden animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                         xmlns="http://www.w3.org/2000/svg" fill="none"
+                         viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10"
+                                stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0
+                                 C5.373 0 0 5.373 0 12h4
+                                 zm2 5.291A7.962 7.962 0 014 12H0
+                                 c0 3.042 1.135 5.824 3 7.938
+                                 l3-2.647z"></path>
                     </svg>
+
                     Import Clients
                 </button>
             </div>
+
         </form>
     </div>
 </div>
+
             <!-- Search and Filter -->
             <div class="flex flex-col lg:flex-row gap-3 lg:gap-4">
                 <div class="relative flex-1">
@@ -173,27 +256,37 @@
         </svg>
     </button>
 
-    <!-- Dropdown Menu -->
-    <div
-        id="client-options-menu-{{ $client->id }}"
-        class="absolute right-0 mt-2 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10 hidden"
-        role="menu"
-        aria-orientation="vertical"
-        aria-labelledby="toggle-client-options-{{ $client->id }}"
-    >
-        <div class="py-1" role="none">
-            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 edit-client-btn" data-client-id="{{ $client->id }}" role="menuitem">
-                Edit Lead
-            </a>
-            @if($client->leadAction)
-            <a href="{{ route('myleads.edit', $client->leadAction->id) }}" 
-   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" 
-   role="menuitem">
-    Edit Taken Action
-</a>
-            @endif
-        </div>
+<!-- Dropdown Menu -->
+<div
+    id="client-options-menu-{{ $client->id }}"
+    class="absolute right-0 mt-2 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10 hidden"
+    role="menu"
+    aria-orientation="vertical"
+    aria-labelledby="toggle-client-options-{{ $client->id }}"
+>
+    <div class="py-1" role="none">
+        <a href="{{ route('clients.edit', $client->id) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
+            Edit Lead
+        </a>
+        @if($client->leadAction)
+        <a href="{{ route('myleads.edit', $client->leadAction->id) }}"
+           class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+           role="menuitem">
+            Edit Taken Action
+        </a>
+        @endif
+        
+        <!-- Delete Option - Only for Admin -->
+        @if(auth()->user()->hasRole('admin'))
+        <button type="button" onclick="openDeleteModal('{{ $client->id }}', '{{ addslashes($client->company_name) }}', '{{ route('clients.destroy', $client->id) }}')"
+                class="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700" role="menuitem">
+            Delete Client
+        </button>
+        @endif
     </div>
+</div>
+
+
 </div>
 
 
@@ -313,7 +406,10 @@
             <div class="pt-3 border-t border-slate-200">
                 <p class="text-xs text-slate-500">Lead Source</p>
                 <p class="text-lg font-semibold text-slate-900">{{ $client->source }}</p>
+                <p class="text-xs text-slate-500"> <strong>Notes:</strong> {{ $client->notes }}</p>
             </div>
+
+
 
         <!-- Take Action Button -->
 @if($client->leadAction)
@@ -355,6 +451,63 @@
 </div>
         </div>
     </div>
+
+
+    
+
+            <!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 hidden">
+    <div class="relative top-20 mx-auto p-4 w-full max-w-md">
+        <div class="relative bg-white rounded-lg shadow-xl">
+            <!-- Modal Header -->
+            <div class="flex items-start justify-between p-5 border-b rounded-t">
+                <h3 class="text-lg sm:text-xl font-semibold text-gray-900">
+                    Confirm Delete
+                </h3>
+                <button type="button" onclick="closeDeleteModal()"
+                    class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Modal Body -->
+            <div class="p-6">
+                <div class="flex items-center mb-4">
+                    <div class="flex-shrink-0 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.998-.833-2.732 0L4.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm sm:text-base font-medium text-gray-900">Delete Client/Lead</p>
+                        <p class="text-sm text-gray-500 mt-1">This action cannot be undone.</p>
+                    </div>
+                </div>
+                
+                <p class="text-sm text-gray-600 mb-2">You are about to delete: <span id="clientToDeleteName" class="font-semibold text-gray-900"></span></p>
+                <p class="text-xs text-gray-500">All client data will be permanently removed from the system.</p>
+            </div>
+            
+            <!-- Modal Footer -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-end p-6 border-t border-gray-200 space-y-3 sm:space-y-0 sm:space-x-3">
+                <button type="button" onclick="closeDeleteModal()"
+                    class="w-full sm:w-auto px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors">
+                    Cancel
+                </button>
+                <form id="deleteForm" method="POST" class="w-full sm:w-auto">
+                    @csrf @method('DELETE')
+                    <button type="submit"
+                        class="w-full px-4 py-2.5 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors">
+                        Delete Client
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
     {{-- take action form --}}
@@ -524,24 +677,53 @@
 
                     <!-- Contact Person -->
                     <div class="space-y-2">
-                        <label for="contact_person" class="text-sm font-medium text-gray-700">Contact Person *</label>
-                        <input id="contact_person" name="contact_person" type="text" required
-                            class="w-full h-10 px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
+                        <label for="contact_person" class="text-sm font-medium text-gray-700">
+                            Contact Person *
+                        </label>
+                        <input
+                            id="contact_person"
+                            name="contact_person"
+                            type="text"
+                            required
+                            minlength="3"
+                            pattern="[A-Za-z ]+"
+                            placeholder="Enter full name"
+                            class="w-full h-10 px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                        />
                     </div>
+
 
                     <!-- Email -->
                     <div class="space-y-2">
                         <label for="email" class="text-sm font-medium text-gray-700">Email *</label>
-                        <input id="email" name="email" type="email" required
-                            class="w-full h-10 px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
+                        <input
+                            id="email"
+                            name="email"
+                            type="email"
+                            required
+                            pattern="^[a-zA-Z0-9._%+-]+@gmail\.com$"
+                            placeholder="example@gmail.com"
+                            class="w-full h-10 px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                        />
                     </div>
+
 
                     <!-- Phone -->
                     <div class="space-y-2">
                         <label for="phone" class="text-sm font-medium text-gray-700">Phone</label>
-                        <input id="phone" name="phone" type="tel"
-                            class="w-full h-10 px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
+                        <input
+                            id="phone"
+                            name="phone"
+                            type="tel"
+                            minlength="10"
+                            maxlength="10"
+                            pattern="[0-9]{10}"
+                            required
+                            placeholder="Enter 10-digit number"
+                            class="w-full h-10 px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                        />
                     </div>
+
 
                     <!-- Status -->
                     <div class="space-y-2">
@@ -704,7 +886,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Filter functionality
     filterBtns.forEach(btn => {
         btn.addEventListener('click', function() {
-            filterBtns.forEach(b => b.classList.remove('active', 'bg-white', 'text-slate-900', 'shadow-sm'));
+            filterBtns.forEach(b => b.classList.remove('active', 'bg-blue-100', 'text-blue-900', 'shadow-sm'));
             filterBtns.forEach(b => b.classList.add('text-slate-600'));
             
             this.classList.add('active', 'bg-white', 'text-slate-900', 'shadow-sm');
@@ -717,46 +899,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Open modal for editing client
     // Use event delegation on document (works for dynamic elements)
-document.addEventListener('click', function(e) {
-    const editBtn = e.target.closest('.edit-client-btn');
-    if (!editBtn) return;
 
-    e.preventDefault(); // Prevent # href navigation
-
-    const clientId = editBtn.getAttribute('data-client-id');
-    if (!clientId) return;
-
-    fetch(`/clients/${clientId}`)
-        .then(response => {
-            if (!response.ok) throw new Error('Client not found');
-            return response.json();
-        })
-        .then(client => {
-            // Populate form
-            document.getElementById('client_id').value = client.id;
-            document.getElementById('company_name').value = client.company_name || '';
-            document.getElementById('contact_person').value = client.contact_person || '';
-            document.getElementById('email').value = client.email || '';
-            document.getElementById('phone').value = client.phone || '';
-            document.getElementById('status').value = client.status || 'lead';
-            document.getElementById('priority').value = client.priority || 'medium';
-            document.getElementById('industry').value = client.industry || '';
-            document.getElementById('source').value = client.source || 'website';
-            document.getElementById('next_follow_up').value = client.next_follow_up || '';
-            document.getElementById('notes').value = client.notes || '';
-
-            // Update UI
-            document.getElementById('modal-title').textContent = 'Edit Client';
-            document.getElementById('submit-btn').textContent = 'Update Client';
-
-            // Show modal
-            document.getElementById('client-modal').classList.remove('hidden');
-        })
-        .catch(err => {
-            console.error('Error:', err);
-            showToast('Failed to load client data');
-        });
-});
 
     // Open modal for adding new client
     addClientBtn.addEventListener('click', function() {
@@ -1092,6 +1235,274 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             showToast('Error: ' + msg);
         });
+    });
+});
+</script>
+
+
+<script>
+    // Delete Modal Functions
+function openDeleteModal(clientId, clientName, deleteUrl) {
+    const modal = document.getElementById('deleteModal');
+    const form = document.getElementById('deleteForm');
+    const clientNameSpan = document.getElementById('clientToDeleteName');
+    
+    // Set the client name in the modal
+    clientNameSpan.textContent = clientName;
+    
+    // Update the form action with the correct URL
+    form.action = deleteUrl;
+    
+    // Show the modal
+    modal.classList.remove('hidden');
+    document.body.classList.add('overflow-hidden');
+}
+
+function closeDeleteModal() {
+    const modal = document.getElementById('deleteModal');
+    
+    // Hide the modal
+    modal.classList.add('hidden');
+    document.body.classList.remove('overflow-hidden');
+}
+
+// Handle delete form submission
+// Update your delete form submission handler
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteForm = document.getElementById('deleteForm');
+    if (deleteForm) {
+        deleteForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const form = this;
+            const deleteUrl = form.action;
+            const clientId = deleteUrl.split('/').pop(); // Extract ID from URL
+            
+            console.log('Delete URL:', deleteUrl);
+            console.log('Extracted Client ID:', clientId);
+            
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Deleting...';
+            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            
+            // Create FormData
+            const formData = new FormData(form);
+            
+            fetch(deleteUrl, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                if (!response.ok) {
+                    return response.json().then(err => { 
+                        console.error('Server error response:', err);
+                        throw new Error(err.message || `Server error: ${response.status}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Delete success response:', data);
+                
+                if (data.success) {
+                    // Show success message
+                    showToast('Client deleted successfully!');
+                    closeDeleteModal();
+                    
+                    // Remove the deleted card from DOM
+                    setTimeout(() => {
+                        const clientCard = document.querySelector(`.client-card[data-client-id="${clientId}"]`);
+                        if (clientCard) {
+                            clientCard.style.transition = 'all 0.3s ease';
+                            clientCard.style.opacity = '0';
+                            clientCard.style.transform = 'translateX(-100%)';
+                            clientCard.style.height = '0';
+                            clientCard.style.margin = '0';
+                            clientCard.style.padding = '0';
+                            clientCard.style.border = '0';
+                            clientCard.style.overflow = 'hidden';
+                            
+                            setTimeout(() => {
+                                clientCard.remove();
+                                // Check if no clients left
+                                const remainingCards = document.querySelectorAll('.client-card');
+                                if (remainingCards.length === 0) {
+                                    console.log('No clients left, reloading page...');
+                                    location.reload();
+                                }
+                            }, 300);
+                        } else {
+                            console.log('Client card not found in DOM, reloading page...');
+                            location.reload();
+                        }
+                    }, 500);
+                } else {
+                    throw new Error(data.message || 'Delete failed');
+                }
+            })
+            .catch(error => {
+                console.error('Delete error details:', error);
+                
+                // Check if it's a 404 error (client not found)
+                if (error.message.includes('No query results') || error.message.includes('not found')) {
+                    // showToast('Client not found or already deleted.', 'error');
+                    // Remove the card anyway since it doesn't exist
+                    const clientCard = document.querySelector(`.client-card[data-client-id="${clientId}"]`);
+                    if (clientCard) {
+                        clientCard.remove();
+                    }
+                } else {
+                    showToast('Error: ' + error.message, 'error');
+                }
+            })
+            .finally(() => {
+                // Reset button state
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Delete Client';
+                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            });
+        });
+    }
+});
+
+// Close delete modal when clicking outside
+document.getElementById('deleteModal')?.addEventListener('click', function(e) {
+    if (e.target.id === 'deleteModal') {
+        closeDeleteModal();
+    }
+});
+
+// Close delete modal with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        const deleteModal = document.getElementById('deleteModal');
+        if (!deleteModal.classList.contains('hidden')) {
+            closeDeleteModal();
+        }
+    }
+});
+
+// Updated showToast function that works for both success and error
+function showToast(message, type = 'success') {
+    // Create or get toast element
+    let toast = document.getElementById('global-toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'global-toast';
+        toast.className = 'fixed top-4 right-4 z-[100] px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300';
+        document.body.appendChild(toast);
+    }
+    
+    // Set color based on type
+    toast.className = toast.className.replace('bg-red-500', '').replace('bg-green-500', '');
+    toast.className += type === 'success' ? ' bg-green-500 text-white' : ' bg-red-500 text-white';
+    
+    // Set message with icon
+    const icon = type === 'success' ? 
+        '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>' :
+        '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg>';
+    
+    toast.innerHTML = `<div class="flex items-center">${icon}${message}</div>`;
+    
+    // Show toast
+    toast.classList.remove('translate-x-full');
+    
+    // Auto-hide after 3 seconds
+    setTimeout(() => {
+        toast.classList.add('translate-x-full');
+    }, 3000);
+}
+</script>
+
+
+<style>
+    /* Delete Modal Styles */
+#deleteModal {
+    transition: opacity 0.3s ease;
+}
+
+#deleteModal > div {
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Prevent body scrolling when modal is open */
+body.overflow-hidden {
+    overflow: hidden;
+}
+</style>
+
+<script>
+    // Handle delete form submission
+document.getElementById('deleteForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const form = this;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    
+    // Show loading state
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Deleting...';
+    
+    fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => { throw err; });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            showToast(data.message);
+            closeDeleteModal();
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            throw new Error(data.message || 'Delete failed');
+        }
+    })
+    .catch(error => {
+        console.error('Delete error:', error);
+        let errorMsg = 'Error deleting client';
+        if (error.message) {
+            errorMsg = error.message;
+        } else if (error.errors) {
+            errorMsg = Object.values(error.errors).flat().join(', ');
+        }
+        showToast('Error: ' + errorMsg);
+    })
+    .finally(() => {
+        // Reset button state
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
     });
 });
 </script>

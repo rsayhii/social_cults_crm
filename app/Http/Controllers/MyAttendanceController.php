@@ -2,258 +2,844 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Myattendance;
+use App\Models\MyAttendance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
+ use Illuminate\Support\Facades\Schema;
 
 class MyAttendanceController extends Controller
 {
-    public function index(Request $request)
-    {
-        $user = Auth::user();
-        $now = Carbon::now('Asia/Kolkata');
-        $currentDate = $now->format('Y-m-d');
-        $currentDateTime = $now->format('h:i A, d M Y');
+     const OFFICE_LAT = 28.618711;
+    const OFFICE_LON = 77.389686;
+    const ALLOWED_DISTANCE_KM = 1;
 
-        // Today's attendance
-        $todayAttendance = Myattendance::where('user_id', $user->id)
-            ->where('date', $currentDate)
-            ->first();
+    private function baseQuery()
+{
+    return MyAttendance::where('company_id', auth()->user()->company_id);
+}
 
-        $todayTotalHours = 0;
-        $todayProductiveHours = 0;
 
-        if ($todayAttendance && $todayAttendance->check_in && $todayAttendance->check_out) {
-            $checkIn = Carbon::parse($todayAttendance->check_in, 'Asia/Kolkata');
-            $checkOut = Carbon::parse($todayAttendance->check_out, 'Asia/Kolkata');
-            $totalMinutes = $checkOut->diffInMinutes($checkIn);
-            $todayTotalHours = round($totalMinutes / 60, 2);
-            $breakMinutes = $todayAttendance->break_time ?? 0;
-            $productiveMinutes = max(0, $totalMinutes - $breakMinutes);
-            $todayProductiveHours = round($productiveMinutes / 60, 2);
+   public function index(Request $request)
+{
+    try {
+        $employee = Auth::user();
+        if (!$employee) {
+            abort(403, 'Authentication required.');
         }
 
-        // Filters
-        $query = Myattendance::where('user_id', $user->id);
+        $employeeId = $employee->id;
+        $today = Carbon::today('Asia/Kolkata');
 
-        if ($request->filled('date_range')) {
-            $dates = explode(' - ', $request->date_range);
-            if (count($dates) == 2) {
-                try {
-                    $startDate = Carbon::createFromFormat('d/m/Y', trim($dates[0]), 'Asia/Kolkata')->format('Y-m-d');
-                    $endDate = Carbon::createFromFormat('d/m/Y', trim($dates[1]), 'Asia/Kolkata')->format('Y-m-d');
-                    $query->whereBetween('date', [$startDate, $endDate]);
-                } catch (\Exception $e) {
-                    $startDate = $now->startOfMonth()->format('Y-m-d');
-                    $endDate = $now->endOfMonth()->format('Y-m-d');
-                    $query->whereBetween('date', [$startDate, $endDate]);
-                }
+        /* ──────────────────────────────
+         | PROFILE DATA
+         ────────────────────────────── */
+        $profile = [
+            'name' => $employee->name ?? 'Employee',
+            'role' => $employee->role ?? 'Employee',
+            'company' => $employee->company ?? 'Company',
+            'employee_id' => $employee->employee_id ?? 'EMP-001',
+            'department' => $employee->department ?? 'General',
+            'join_date' => $employee->join_date
+                ? Carbon::parse($employee->join_date)->format('d M Y')
+                : 'N/A',
+            'avatar' => $employee->avatar
+                ?? 'https://ui-avatars.com/api/?name=' . urlencode($employee->name),
+        ];
+
+        /* ──────────────────────────────
+         | TODAY RECORD
+         ────────────────────────────── */
+        $todayRecord = $this->baseQuery()
+    ->where('employee_id', $employeeId)
+    ->where('date', $today->format('Y-m-d'))
+    ->with('breaks')
+    ->first();
+
+
+        /* ──────────────────────────────
+         | JS DATA
+         ────────────────────────────── */
+        $jsAttendanceData = [
+            'punchIn' => $todayRecord?->punch_in,
+            'punchOut' => $todayRecord?->punch_out,
+            'breakRunning' => $todayRecord
+                ? $todayRecord->breaks()->whereNull('break_out')->exists()
+                : false,
+        ];
+
+        /* ──────────────────────────────
+         | MONTHLY DATA
+         ────────────────────────────── */
+        $currentMonth = $request->get('month', $today->month);
+        $currentYear  = $today->year;
+
+       $monthRecords = $this->baseQuery()
+    ->where('employee_id', $employeeId)
+    ->whereYear('date', $currentYear)
+    ->whereMonth('date', $currentMonth)
+    ->with('breaks')
+    ->get();
+
+
+        $presentDays = $monthRecords->where('status', 'Present')->count();
+        $absentDays  = $monthRecords->where('status', 'Absent')->count();
+        $totalDays   = $monthRecords->count();
+
+        $attendancePercentage = $totalDays > 0
+            ? round(($presentDays / $totalDays) * 100)
+            : 0;
+
+        /* ──────────────────────────────
+         | 🔧 FIX-2: MONTHLY WORK HOURS
+         ────────────────────────────── */
+        $totalWorkSeconds = 0;
+
+        foreach ($monthRecords as $record) {
+            if ($record->punch_in && $record->punch_out) {
+
+                $workedSeconds = Carbon::parse($record->punch_out)
+                    ->diffInSeconds(Carbon::parse($record->punch_in));
+
+                $breakSeconds = $record->breaks()->sum('break_seconds');
+
+                $netSeconds = max(0, $workedSeconds - $breakSeconds);
+
+                $totalWorkSeconds += $netSeconds;
             }
-        } else {
-            $startDate = $now->startOfMonth()->format('Y-m-d');
-            $endDate = $now->endOfMonth()->format('Y-m-d');
-            $query->whereBetween('date', [$startDate, $endDate]);
         }
 
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
+        $totalHours = gmdate('H:i', $totalWorkSeconds);
+
+        /* ──────────────────────────────
+         | 🔧 FIX-3: TODAY PROGRESS
+         ────────────────────────────── */
+        $todayProgress = 0;
+
+        if ($todayRecord && $todayRecord->punch_in) {
+            $start = Carbon::parse($todayRecord->punch_in);
+            $end = $todayRecord->punch_out
+                ? Carbon::parse($todayRecord->punch_out)
+                : Carbon::now('Asia/Kolkata');
+
+            $workedSeconds = $end->diffInSeconds($start);
+            $breakSeconds  = $todayRecord->breaks()->sum('break_seconds');
+
+            $netSeconds = max(0, $workedSeconds - $breakSeconds);
+
+            // 8 hours = 28800 seconds
+            $todayProgress = min(($netSeconds / 28800) * 100, 100);
         }
 
-        $query->orderBy('date', 'desc');
-        $attendance = $query->paginate($request->per_page ?? 10);
+        /* ──────────────────────────────
+         | ATTENDANCE LOG
+         ────────────────────────────── */
+        $attendanceLog = $monthRecords->map(function ($record) {
 
-        // Monthly stats
-        $currentMonth = $now->month;
-        $currentYear = $now->year;
+            $breaksFormatted = $record->breaks->map(function ($b) {
+                $in  = Carbon::parse($b->break_in)->format('h:i A');
+                $out = $b->break_out
+                    ? Carbon::parse($b->break_out)->format('h:i A')
+                    : 'Running';
 
-        $monthlyStats = Myattendance::where('user_id', $user->id)
-            ->whereYear('date', $currentYear)
-            ->whereMonth('date', $currentMonth)
-            ->get();
+                return "$in - $out";
+            });
 
-        $totalPresent = $monthlyStats->where('status', 'Present')->count();
-        $totalAbsent = $monthlyStats->where('status', 'Absent')->count();
+            return [
+                'date'       => $record->date->format('d-m-Y'),
+                'punchIn'    => optional($record->punch_in)->format('h:i A') ?? '--',
+                'punchOut'   => optional($record->punch_out)->format('h:i A') ?? '--',
+                'workHours'  => $record->work_hours ?? '--',
+                'breaks'     => $breaksFormatted->values(),
+                'totalBreak' => gmdate('H:i', $record->breaks->sum('break_seconds')),
+                'status'     => $record->status,
+            ];
+        });
 
-        $totalMonthlyHours = 0;
-        foreach ($monthlyStats as $record) {
-            if ($record->check_in && $record->check_out) {
-                $in = Carbon::parse($record->check_in, 'Asia/Kolkata');
-                $out = Carbon::parse($record->check_out, 'Asia/Kolkata');
-                $totalMonthlyHours += $out->diffInHours($in);
-            }
+        /* ──────────────────────────────
+         | TODAY TOTAL BREAK
+         ────────────────────────────── */
+        $todayBreakDuration = '00:00';
+
+        if ($todayRecord) {
+            $todayBreakSeconds = $todayRecord->breaks()->sum('break_seconds');
+            $todayBreakDuration = gmdate('H:i', $todayBreakSeconds);
         }
-
-        $totalLate = $monthlyStats->sum('late_minutes');
-        $totalOvertime = $monthlyStats->sum('overtime_minutes');
-
-        // Weekly stats
-        $weekStart = $now->copy()->startOfWeek();
-        $weekEnd = $now->copy()->endOfWeek();
-
-        $weeklyStats = Myattendance::where('user_id', $user->id)
-            ->whereBetween('date', [$weekStart->format('Y-m-d'), $weekEnd->format('Y-m-d')])
-            ->get();
-
-        $weeklyHours = 0;
-        foreach ($weeklyStats as $record) {
-            if ($record->check_in && $record->check_out) {
-                $in = Carbon::parse($record->check_in, 'Asia/Kolkata');
-                $out = Carbon::parse($record->check_out, 'Asia/Kolkata');
-                $weeklyHours += $out->diffInHours($in);
-            }
-        }
-
-        // Salary
-        $baseSalary = 30000;
-        $totalWorkingDays = 30;
-        $presentDays = $totalPresent;
-        $lateDays = $monthlyStats->where('late_minutes', '>', 0)->count();
-
-        $perDaySalary = $baseSalary / $totalWorkingDays;
-        $halfDayPenalty = floor($lateDays / 3) * ($perDaySalary / 2);
-        $salaryForPresentDays = $perDaySalary * $presentDays;
-        $finalSalary = round($salaryForPresentDays - $halfDayPenalty);
-
-        $timeDistribution = $this->calculateTimeDistribution($todayAttendance);
-
-
 
         return view('admin.myattendance', compact(
-            'attendance', 'todayAttendance', 'currentDateTime', 'todayTotalHours',
-            'todayProductiveHours', 'totalPresent', 'totalAbsent', 'totalLate',
-            'totalOvertime', 'weeklyHours', 'totalMonthlyHours', 'monthlyStats',
-            'baseSalary', 'totalWorkingDays', 'presentDays', 'lateDays',
-            'finalSalary', 'user', 'timeDistribution'
+            'profile',
+            'presentDays',
+            'absentDays',
+            'totalHours',
+            'attendancePercentage',
+            'todayProgress',
+            'attendanceLog',
+            'currentMonth',
+            'todayRecord',
+            'jsAttendanceData',
+            'todayBreakDuration'
         ));
+
+    } catch (\Exception $e) {
+        Log::error('Attendance index error: ' . $e->getMessage());
+        return response()->view('errors.500', [], 500);
+    }
+}
+
+
+    /**
+     * Calculate distance using Haversine formula
+     */
+    private function calculateDistance($lat1, $lon1, $lat2, $lon2)
+    {
+        try {
+            $earthRadius = 6371; // kilometers
+
+            $dLat = deg2rad($lat2 - $lat1);
+            $dLon = deg2rad($lon2 - $lon1);
+
+            $a = sin($dLat/2) * sin($dLat/2) +
+                 cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+                 sin($dLon/2) * sin($dLon/2);
+                 
+            $c = 2 * atan2(sqrt($a), sqrt(1-$a));
+            $distance = $earthRadius * $c;
+
+            return round($distance, 2);
+        } catch (\Exception $e) {
+            Log::error('Distance calculation error: ' . $e->getMessage());
+            return 0;
+        }
     }
 
-    private function calculateTimeDistribution($attendance)
-    {
-        $default = ['gray' => 100, 'green' => 0, 'yellow' => 0, 'blue' => 0];
-        if (!$attendance || !$attendance->check_in || !$attendance->check_out) return $default;
+    /**
+     * Process location data
+     */
+  
 
-        $checkIn = Carbon::parse($attendance->check_in, 'Asia/Kolkata');
-        $checkOut = Carbon::parse($attendance->check_out, 'Asia/Kolkata');
-        $totalMinutes = $checkOut->diffInMinutes($checkIn);
-        $breakMinutes = $attendance->break_time ?? 0;
-        $standardMinutes = 8 * 60;
-        $overtimeMinutes = max(0, $totalMinutes - $standardMinutes - $breakMinutes);
-        $productiveMinutes = max(0, $totalMinutes - $breakMinutes - $overtimeMinutes);
-        $nonWorkingMinutes = (24 * 60) - $totalMinutes;
+/**
+ * Process location data with database field check
+ */
+private function processLocationData($request)
+{
+    try {
+        $defaultLocation = 'Location not available';
+        
+        // Check if location fields exist in database
+        $hasLocationFields = Schema::hasColumn('my_attendances', 'latitude');
+        
+        if (!$request->latitude || !$request->longitude || !$hasLocationFields) {
+            return [
+                'location' => $request->location ?? $defaultLocation,
+                'latitude' => null,
+                'longitude' => null,
+                'accuracy' => null,
+                'distance' => null,
+                'is_within_range' => false
+            ];
+        }
+
+        $distance = $this->calculateDistance(
+            $request->latitude,
+            $request->longitude,
+            self::OFFICE_LAT,
+            self::OFFICE_LON
+        );
+
+        $isWithinRange = $distance <= self::ALLOWED_DISTANCE_KM;
+        
+        $locationString = sprintf(
+            "Lat: %s, Lng: %s, Dist: %skm, Acc: %sm %s",
+            $request->latitude,
+            $request->longitude,
+            $distance,
+            $request->accuracy ?? 'N/A',
+            $isWithinRange ? '✅' : '❌'
+        );
 
         return [
-            'gray' => round(($nonWorkingMinutes / 1440) * 100),
-            'green' => round(($productiveMinutes / 1440) * 100),
-            'yellow' => round(($breakMinutes / 1440) * 100),
-            'blue' => round(($overtimeMinutes / 1440) * 100),
+            'location' => $locationString,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
+            'accuracy' => $request->accuracy,
+            'distance' => $distance,
+            'is_within_range' => $isWithinRange
+        ];
+    } catch (\Exception $e) {
+        Log::error('Location processing error: ' . $e->getMessage());
+        return [
+            'location' => $request->location ?? $defaultLocation,
+            'latitude' => null,
+            'longitude' => null,
+            'accuracy' => null,
+            'distance' => null,
+            'is_within_range' => false
         ];
     }
+}
 
-    public function punchIn(Request $request)
-    {
-        $user = Auth::user();
-        $now = Carbon::now('Asia/Kolkata');
-        $currentDate = $now->format('Y-m-d');
 
-        $existing = Myattendance::where('user_id', $user->id)->where('date', $currentDate)->first();
-        if ($existing) return back()->with('error', 'You have already punched in today.');
+public function punchIn(Request $request)
+{
+    try {
 
-        $checkInTime = $now;
-        $lateMinutes = 0;
-        $standardStart = Carbon::createFromTime(10, 0, 0, 'Asia/Kolkata');
-        if ($checkInTime->gt($standardStart)) {
-            $lateMinutes = $checkInTime->diffInMinutes($standardStart);
+    //        if (!$this->isMobileRequest($request)) {
+    //     return response()->json([
+    //         'error' => 'Punching allowed only from mobile devices!'
+    //     ], 403);
+    // }
+
+
+        Log::info('Punch In Request:', $request->all());
+
+        $employee = Auth::user();
+        if (!$employee) {
+            return response()->json(['error' => 'Authentication required.'], 401);
         }
 
-        Myattendance::create([
-            'user_id' => $user->id,
-            'date' => $currentDate,
-            'check_in' => $checkInTime,
-            'status' => 'Present',
-            'late_minutes' => $lateMinutes,
+        $today = Carbon::today('Asia/Kolkata');
+        
+        // Check existing record
+      $existing = $this->baseQuery()
+    ->where('employee_id', $employee->id)
+    ->where('date', $today->format('Y-m-d'))
+    ->first();
+
+
+        if ($existing && $existing->punch_in) {
+            return response()->json(['error' => 'Already punched in today!'], 400);
+        }
+
+        $punchTime = Carbon::now('Asia/Kolkata');
+        
+        // Process location data with fallback
+        $locationData = $this->processLocationData($request);
+
+        // Create or update record without location fields first
+        if (!$existing) {
+            $attendanceData = [
+                'employee_id' => $employee->id,
+                'date' => $today,
+                'punch_in' => $punchTime->format('H:i:s'),
+                'location' => $locationData['location'],
+                'status' => 'Present',
+            ];
+            
+            // Only add location fields if they exist in database
+            if (Schema::hasColumn('my_attendances', 'latitude')) {
+                $attendanceData['latitude'] = $locationData['latitude'];
+                $attendanceData['longitude'] = $locationData['longitude'];
+                $attendanceData['accuracy'] = $locationData['accuracy'];
+                $attendanceData['distance'] = $locationData['distance'];
+                $attendanceData['is_within_range'] = $locationData['is_within_range'];
+            }
+            
+            MyAttendance::create($attendanceData);
+        } else {
+            $updateData = [
+                'punch_in' => $punchTime->format('H:i:s'),
+                'location' => $locationData['location'],
+                'status' => 'Present'
+            ];
+            
+            // Only update location fields if they exist in database
+            if (Schema::hasColumn('my_attendances', 'latitude')) {
+                $updateData['latitude'] = $locationData['latitude'];
+                $updateData['longitude'] = $locationData['longitude'];
+                $updateData['accuracy'] = $locationData['accuracy'];
+                $updateData['distance'] = $locationData['distance'];
+                $updateData['is_within_range'] = $locationData['is_within_range'];
+            }
+            
+            $existing->update($updateData);
+        }
+
+        Log::info('Punch In Successful', [
+            'employee_id' => $employee->id,
+            'punch_time' => $punchTime->format('H:i:s')
         ]);
 
-        return back()->with('success', 'Punched in successfully at ' . $checkInTime->format('h:i A'));
+        return response()->json([
+            'success' => true,
+            'punch_time' => $punchTime->format('h:i A'),
+            'location' => $locationData['location'],
+            'distance' => $locationData['distance'],
+            'is_within_range' => $locationData['is_within_range']
+        ]);
+
+    } catch (\Exception $e) {
+        Log::error('Punch In Error: ' . $e->getMessage());
+        Log::error('Stack trace: ' . $e->getTraceAsString());
+        
+        return response()->json([
+            'error' => 'Server error: ' . $e->getMessage()
+        ], 500);
     }
+}
 
-    public function punchOut(Request $request)
-    {
-        $user = Auth::user();
-        $now = Carbon::now('Asia/Kolkata');
-        $currentDate = $now->format('Y-m-d');
+    // Similar error handling for other methods (punchOut, lunchStart, lunchEnd)
+  public function punchOut(Request $request)
+{
+    try {
+        $employee = Auth::user();
+        if (!$employee) {
+            return response()->json(['error' => 'Authentication required.'], 401);
+        }
 
-        $attendance = Myattendance::where('user_id', $user->id)->where('date', $currentDate)->first();
-        if (!$attendance) return back()->with('error', 'You need to punch in first.');
-        if ($attendance->check_out) return back()->with('error', 'You have already punched out today.');
+        $today = Carbon::today('Asia/Kolkata');
 
-        $checkOutTime = $now;
-        $checkIn = Carbon::parse($attendance->check_in, 'Asia/Kolkata');
-        $totalMinutes = $checkOutTime->diffInMinutes($checkIn);
-        $standardMinutes = 9 * 60;
-        $overtimeMinutes = max(0, $totalMinutes - $standardMinutes - ($attendance->break_time ?? 0));
+       $attendance = $this->baseQuery()
+    ->where('employee_id', $employee->id)
+    ->where('date', $today->format('Y-m-d'))
+    ->with('breaks')
+    ->first();
+
+
+        if (!$attendance || !$attendance->punch_in) {
+            return response()->json(['error' => 'Punch in first!'], 400);
+        }
+
+        $punchOutTime = Carbon::now('Asia/Kolkata');
+        $punchInTime  = Carbon::parse($attendance->punch_in, 'Asia/Kolkata');
+
+        // ✅ Total worked seconds
+        $totalSeconds = $punchOutTime->diffInSeconds($punchInTime);
+
+        // ✅ Subtract ALL breaks
+        $totalBreakSeconds = $attendance->breaks()->sum('break_seconds');
+        $netWorkSeconds = max(0, $totalSeconds - $totalBreakSeconds);
+
+        // ✅ Format values
+        $workHours  = gmdate('H:i', $netWorkSeconds);
+        $breakHours = gmdate('H:i', $totalBreakSeconds);
+
+        // ✅ Status logic
+        $status = $netWorkSeconds < 25200 ? 'Half Day' : 'Present'; // < 7 hrs
 
         $attendance->update([
-            'check_out' => $checkOutTime,
-            'overtime_minutes' => $overtimeMinutes,
-            'total_hours' => floor($totalMinutes / 60) . 'h ' . ($totalMinutes % 60) . 'm',
-            'production_hours' => floor(($totalMinutes - ($attendance->break_time ?? 0)) / 60) . 'h ' . (($totalMinutes - ($attendance->break_time ?? 0)) % 60) . 'm'
+            'punch_out'        => $punchOutTime->format('H:i:s'),
+            'work_hours'       => $workHours,
+            'break_hours'      => $breakHours,
+            'overtime_seconds' => max(0, $netWorkSeconds - 28800),
+            'status'           => $status,
         ]);
 
-        return back()->with('success', 'Punched out successfully at ' . $checkOutTime->format('h:i A'));
-    }
+        return response()->json([
+            'success'          => true,
+            'punch_time'       => $punchOutTime->format('h:i A'),
+            'work_hours'       => $workHours,
+            'total_break_time' => $breakHours,
+        ]);
 
-    public function toggleBreak(Request $request)
+    } catch (\Exception $e) {
+        Log::error('Punch Out Error: ' . $e->getMessage());
+        return response()->json(['error' => 'Server error'], 500);
+    }
+}
+
+
+public function lunchStart(Request $request)
+{
+    try {
+
+
+//         if (!$this->isMobileRequest($request)) {
+//     return response()->json([
+//         'error' => 'Punching allowed only from mobile devices!'
+//     ], 403);
+// }
+
+        $employee = Auth::user();
+        if (!$employee) {
+            return response()->json(['error' => 'Authentication required.'], 401);
+        }
+
+        $today = Carbon::today('Asia/Kolkata');
+        $record = $this->baseQuery()
+    ->where('employee_id', $employee->id)
+            ->where('date', $today->format('Y-m-d'))
+            ->first();
+
+        if (!$record || !$record->punch_in) {
+            return response()->json(['error' => 'Punch in first!'], 400);
+        }
+
+        if ($record->lunch_start) {
+            return response()->json(['error' => 'Lunch already started!'], 400);
+        }
+
+        $lunchTime = Carbon::now('Asia/Kolkata');
+        $locationData = $this->processLocationData($request);
+
+        $updateData = [
+            'lunch_start' => $lunchTime->format('H:i:s'),
+            'location' => $locationData['location'],
+        ];
+
+        // Only update location fields if they exist in database
+        if (Schema::hasColumn('my_attendances', 'latitude')) {
+            $updateData['latitude'] = $locationData['latitude'];
+            $updateData['longitude'] = $locationData['longitude'];
+            $updateData['accuracy'] = $locationData['accuracy'];
+            $updateData['distance'] = $locationData['distance'];
+            $updateData['is_within_range'] = $locationData['is_within_range'];
+        }
+
+        $record->update($updateData);
+
+        return response()->json([
+            'success' => true,
+            'lunch_time' => $lunchTime->format('h:i A'),
+            'distance' => $locationData['distance'],
+            'is_within_range' => $locationData['is_within_range']
+        ]);
+
+    } catch (\Exception $e) {
+        Log::error('Lunch Start Error: ' . $e->getMessage());
+        return response()->json(['error' => 'Server error'], 500);
+    }
+}
+
+public function lunchEnd(Request $request)
+{
+    try {
+
+//         if (!$this->isMobileRequest($request)) {
+//     return response()->json([
+//         'error' => 'Punching allowed only from mobile devices!'
+//     ], 403);
+// }
+
+
+
+        $employee = Auth::user();
+        if (!$employee) {
+            return response()->json(['error' => 'Authentication required.'], 401);
+        }
+
+        $today = Carbon::today('Asia/Kolkata');
+        $record = $this->baseQuery()
+    ->where('employee_id', $employee->id)
+            ->where('date', $today->format('Y-m-d'))
+            ->first();
+
+        if (!$record || !$record->lunch_start) {
+            return response()->json(['error' => 'Start lunch first!'], 400);
+        }
+
+        $lunchTime = Carbon::now('Asia/Kolkata');
+        $locationData = $this->processLocationData($request);
+
+        $updateData = [
+            'lunch_end' => $lunchTime->format('H:i:s'),
+            'location' => $locationData['location'],
+        ];
+
+        // Only update location fields if they exist in database
+        if (Schema::hasColumn('my_attendances', 'latitude')) {
+            $updateData['latitude'] = $locationData['latitude'];
+            $updateData['longitude'] = $locationData['longitude'];
+            $updateData['accuracy'] = $locationData['accuracy'];
+            $updateData['distance'] = $locationData['distance'];
+            $updateData['is_within_range'] = $locationData['is_within_range'];
+        }
+
+        $record->update($updateData);
+
+        return response()->json([
+            'success' => true,
+            'lunch_time' => $lunchTime->format('h:i A'),
+            'distance' => $locationData['distance'],
+            'is_within_range' => $locationData['is_within_range']
+        ]);
+
+    } catch (\Exception $e) {
+        Log::error('Lunch End Error: ' . $e->getMessage());
+        return response()->json(['error' => 'Server error'], 500);
+    }
+}
+
+    public function getLog(Request $request)
     {
-        $user = Auth::user();
-        $currentDate = Carbon::now('Asia/Kolkata')->format('Y-m-d');
-        $now = Carbon::now('Asia/Kolkata');
-
-        $attendance = Myattendance::where('user_id', $user->id)->where('date', $currentDate)->first();
-        if (!$attendance) {
-            return response()->json(['error' => 'Please punch in first.'], 400);
-        }
-        if ($attendance->check_out) {
-            return response()->json(['error' => 'Cannot take break after punch out.'], 400);
-        }
-
-        $currentBreakTime = $attendance->break_time ?? 0;
-
-        if ($request->break_active) {
-            // Start break
-            if ($attendance->break_in && !$attendance->break_out) {
-                return response()->json(['error' => 'Break already in progress.'], 400);
+        try {
+            $employee = Auth::user();
+            if (!$employee) {
+                return response()->json(['error' => 'Authentication required.'], 401);
             }
 
-            $attendance->update([
-                'break_in' => $now,
-                'break_time' => $currentBreakTime + 15
-            ]);
+            $month = $request->get('month', now()->month);
+            $year = $request->get('year', now()->year);
 
-            return response()->json([
-                'success' => true,
-                'break_time' => $currentBreakTime + 15,
-                'break_display' => floor(($currentBreakTime + 15) / 60) . 'h ' . (($currentBreakTime + 15) % 60) . 'm',
-                'break_in' => $now->format('h:i A'),
-                'message' => 'Break started'
-            ]);
-        } else {
-            // End break
-            if (!$attendance->break_in || $attendance->break_out) {
-                return response()->json(['error' => 'No active break to end.'], 400);
-            }
+            $records = $this->baseQuery()
+    ->where('employee_id', $employee->id)
+                ->whereYear('date', $year)
+                ->whereMonth('date', $month)
+                ->get()
+                ->map(function ($record) {
+                    return [
+                        'date' => $record->date->format('d-m-Y'),
+                        'punchIn' => $record->punch_in ? $record->punch_in->format('h:i A') : '--',
+                        'punchOut' => $record->punch_out ? $record->punch_out->format('h:i A') : '--',
+                        'lunchIn' => $record->lunch_start ? $record->lunch_start->format('h:i A') : '--',
+                        'lunchOut' => $record->lunch_end ? $record->lunch_end->format('h:i A') : '--',
+                       'workHours' => $record->work_hours,
+'breakHours' => $record->break_hours,
 
-            $attendance->update([
-                'break_out' => $now
-            ]);
+                        'status' => $record->status,
+                    ];
+                });
 
-            return response()->json([
-                'success' => true,
-                'break_time' => $currentBreakTime,
-                'break_display' => floor($currentBreakTime / 60) . 'h ' . ($currentBreakTime % 60) . 'm',
-                'break_out' => $now->format('h:i A'),
-                'message' => 'Break ended'
-            ]);
+            return response()->json($records);
+
+        } catch (\Exception $e) {
+            Log::error('Get Log Error: ' . $e->getMessage());
+            return response()->json(['error' => 'Server error'], 500);
         }
     }
+
+
+    /**
+ * Check if action is allowed for the day
+ */
+private function isActionAllowed($employeeId, $action)
+{
+    $today = Carbon::today('Asia/Kolkata');
+   $record = $this->baseQuery()
+    ->where('employee_id', $employeeId)
+    ->where('date', $today->format('Y-m-d'))
+    ->first();
+
+    if (!$record) {
+        return true; // No record exists, all actions allowed
+    }
+
+    $limits = [
+        'punch_in' => !$record->punch_in,
+        'punch_out' => $record->punch_in && !$record->punch_out,
+        'lunch_start' => $record->punch_in && !$record->lunch_start && !$record->punch_out,
+        'lunch_end' => $record->lunch_start && !$record->lunch_end && !$record->punch_out,
+    ];
+
+    return $limits[$action] ?? false;
+}
+
+
+
+    // private function isMobileRequest($request)
+    // {
+    //     $agent = $request->header('User-Agent');
+
+    //     return preg_match('/Android|iPhone|iPad|iPod|Opera Mini|IEMobile|Mobile/i', $agent);
+    // }
+
+
+public function breakIn(Request $request)
+{
+    try {
+        $employee = Auth::user();
+        if (!$employee) {
+            return response()->json(['error' => 'Authentication required.'], 401);
+        }
+
+        $today = Carbon::today('Asia/Kolkata');
+        
+        // Find today's attendance record
+       $attendance = $this->baseQuery()
+    ->where('employee_id', $employee->id)
+    ->where('date', $today->format('Y-m-d'))
+    ->first();
+
+$this->authorize('manage', $attendance);
+
+
+        if (!$attendance) {
+            return response()->json(['error' => 'Please punch in first!'], 400);
+        }
+
+        // Check if there's already an active break
+        $activeBreak = $attendance->breaks()->whereNull('break_out')->first();
+        if ($activeBreak) {
+            return response()->json(['error' => 'Break already in progress!'], 400);
+        }
+
+        $breakTime = Carbon::now('Asia/Kolkata');
+        
+        // Process location data
+        $locationData = $this->processLocationData($request);
+
+        // Create a new break record
+    $break = $attendance->breaks()->create([
+    'company_id' => auth()->user()->company_id,
+    'break_in' => $breakTime->format('H:i:s'),
+    'break_seconds' => 0,
+]);
+
+
+       Log::info('Break In Successful', [
+    'employee_id' => $employee->id,
+    'break_time' => $breakTime->format('H:i:s'),
+    'break_id' => $break->id
+]);
+
+        return response()->json([
+            'success' => true,
+            'break_time' => $breakTime->format('h:i A'),
+            'break_id' => $break->id,
+            'location' => $locationData['location'],
+            'distance' => $locationData['distance'],
+            'is_within_range' => $locationData['is_within_range']
+        ]);
+
+    } catch (\Exception $e) {
+        Log::error('Break In Error: ' . $e->getMessage());
+        Log::error('Stack trace: ' . $e->getTraceAsString());
+        
+        return response()->json([
+            'error' => 'Server error: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+public function breakOut(Request $request)
+{
+    try {
+        $employee = Auth::user();
+        if (!$employee) {
+            return response()->json(['error' => 'Authentication required.'], 401);
+        }
+
+        $today = Carbon::today('Asia/Kolkata');
+        
+        // Find today's attendance record
+       $attendance = $this->baseQuery()
+    ->where('employee_id', $employee->id)
+    ->where('date', $today->format('Y-m-d'))
+    ->first();
+
+$this->authorize('manage', $attendance);
+
+
+        if (!$attendance) {
+            return response()->json(['error' => 'No attendance record found!'], 400);
+        }
+
+        // Find the active break
+        $activeBreak = $attendance->breaks()->whereNull('break_out')->first();
+        if (!$activeBreak) {
+            return response()->json(['error' => 'No active break found!'], 400);
+        }
+
+        $breakOutTime = Carbon::now('Asia/Kolkata');
+        $breakInTime = Carbon::parse($activeBreak->break_in);
+        
+        // Calculate break duration in seconds
+        $breakSeconds = $breakOutTime->diffInSeconds($breakInTime);
+        
+        // Process location data
+        $locationData = $this->processLocationData($request);
+
+        // Update the break record
+        $activeBreak->update([
+            'break_out' => $breakOutTime->format('H:i:s'),
+            'break_seconds' => $breakSeconds
+        ]);
+
+        // Update total break seconds on attendance
+        $attendance->refresh(); // Refresh to get updated breaks
+        $totalBreakSeconds = $attendance->breaks()->sum('break_seconds');
+        
+        // Format total break time
+        $totalBreakFormatted = gmdate('H:i', $totalBreakSeconds);
+
+        Log::info('Break Out Successful', [
+            'employee_id' => $employee->id,
+            'break_duration' => $breakSeconds,
+            'total_break_seconds' => $totalBreakSeconds
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'break_out_time' => $breakOutTime->format('h:i A'),
+            'break_duration' => gmdate('H:i', $breakSeconds),
+            'total_break_time' => $totalBreakFormatted,
+            'location' => $locationData['location'],
+            'distance' => $locationData['distance'],
+            'is_within_range' => $locationData['is_within_range']
+        ]);
+
+    } catch (\Exception $e) {
+        Log::error('Break Out Error: ' . $e->getMessage());
+        Log::error('Stack trace: ' . $e->getTraceAsString());
+        
+        return response()->json([
+            'error' => 'Server error: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+// Add this method to your MyAttendanceController class
+/**
+ * Get current break status for the authenticated user
+ */
+public function getCurrentBreakStatus(Request $request)
+{
+    try {
+        $employee = Auth::user();
+        if (!$employee) {
+            return response()->json(['error' => 'Authentication required.'], 401);
+        }
+
+        $today = Carbon::today('Asia/Kolkata');
+        
+        // Find today's attendance record
+        $attendance = $this->baseQuery()
+    ->where('employee_id', $employee->id)
+            ->where('date', $today->format('Y-m-d'))
+            ->with(['breaks' => function($query) {
+                $query->whereNull('break_out')->latest();
+            }])
+            ->first();
+
+        if (!$attendance) {
+            return response()->json([
+                'has_attendance' => false,
+                'break_running' => false
+            ]);
+        }
+
+        // Check if there's an active break
+        $activeBreak = $attendance->breaks->first();
+        $breakRunning = $activeBreak ? true : false;
+        
+        $response = [
+            'has_attendance' => true,
+            'break_running' => $breakRunning,
+            'punch_in' => $attendance->punch_in ? $attendance->punch_in->format('H:i:s') : null,
+            'punch_out' => $attendance->punch_out ? $attendance->punch_out->format('H:i:s') : null
+        ];
+
+        if ($breakRunning && $activeBreak) {
+            $breakInTime = Carbon::parse($activeBreak->break_in);
+            $breakDuration = Carbon::now('Asia/Kolkata')->diffInSeconds($breakInTime);
+            
+            $response['break_data'] = [
+                'break_id' => $activeBreak->id,
+                'break_in' => $activeBreak->break_in,
+                'break_duration_seconds' => $breakDuration,
+                'break_duration_formatted' => gmdate('H:i:s', $breakDuration)
+            ];
+        }
+
+        return response()->json($response);
+
+    } catch (\Exception $e) {
+        Log::error('Get Break Status Error: ' . $e->getMessage());
+        return response()->json(['error' => 'Server error: ' . $e->getMessage()], 500);
+    }
+}
+
+
+
+
 }

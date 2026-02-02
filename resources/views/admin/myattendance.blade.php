@@ -1,565 +1,1670 @@
+{{-- Updated resources/views/myattendance/my-attendance.blade.php --}}
+{{-- Changes: Fully responsive design for mobile, tablet, and desktop --}}
+
 @extends('components.layout')
-
 @section('content')
-<div class="min-h-screen bg-gray-50 py-0 text-sm">
-    <div class="container mx-auto px-4 py-4">
-        <!-- Breadcrumb -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 text-xs">
-            <div class="mb-2 md:mb-0">
-                <h2 class="text-lg font-bold text-gray-800 mb-1">Employee Attendance</h2>
-                <nav class="flex text-xs" aria-label="Breadcrumb">
-                    <ol class="inline-flex items-center space-x-1">
-                        <li><a href="#" class="text-gray-500 hover:text-gray-700"><i class="fas fa-home mr-1"></i></a></li>
-                        <li><span class="text-gray-400 mx-1">/</span><span class="text-gray-500">Employee</span></li>
-                        <li><span class="text-gray-400 mx-1">/</span><span class="text-gray-700 font-medium">Attendance</span></li>
-                    </ol>
-                </nav>
-            </div>
-            <div class="flex flex-wrap items-center gap-2 text-xs">
-                <div class="flex items-center border bg-white rounded p-1">
-                    <a href="#" class="px-2 py-1 bg-gray-800 text-white rounded text-xs"><i class="fas fa-calendar-day mr-1"></i></a>
-                    <a href="#" class="px-2 py-1 text-gray-600 text-xs"><i class="fas fa-calendar-alt mr-1"></i></a>
-                </div>
-                <button class="flex items-center bg-white border rounded px-3 py-1 text-gray-700 text-xs">
-                    <i class="fas fa-file-export mr-1"></i>Export
-                </button>
-                <button class="flex items-center bg-gray-800 text-white px-3 py-1 rounded text-xs">
-                    <i class="fas fa-chart-bar mr-1"></i>Report
-                </button>
-            </div>
-        </div>
-
-        <!-- Messages -->
-        @if(session('success'))
-            <div class="bg-green-100 border border-green-400 text-green-700 px-3 py-2 rounded mb-3 text-xs">
-                {{ session('success') }}
-            </div>
-        @endif
-        @if(session('error'))
-            <div class="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mb-3 text-xs">
-                {{ session('error') }}
-            </div>
-        @endif
-
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-4">
-            <!-- Employee Card -->
-            <div class="lg:col-span-1">
-                <div class="bg-white rounded-lg shadow p-4 text-xs">
-                    <div class="text-center mb-3">
-                        <h6 class="text-gray-500 mb-1">Good Morning, {{ Auth::user()->name }}</h6>
-                        <h4 class="text-sm font-semibold">{{ $currentDateTime }}</h4>
-                    </div>
-                    <div class="relative w-28 h-28 mx-auto mb-3">
-                        <div class="absolute inset-0 rounded-full border-8 border-gray-200"></div>
-                        <div class="absolute inset-0 rounded-full border-8 border-green-500" style="clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);"></div>
-                        <div class="absolute inset-0 rounded-full border-8 border-green-500 transform rotate-180" style="clip-path: polygon(50% 0, 100% 0, 100% 65%, 50% 65%);"></div>
-                        <div class="absolute inset-0 flex items-center justify-center">
-                            <img src="https://smarthr.dreamstechnologies.com/laravel/template/public/build/img/profiles/avatar-27.jpg" alt="Profile" class="w-20 h-20 rounded-full">
-                        </div>
-                    </div>
-
-                    <div class="text-center">
-                        @if($todayAttendance && $todayAttendance->check_in)
-                            <span class="inline-block bg-gray-600 text-white text-xs px-2 py-1 rounded-full mb-2">
-                                Production: {{ $todayAttendance->production_hours ?? '0h 0m' }}
-                            </span>
-                            <h6 class="flex items-center justify-center text-gray-700 mb-3 text-xs">
-                                <i class="fas fa-fingerprint text-primary mr-1"></i>
-                                Punch In: 
-                                @if($todayAttendance && $todayAttendance->check_in)
-                                    {{ \Carbon\Carbon::parse($todayAttendance->check_in)->format('h:i A') }}
-                                @else
-                                    Not Punched In
-                                @endif
-                            </h6>
-
-                            @if(!$todayAttendance->check_out)
-                                <form action="{{ route('punch.out') }}" method="POST" onsubmit="return confirm('Are you sure you want to Punch Out?');">
-                                    @csrf
-                                    <button type="submit" class="w-full bg-gray-800 hover:bg-gray-900 text-white py-1.5 rounded text-xs transition">
-                                        Punch Out
-                                    </button>
-                                </form>
-                            @else
-                                <button class="w-full bg-gray-400 text-white py-1.5 rounded text-xs cursor-not-allowed" disabled>
-                                    Already Punched Out
-                                </button>
-                            @endif
-                        @else
-                            <span class="inline-block bg-gray-500 text-white text-xs px-2 py-1 rounded-full mb-2">
-                                Not Punched In
-                            </span>
-                            <button id="punchInBtn" type="button" class="w-full bg-gray-900 hover:bg-gray-500 text-white py-1.5 rounded-xl text-xs mb-2">
-                                Punch In
-                            </button>
-
-                            <form id="punchInForm" method="POST" action="{{ route('punch.in') }}" style="display:none;">
-                                @csrf
-                                <input type="hidden" name="latitude" id="latitude">
-                                <input type="hidden" name="longitude" id="longitude">
-                            </form>
-                            <p id="locationStatus" class="text-xs text-gray-600 mt-1"></p>
-                        @endif
-
-                        <!-- Break Toggle -->
-                        <div class="flex items-center justify-center space-x-2 mt-3 text-xs">
-                            <label>Break</label>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="breakToggle" class="sr-only peer"
-                                    {{ !$todayAttendance || !$todayAttendance->check_in || $todayAttendance->check_out ? 'disabled' : '' }}>
-                                <div class="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 peer-disabled:bg-gray-200"></div>
-                                <div class="absolute left-0.5 top-0.5 bg-white w-4 h-4 rounded-full transition-all duration-300 peer-checked:translate-x-5"></div>
-                            </label>
-                            <span id="breakStatus" class="text-xs">
-                                @if(!$todayAttendance || !$todayAttendance->check_in)
-                                    PUNCH IN FIRST
-                                @elseif($todayAttendance->check_out)
-                                    PUNCHED OUT
-                                @elseif($todayAttendance->break_in && !$todayAttendance->break_out)
-                                    ON
-                                @else
-                                    OFF
-                                @endif
-                            </span>
-                        </div>
-                        <div id="breakTimeDisplay" class="text-xs text-gray-600 mt-1">
-                            @if($todayAttendance && $todayAttendance->break_time)
-                                Total Break: {{ floor($todayAttendance->break_time / 60) }}h {{ $todayAttendance->break_time % 60 }}m
-                            @elseif($todayAttendance && $todayAttendance->break_in && !$todayAttendance->break_out)
-                                Break started at: {{ \Carbon\Carbon::parse($todayAttendance->break_in)->setTimezone('Asia/Kolkata')->format('h:i A') }}
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Stats Cards -->
-            <div class="lg:col-span-3">
-                <!-- Cards Section -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                    <div class="bg-white rounded-lg shadow p-4">
-                        <div class="border-b border-gray-200 pb-3 mb-3">
-                            <div class="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white mb-2">
-                                <i class="fas fa-stopwatch"></i>
-                            </div>
-                            <h2 class="text-lg font-bold">
-                                {{ number_format($todayTotalHours, 1) }} <span class="text-lg text-gray-500">/ 9</span>
-                            </h2>
-                            <p class="font-medium truncate">Total Hours Today</p>
-                        </div>
-                        <div>
-                            <p class="flex items-center text-sm">
-                                <span class="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center text-white mr-2">
-                                    <i class="fas fa-arrow-up text-xs"></i>
-                                </span>
-                                <span>5% This Week</span>
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-lg shadow p-4">
-                        <div class="border-b border-gray-200 pb-3 mb-3">
-                            <div class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center text-white mb-2">
-                                <i class="fas fa-clock"></i>
-                            </div>
-                            <h2 class="text-lg font-bold">{{ number_format($weeklyHours, 1) }} <span class="text-lg text-gray-500">/ 40</span></h2>
-                            <p class="font-medium truncate">Total Hours Week</p>
-                        </div>
-                        <div>
-                            <p class="flex items-center text-sm">
-                                <span class="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center text-white mr-2">
-                                    <i class="fas fa-arrow-up text-xs"></i>
-                                </span>
-                                <span>7% Last Week</span>
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-lg shadow p-4">
-                        <div class="border-b border-gray-200 pb-3 mb-3">
-                            <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white mb-2">
-                                <i class="fas fa-calendar-plus"></i>
-                            </div>
-                            <h2 class="text-lg font-bold">{{ number_format($totalMonthlyHours, 1) }} <span class="text-lg text-gray-500">/ 98</span></h2>
-                            <p class="font-medium truncate">Total Hours Month</p>
-                        </div>
-                        <div>
-                            <p class="flex items-center text-sm truncate">
-                                <span class="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white mr-2">
-                                    <i class="fas fa-arrow-down text-xs"></i>
-                                </span>
-                                <span>8% Last Month</span>
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-lg shadow p-4">
-                        <div class="border-b border-gray-200 pb-3 mb-3">
-                            <div class="w-10 h-10 bg-pink-500 rounded-full flex items-center justify-center text-white mb-2">
-                                <i class="fas fa-calendar-plus"></i>
-                            </div>
-                            <h2 class="text-lg font-bold">{{ floor($totalOvertime / 60) }} <span class="text-lg text-gray-500">/ 28</span></h2>
-                            <p class="font-medium truncate">Overtime this Month</p>
-                        </div>
-                        <div>
-                            <p class="flex items-center text-sm truncate">
-                                <span class="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white mr-2">
-                                    <i class="fas fa-arrow-down text-xs"></i>
-                                </span>
-                                <span>6% Last Month</span>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ✅ Separate Section for Total Salary (Dynamic Calculation) -->
-                <div class="bg-white rounded-lg shadow p-3">
-                    <h2 class="text-lg font-semibold mb-4 border-b pb-2">Total Salary Summary</h2>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-                        <div>
-                            <p class="text-gray-600 text-sm">Total Working Days</p>
-                            <h3 id="totalDays" class="text-xl font-bold text-gray-800">{{ $totalWorkingDays }}</h3>
-                        </div>
-                        <div>
-                            <p class="text-gray-600 text-sm">Total Present Days</p>
-                            <h3 id="presentDays" class="text-xl font-bold text-gray-800">{{ $presentDays }}</h3>
-                        </div>
-                        <div>
-                            <p class="text-gray-600 text-sm">Late Days (after 10:00 AM)</p>
-                            <h3 id="lateDays" class="text-xl font-bold text-gray-800">{{ $lateDays }}</h3>
-                        </div>
-                        <div>
-                            <p class="text-gray-600 text-sm">Base Monthly Salary</p>
-                            <h3 id="baseSalary" class="text-xl font-bold text-gray-800">₹{{ number_format($user->salary) }}</h3>
-                        </div>
-                    </div>
-
-                    <div class="border-t pt-4 flex flex-col md:flex-row items-start md:items-center justify-between">
-                        <div class="text-gray-700">
-                            <p class="text-sm">
-                                <strong>Salary Calculation:</strong>  
-                                (Base Salary ÷ Total Days × Present Days) − (Late Days ÷ 2 × Per-Day Salary)
-                            </p>
-                        </div>
-
-                        <div class="mt-4 md:mt-0 text-right">
-                            <p class="text-gray-600 text-sm">Final Calculated Salary</p>
-                            <h2 id="finalSalary" class="text-xl font-bold text-green-600">₹{{ number_format($finalSalary) }}</h2>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="mb-4">
-            <!-- Hours Breakdown -->
-            <div class="bg-white rounded-lg shadow p-4">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                    <div>
-                        <p class="flex items-center mb-1">
-                            <i class="fas fa-circle text-gray-400 mr-1"></i>Total Working hours
-                        </p>
-                        <h3 class="text-xl font-bold">
-                            @if($todayAttendance && $todayAttendance->total_hours)
-                                {{ $todayAttendance->total_hours }}
-                            @else
-                                0h 0m
-                            @endif
-                        </h3>
-                    </div>
-                    <div>
-                        <p class="flex items-center mb-1">
-                            <i class="fas fa-circle text-green-500 mr-1"></i>Productive Hours
-                        </p>
-                        <h3 class="text-xl font-bold">
-                            @if($todayAttendance && $todayAttendance->production_hours)
-                                {{ $todayAttendance->production_hours }}
-                            @else
-                                0h 0m
-                            @endif
-                        </h3>
-                    </div>
-                    <div>
-                        <p class="flex items-center mb-1">
-                            <i class="fas fa-circle text-yellow-500 mr-1"></i>Break hours
-                        </p>
-                        <h3 class="text-xl font-bold">
-                            @if($todayAttendance && $todayAttendance->break_time)
-                                {{ floor($todayAttendance->break_time / 60) }}h {{ $todayAttendance->break_time % 60 }}m
-                            @else
-                                0h 0m
-                            @endif
-                        </h3>
-                    </div>
-                    <div>
-                        <p class="flex items-center mb-1">
-                            <i class="fas fa-circle text-blue-500 mr-1"></i>Overtime
-                        </p>
-                        <h3 class="text-xl font-bold">
-                            @if($todayAttendance && $todayAttendance->overtime_minutes)
-                                {{ floor($todayAttendance->overtime_minutes / 60) }}h {{ $todayAttendance->overtime_minutes % 60 }}m
-                            @else
-                                0h 0m
-                            @endif
-                        </h3>
-                    </div>
-                </div>
-                <div>
-                    <!-- Dynamic Progress Bar -->
-                    <div class="h-6 bg-gray-300 rounded-full mb-3 flex overflow-hidden">
-                        <div class="bg-gray-400" style="width: {{ $timeDistribution['gray'] }}%"></div>
-                        <div class="bg-green-500" style="width: {{ $timeDistribution['green'] }}%"></div>
-                        <div class="bg-yellow-500" style="width: {{ $timeDistribution['yellow'] }}%"></div>
-                        <div class="bg-blue-500" style="width: {{ $timeDistribution['blue'] }}%"></div>
-                    </div>
-                    <div class="flex justify-between text-xs text-gray-600 mb-2">
-                        <span>Non-Working: {{ $timeDistribution['gray'] }}%</span>
-                        <span>Productive: {{ $timeDistribution['green'] }}%</span>
-                        <span>Break: {{ $timeDistribution['yellow'] }}%</span>
-                        <span>Overtime: {{ $timeDistribution['blue'] }}%</span>
-                    </div>
-                    <div class="flex justify-between text-xs">
-                        <span>12:00 AM</span>
-                        <span>06:00 AM</span>
-                        <span>12:00 PM</span>
-                        <span>06:00 PM</span>
-                        <span>12:00 AM</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Table -->
-        <div class="bg-white rounded-lg shadow text-xs">
-            <div class="p-3 border-b flex flex-col md:flex-row justify-between gap-2">
-                <h5 class="font-semibold">Attendance Log</h5>
-              <form method="GET" action="{{ route('myattendance') }}" class="flex flex-wrap gap-2 text-xs" id="filterForm">
-    <div class="flex gap-1">
-        <input type="date" name="start_date" id="startDate" class="px-2 py-1 border rounded text-xs" 
-               value="@php
-                    $dateRange = request('date_range', '');
-                    $startValue = '';
-                    if (!empty($dateRange)) {
-                        $parts = explode(' - ', trim($dateRange));
-                        if (isset($parts[0]) && trim($parts[0])) {
-                            $date = DateTime::createFromFormat('d/m/Y', trim($parts[0]));
-                            $startValue = $date ? $date->format('Y-m-d') : '';
-                        }
-                    }
-                    echo $startValue;
-                @endphp">
-        <span class="self-center text-gray-500">-</span>
-        <input type="date" name="end_date" id="endDate" class="px-2 py-1 border rounded text-xs" 
-               value="@php
-                    $dateRange = request('date_range', '');
-                    $endValue = '';
-                    if (!empty($dateRange)) {
-                        $parts = explode(' - ', trim($dateRange));
-                        if (isset($parts[1]) && trim($parts[1])) {
-                            $date = DateTime::createFromFormat('d/m/Y', trim($parts[1]));
-                            $endValue = $date ? $date->format('Y-m-d') : '';
-                        }
-                    }
-                    echo $endValue;
-                @endphp">
-    </div>
-    <input type="hidden" name="date_range" id="dateRangeHidden">
-    <select name="status" onchange="updateDateRangeAndSubmit()" class="px-2 py-1 border rounded text-xs">
-        <option value="">All Status</option>
-        <option value="Present" {{ request('status') == 'Present' ? 'selected' : '' }}>Present</option>
-        <option value="Absent" {{ request('status') == 'Absent' ? 'selected' : '' }}>Absent</option>
-    </select>
-    <button type="submit" class="bg-gray-900 text-white px-2 py-1 rounded text-xs"><i class="fas fa-filter mr-1"></i>Apply</button>
-    <a href="{{ route('myattendance') }}" class="bg-gray-500 text-white px-2 py-1 rounded text-xs"><i class="fas fa-refresh mr-1"></i>Reset</a>
-</form>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 text-xs">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-3 py-2 text-left">Date</th>
-                            <th class="px-3 py-2 text-left">In</th>
-                            <th class="px-3 py-2 text-left">Status</th>
-                            <th class="px-3 py-2 text-left">Out</th>
-                            <th class="px-3 py-2 text-left">Break In</th>
-                            <th class="px-3 py-2 text-left">Break Out</th>
-                            <th class="px-3 py-2 text-left">Late</th>
-                            <th class="px-3 py-2 text-left">OT</th>
-                            <th class="px-3 py-2 text-left">Prod</th>
-                        </tr>
-                    </thead>
-                    <tbody id="attendanceTable">
-                        @forelse($attendance as $record)
-                        <tr>
-                            <td class="px-3 py-2">{{ \Carbon\Carbon::parse($record->date)->format('d M Y') }}</td>
-                            <td class="px-3 py-2">{{ $record->check_in ?? '--' }}</td>
-                            <td class="px-3 py-2">
-                                <span class="px-2 py-1 rounded text-xs {{ $record->status == 'Present' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                    {{ $record->status }}
-                                </span>
-                            </td>
-                            <td class="px-3 py-2">{{ $record->check_out ?? '--' }}</td>
-                            <td class="px-3 py-2">{{ $record->break_in ?? '-' }}</td>
-                            <td class="px-3 py-2">{{ $record->break_out ?? '-' }}</td>
-                            <td class="px-3 py-2">{{ $record->late_minutes ? $record->late_minutes.'m' : '-' }}</td>
-                            <td class="px-3 py-2">{{ $record->overtime_minutes ? floor($record->overtime_minutes / 60).'h '.($record->overtime_minutes % 60).'m' : '-' }}</td>
-                            <td class="px-3 py-2">
-                                <span class="bg-green-500 text-white px-2 py-1 rounded text-xs">
-                                    {{ $record->production_hours ?? '0h 0m' }}
-                                </span>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr><td colspan="9" class="text-center py-3 text-gray-500">No records found.</td></tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-            <div class="p-3 flex justify-between text-xs">
-                <p>Showing {{ $attendance->firstItem() }} - {{ $attendance->lastItem() }} of {{ $attendance->total() }}</p>
-                {{ $attendance->links() }}
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Confirm Punch In
-        document.getElementById('punchInBtn')?.addEventListener('click', function () {
-            if (confirm('Are you sure you want to Punch In?')) {
-                const statusEl = document.getElementById('locationStatus');
-                if (navigator.geolocation) {
-                    statusEl.textContent = "Fetching location...";
-                    navigator.geolocation.getCurrentPosition(
-                        pos => {
-                            const dist = getDistanceFromLatLonInKm(28.6039311, 77.3984592, pos.coords.latitude, pos.coords.longitude);
-                            if (dist <= 0.3) {
-                                document.getElementById('latitude').value = pos.coords.latitude;
-                                document.getElementById('longitude').value = pos.coords.longitude;
-                                statusEl.textContent = `Inside range (${dist.toFixed(2)} km)`;
-                                document.getElementById('punchInForm').submit();
-                            } else {
-                                statusEl.textContent = `Outside range (${dist.toFixed(2)} km)`;
-                            }
-                        },
-                        () => statusEl.textContent = "Location access denied."
-                    );
-                } else {
-                    statusEl.textContent = "Geolocation not supported.";
-                }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>My Attendance - Employee Attendance Management System</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @media (max-width: 640px) {
+            .container-padding {
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
             }
-        });
-
-        function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
-            const R = 6371;
-            const dLat = deg2rad(lat2 - lat1);
-            const dLon = deg2rad(lon2 - lon1);
-            const a = Math.sin(dLat/2)**2 + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon/2)**2;
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return R * c;
-        }
-        function deg2rad(deg) { return deg * (Math.PI / 180); }
-
-        // Break Toggle
-        const breakToggle = document.getElementById('breakToggle');
-        const breakStatus = document.getElementById('breakStatus');
-        const breakTimeDisplay = document.getElementById('breakTimeDisplay');
-
-        breakToggle?.addEventListener('change', function () {
-            const active = this.checked;
             
-            if (!confirm(active ? 'Are you sure you want to start break?' : 'Are you sure you want to end break?')) {
-                this.checked = !active;
-                return;
+            .mobile-scroll {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
             }
-
-            breakStatus.textContent = active ? 'ON' : 'OFF';
-            breakStatus.className = active ? 'text-green-600 font-semibold' : 'text-gray-600';
-
-            fetch('{{ route("toggle.break") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({ break_active: active })
-            })
-            .then(r => r.json())
-            .then(data => {
-                if (data.success) {
-                    if (active) {
-                        breakTimeDisplay.innerHTML = `Break started at: ${data.break_in}`;
-                        alert(data.message);
-                    } else {
-                        breakTimeDisplay.innerHTML = `Total Break: ${data.break_display}`;
-                        alert(data.message);
-                    }
-                } else {
-                    alert(data.error);
-                    this.checked = !active;
-                    breakStatus.textContent = this.checked ? 'ON' : 'OFF';
-                    breakStatus.className = this.checked ? 'text-green-600 font-semibold' : 'text-gray-600';
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred. Please try again.');
-                this.checked = !active;
-                breakStatus.textContent = this.checked ? 'ON' : 'OFF';
-                breakStatus.className = this.checked ? 'text-green-600 font-semibold' : 'text-gray-600';
-            });
-        });
-
-        // Initialize break status
-        function initializeBreakStatus() {
-            @if($todayAttendance && $todayAttendance->break_in && !$todayAttendance->break_out)
-                breakToggle.checked = true;
-                breakStatus.textContent = 'ON';
-                breakStatus.className = 'text-green-600 font-semibold';
-                breakTimeDisplay.innerHTML = `Break started at: {{ $todayAttendance->break_in?->setTimezone('Asia/Kolkata')->format('h:i A') }}`;
-            @endif
+            
+            .mobile-text-sm {
+                font-size: 0.875rem;
+            }
+            
+            .mobile-text-xs {
+                font-size: 0.75rem;
+            }
+            
+            .mobile-p-4 {
+                padding: 1rem;
+            }
+            
+            .mobile-mb-4 {
+                margin-bottom: 1rem;
+            }
+            
+            .mobile-stack {
+                display: block;
+            }
+            
+            .mobile-hide {
+                display: none;
+            }
+        }
+        
+        @media (min-width: 641px) and (max-width: 1024px) {
+            .tablet-text-lg {
+                font-size: 1.125rem;
+            }
+            
+            .tablet-p-5 {
+                padding: 1.25rem;
+            }
+            
+            .tablet-grid-cols-2 {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+        
+        .shadow-custom {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background-color: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: #10b981;
+            transition: width 0.3s ease;
+        }
+        
+        .location-status-valid {
+            color: #10b981;
+        }
+        
+        .location-status-invalid {
+            color: #ef4444;
+        }
+        
+        /* Mobile-first responsive table */
+        @media (max-width: 768px) {
+            .responsive-table {
+                display: block;
+            }
+            
+            .responsive-table thead {
+                display: none;
+            }
+            
+            .responsive-table tbody {
+                display: block;
+            }
+            
+            .responsive-table tr {
+                display: block;
+                margin-bottom: 1rem;
+                border: 1px solid #e5e7eb;
+                border-radius: 0.5rem;
+                padding: 1rem;
+                background-color: white;
+            }
+            
+            .responsive-table td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.5rem 0;
+                border-bottom: 1px solid #f3f4f6;
+            }
+            
+            .responsive-table td:last-child {
+                border-bottom: none;
+            }
+            
+            .responsive-table td::before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: #6b7280;
+                font-size: 0.875rem;
+                min-width: 120px;
+            }
+        }
+        
+        /* Touch-friendly buttons for mobile */
+        .touch-button {
+            min-height: 44px;
+            min-width: 44px;
+        }
+        
+        /* Better tap targets for mobile */
+        @media (max-width: 640px) {
+            button, a {
+                min-height: 44px;
+            }
+        }
+        
+        /* Modal Styles */
+        .confirmation-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+        
+        .confirmation-modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 0;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .confirmation-modal-header {
+            padding: 24px 24px 16px 24px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .confirmation-modal-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .confirmation-modal-icon.location {
+            background-color: #dbeafe;
+            color: #1d4ed8;
+        }
+        
+        .confirmation-modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #111827;
+            margin: 0;
+        }
+        
+        .confirmation-modal-body {
+            padding: 20px 24px;
+            color: #6b7280;
+            line-height: 1.6;
+        }
+        
+        .confirmation-modal-footer {
+            padding: 16px 24px 24px 24px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+        
+        .confirmation-modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            min-height: 44px;
+        }
+        
+        .confirmation-modal-btn.cancel {
+            background-color: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+        
+        .confirmation-modal-btn.cancel:hover {
+            background-color: #e5e7eb;
+        }
+        
+        .confirmation-modal-btn.confirm {
+            background-color: #2563eb;
+            color: white;
+        }
+        
+        .confirmation-modal-btn.confirm:hover {
+            background-color: #1d4ed8;
+            transform: translateY(-1px);
+        }
+        
+        .confirmation-modal-btn:active {
+            transform: translateY(0);
+        }
+        
+        /* Mobile-specific modal adjustments */
+        @media (max-width: 640px) {
+            .confirmation-modal-content {
+                margin: 5% auto;
+                width: 95%;
+                max-width: 95%;
+            }
+            
+            .confirmation-modal-header {
+                padding: 16px 16px 12px 16px;
+            }
+            
+            .confirmation-modal-body {
+                padding: 16px;
+            }
+            
+            .confirmation-modal-footer {
+                padding: 12px 16px 16px 16px;
+                flex-direction: column;
+            }
+            
+            .confirmation-modal-btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+        
+        /* Location Modal */
+        @media (max-width: 768px) {
+            #location-modal .bg-white {
+                margin: 1rem;
+                width: calc(100% - 2rem);
+                max-height: calc(100vh - 2rem);
+                overflow-y: auto;
+            }
+            
+            #location-modal .h-64 {
+                height: 200px;
+            }
         }
 
-        // Call initialization when page loads
-        document.addEventListener('DOMContentLoaded', initializeBreakStatus);
-    </script>
 
-<script>
-function formatDate(date) {
-    if (!date) return '';
-    const d = new Date(date);
-    const day = String(d.getDate()).padStart(2, '0');
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const year = d.getFullYear();
-    return `${day}/${month}/${year}`;
+        /* Add these styles to your existing CSS */
+
+/* Break timer animations */
+@keyframes pulse-break {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
 }
 
-function updateDateRange() {
-    const start = document.getElementById('startDate').value;
-    const end = document.getElementById('endDate').value;
-    const hidden = document.getElementById('dateRangeHidden');
-    if (start && end) {
-        hidden.value = `${formatDate(start)} - ${formatDate(end)}`;
-    } else {
-        hidden.value = '';
+.break-timer-active {
+    animation: pulse-break 2s infinite;
+}
+
+/* Progress bar animation */
+#break-progress-bar {
+    transition: width 1s linear, background-color 0.5s ease;
+}
+
+/* Responsive adjustments for break timer */
+@media (max-width: 640px) {
+    #break-timer-display {
+        font-size: 2rem;
+    }
+    
+    #active-break-timer .flex {
+        flex-direction: column;
+    }
+    
+    #end-break-timer-btn {
+        margin-top: 1rem;
+        width: 100%;
     }
 }
 
-function updateDateRangeAndSubmit() {
-    updateDateRange();
-    document.getElementById('filterForm').submit();
+@media (min-width: 641px) and (max-width: 1024px) {
+    #break-timer-display {
+        font-size: 3rem;
+    }
+}
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="max-w-7xl mx-auto py-3 md:py-6 px-3 sm:px-4 lg:px-8 container-padding">
+        <!-- Employee Dashboard -->
+        <div class="mb-8 md:mb-12">
+            <!-- Header Section -->
+            <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-4 md:mb-6 mobile-mb-4">
+                <div class="mb-3 md:mb-0">
+                    <h2 class="text-xl md:text-2xl font-bold text-gray-800">Employee Attendance</h2>
+                    <p class="text-sm md:text-base text-gray-600">By: Employee / My Attendance</p>
+                </div>
+                <div class="text-left md:text-right">
+                    <p class="text-sm md:text-base text-gray-600" id="current-date">Loading date...</p>
+                    <p class="text-sm md:text-base text-gray-800 font-medium">Punch In: <span id="current-punch-time">--:--</span></p>
+                </div>
+            </div>
+           
+            <!-- Employee Profile and Stats Section -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 mb-4 md:mb-6">
+                <!-- Employee Profile Card -->
+                <div class="bg-white rounded-xl shadow-custom p-4 md:p-6 md:col-span-1">
+                    <div class="flex flex-col items-center text-center">
+                        <img class="h-16 w-16 md:h-24 md:w-24 rounded-full mb-3 md:mb-4" src="{{ $profile['avatar'] }}" alt="Employee avatar">
+                        <h3 class="text-base md:text-lg font-bold text-gray-800 truncate w-full">{{ $profile['name'] }}</h3>
+                        <p class="text-xs md:text-sm text-gray-600 mb-1 md:mb-2 truncate w-full">{{ $profile['role'] }}</p>
+                        <p class="text-xs text-gray-500 mb-3 md:mb-4 truncate w-full">{{ $profile['company'] }}</p>
+                       
+                        <div class="w-full border-t border-gray-200 pt-3 md:pt-4">
+                            <div class="flex justify-between mb-1 md:mb-2">
+                                <span class="text-xs md:text-sm text-gray-600">Employee ID:</span>
+                                <span class="text-xs md:text-sm font-medium">{{ $profile['employee_id'] }}</span>
+                            </div>
+                            <div class="flex justify-between mb-1 md:mb-2">
+                                <span class="text-xs md:text-sm text-gray-600">Department:</span>
+                                <span class="text-xs md:text-sm font-medium">{{ $profile['department'] }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-xs md:text-sm text-gray-600">Join Date:</span>
+                                <span class="text-xs md:text-sm font-medium">{{ $profile['join_date'] }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+               
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 md:col-span-3">
+                    <div class="bg-white rounded-xl shadow-custom p-4 md:p-6">
+                        <div class="flex items-center">
+                            <div class="rounded-full bg-blue-100 p-2 md:p-3 mr-3 md:mr-4">
+                                <i class="fas fa-calendar-check text-blue-600 text-lg md:text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs md:text-sm font-medium text-gray-500">Present Days</p>
+                                <h3 class="text-lg md:text-xl font-bold text-gray-800">{{ $presentDays }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                   
+                    <div class="bg-white rounded-xl shadow-custom p-4 md:p-6">
+                        <div class="flex items-center">
+                            <div class="rounded-full bg-green-100 p-2 md:p-3 mr-3 md:mr-4">
+                                <i class="fas fa-clock text-green-600 text-lg md:text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs md:text-sm font-medium text-gray-500">Total Working Hours</p>
+                                <h3 class="text-lg md:text-xl font-bold text-gray-800" id="total-hours">{{ $totalHours }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                   
+                    <div class="bg-white rounded-xl shadow-custom p-4 md:p-6">
+                        <div class="flex items-center">
+                            <div class="rounded-full bg-yellow-100 p-2 md:p-3 mr-3 md:mr-4">
+                                <i class="fas fa-utensils text-yellow-600 text-lg md:text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs md:text-sm font-medium text-gray-500">Break Duration</p>
+                                <h3 class="text-lg md:text-xl font-bold text-gray-800" id="break-duration">{{ $todayBreakDuration }}</h3>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Add this HTML section after the break duration stat card -->
+<div class="bg-white rounded-xl shadow-custom p-4 md:p-6 mb-4 md:mb-6">
+    <h3 class="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4">Break Timer</h3>
+    
+    <!-- Active Break Timer Display -->
+   <!-- Compact Break Timer -->
+<div id="active-break-timer"
+     class="hidden fixed bottom-4 right-4 z-50 bg-white shadow-lg rounded-full px-4 py-2 flex items-center gap-3 border border-yellow-200">
+
+    <!-- Icon -->
+    <div class="w-8 h-8 flex items-center justify-center rounded-full bg-yellow-100 text-yellow-600">
+        <i class="fas fa-clock text-sm"></i>
+    </div>
+
+    <!-- Time -->
+    <div class="flex flex-col leading-tight">
+        <span class="text-xs text-gray-500">On Break</span>
+        <span id="break-timer-display"
+              class="text-sm font-semibold text-gray-800">
+            00:00
+        </span>
+    </div>
+
+    <!-- Progress -->
+    <div class="w-16 h-1 bg-yellow-100 rounded-full overflow-hidden">
+        <div id="break-progress-bar"
+             class="h-full bg-yellow-500 transition-all duration-1000"
+             style="width: 0%"></div>
+    </div>
+
+    <!-- End Button -->
+    <button id="end-break-timer-btn"
+            class="w-8 h-8 flex items-center justify-center rounded-full bg-red-500 hover:bg-red-600 text-white">
+        <i class="fas fa-stop text-xs"></i>
+    </button>
+</div>
+
+    
+    <!-- No Active Break Message -->
+    <div id="no-active-break" class="bg-gray-50 border border-gray-200 rounded-lg p-4 md:p-6 text-center">
+        <i class="fas fa-coffee text-gray-400 text-3xl mb-3"></i>
+        <h4 class="text-lg font-semibold text-gray-700 mb-2">No Active Break</h4>
+        <p class="text-gray-600 text-sm mb-4">You're currently not on a break. Start a break to see the timer.</p>
+        
+        <!-- Break Statistics -->
+        <div class="grid grid-cols-2 gap-4 mt-4">
+            <div class="bg-white p-3 rounded-lg shadow-sm">
+                <div class="text-xs text-gray-500">Today's Breaks</div>
+                <div class="text-lg font-bold text-gray-800" id="today-break-count">0</div>
+            </div>
+            <div class="bg-white p-3 rounded-lg shadow-sm">
+                <div class="text-xs text-gray-500">Total Break Time</div>
+                <div class="text-lg font-bold text-gray-800" id="today-total-break">00:00</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Break History -->
+    <div class="mt-6">
+        <h5 class="text-sm font-semibold text-gray-700 mb-3">Today's Breaks</h5>
+        <div class="overflow-hidden bg-white shadow-sm rounded-lg">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Start Time</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">End Time</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Duration</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="break-history-table" class="divide-y divide-gray-200">
+                    <!-- Break history rows will be populated by JavaScript -->
+                </tbody>
+            </table>
+            <div id="no-breaks-message" class="p-4 text-center text-gray-500">
+                <i class="fas fa-history text-gray-300 text-2xl mb-2"></i>
+                <p>No breaks taken today</p>
+            </div>
+        </div>
+    </div>
+</div>
+                   
+                    <div class="bg-white rounded-xl shadow-custom p-4 md:p-6">
+                        <div class="flex items-center">
+                            <div class="rounded-full bg-purple-100 p-2 md:p-3 mr-3 md:mr-4">
+                                <i class="fas fa-business-time text-purple-600 text-lg md:text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs md:text-sm font-medium text-gray-500">Today's Progress</p>
+                                <h3 class="text-lg md:text-xl font-bold text-gray-800" id="today-progress">{{ round($todayProgress) }}%</h3>
+                            </div>
+                        </div>
+                        <div class="mt-2 progress-bar">
+                            <div class="progress-fill" id="progress-fill" style="width: {{ $todayProgress }}%"></div>
+                        </div>
+                    </div>
+                   
+                    <div class="bg-white rounded-xl shadow-custom p-4 md:p-6">
+                        <div class="flex items-center">
+                            <div class="rounded-full bg-red-100 p-2 md:p-3 mr-3 md:mr-4">
+                                <i class="fas fa-calendar-times text-red-600 text-lg md:text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs md:text-sm font-medium text-gray-500">Absent Days</p>
+                                <h3 class="text-lg md:text-xl font-bold text-gray-800">{{ $absentDays }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                   
+                    <div class="bg-white rounded-xl shadow-custom p-4 md:p-6">
+                        <div class="flex items-center">
+                            <div class="rounded-full bg-indigo-100 p-2 md:p-3 mr-3 md:mr-4">
+                                <i class="fas fa-percentage text-indigo-600 text-lg md:text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs md:text-sm font-medium text-gray-500">Attendance %</p>
+                                <h3 class="text-lg md:text-xl font-bold text-gray-800">{{ $attendancePercentage }}%</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+           
+            <!-- Punch Controls -->
+            <div class="bg-white rounded-xl shadow-custom p-4 md:p-6 mb-4 md:mb-6">
+                <h3 class="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4">Attendance Actions</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+                    <button id="punch-in-btn" class="touch-button bg-green-500 hover:bg-green-600 text-white font-bold py-3 md:py-4 px-3 md:px-4 rounded-lg flex items-center justify-center {{ $todayRecord && $todayRecord->punch_in ? 'opacity-50 cursor-not-allowed' : 'pulse-animation' }}" {{ $todayRecord && $todayRecord->punch_in ? 'disabled' : '' }}>
+                        <i class="fas fa-sign-in-alt mr-2 text-sm md:text-base"></i>
+                        <span class="text-sm md:text-base">Punch In</span>
+                    </button>
+                    <button id="punch-out-btn" class="touch-button bg-red-500 hover:bg-red-600 text-white font-bold py-3 md:py-4 px-3 md:px-4 rounded-lg flex items-center justify-center {{ !$todayRecord || !$todayRecord->punch_in ? 'opacity-50 cursor-not-allowed' : '' }}" {{ !$todayRecord || !$todayRecord->punch_in ? 'disabled' : '' }}>
+                        <i class="fas fa-sign-out-alt mr-2 text-sm md:text-base"></i>
+                        <span class="text-sm md:text-base">Punch Out</span>
+                    </button>
+                 <button id="break-in-btn"
+    class="touch-button bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 rounded-lg">
+    <i class="fas fa-pause mr-2"></i> Break In
+</button>
+
+<button id="break-out-btn"
+    class="touch-button bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-lg">
+    <i class="fas fa-play mr-2"></i> Break Out
+</button>
+
+
+                </div>
+               
+                <div class="mt-4 md:mt-6">
+                    <div class="flex items-center mb-1 md:mb-2">
+                        <i class="fas fa-map-marker-alt text-red-500 mr-2 text-sm md:text-base"></i>
+                        <span class="text-sm md:text-base font-medium text-gray-700">Current Location:</span>
+                        <span id="location-status" class="ml-2 text-xs md:text-sm font-medium"></span>
+                    </div>
+                    <div id="location-display" class="text-xs md:text-sm text-gray-600 bg-gray-100 p-2 md:p-3 rounded-lg">
+                        {{ $todayRecord->location ?? 'Location will be captured when you punch in' }}
+                    </div>
+                    <div id="distance-display" class="text-xs text-gray-500 mt-1"></div>
+                </div>
+            </div>
+           
+            <!-- Attendance Log Table -->
+            <div class="bg-white rounded-xl shadow-custom p-4 md:p-6 mb-6">
+                <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-3 md:mb-4">
+                    <h3 class="text-base md:text-lg font-semibold text-gray-800 mb-2 md:mb-0">Attendance Log</h3>
+                    <div class="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+                        <div class="flex items-center">
+                            <span class="text-xs md:text-sm text-gray-600 mr-2">Month:</span>
+                            <select class="border border-gray-300 rounded-lg px-2 md:px-3 py-1 md:py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm md:text-base w-full sm:w-auto" id="attendance-month-filter">
+                                @for ($m = 1; $m <= 12; $m++)
+                                    <option value="{{ $m }}" {{ $currentMonth == $m ? 'selected' : '' }}>
+                                        {{ date('F Y', mktime(0, 0, 0, $m, 1, now()->year)) }}
+                                    </option>
+                                @endfor
+                            </select>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs md:text-sm text-gray-600 mr-2">Page:</span>
+                            <span class="text-xs md:text-sm font-medium">1/2</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="overflow-x-auto mobile-scroll">
+                    <!-- Desktop Table -->
+                    <table class="min-w-full divide-y divide-gray-200 hidden md:table responsive-table">
+                        <thead>
+                            <tr>
+                                <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Punch In</th>
+                                <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Punch Out</th>
+                                <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Work Hours</th>
+                                <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th>Breaks</th>
+<th>Total Break</th>
+
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200" id="employee-attendance-log">
+                            <!-- Rows populated by JS -->
+                        </tbody>
+                    </table>
+                    
+                    <!-- Mobile Cards View -->
+                    <div class="md:hidden" id="mobile-attendance-cards">
+                        <!-- Cards will be populated by JS -->
+                    </div>
+                </div>
+                <div class="mt-3 md:mt-4 flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
+                    <div>
+                        <span class="text-xs md:text-sm text-gray-600">{{ date('F 1, Y', strtotime('first day of this month')) }} of service</span>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button class="touch-button bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-1 px-2 md:px-3 rounded text-sm">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="touch-button bg-blue-500 hover:bg-blue-600 text-white font-medium py-1 px-2 md:px-3 rounded text-sm">
+                            1
+                        </button>
+                        <button class="touch-button bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-1 px-2 md:px-3 rounded text-sm">
+                            2
+                        </button>
+                        <button class="touch-button bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-1 px-2 md:px-3 rounded text-sm">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Location Modal -->
+    <div id="location-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-2 md:p-4">
+        <div class="bg-white rounded-xl shadow-custom p-4 md:p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-3 md:mb-4">
+                <h3 class="text-base md:text-lg font-semibold text-gray-800">Location Details</h3>
+                <button id="close-modal" class="text-gray-500 hover:text-gray-700 touch-button">
+                    <i class="fas fa-times text-lg md:text-xl"></i>
+                </button>
+            </div>
+            <div class="bg-gray-100 h-48 md:h-64 rounded-lg flex items-center justify-center mb-3 md:mb-4">
+                <div class="text-center p-4">
+                    <i class="fas fa-map-marked-alt text-3xl md:text-4xl text-gray-400 mb-2"></i>
+                    <p class="text-gray-500 text-sm md:text-base">GPS Location Map</p>
+                    <p id="modal-location-text" class="text-xs md:text-sm text-gray-600 mt-2 break-words"></p>
+                    <p id="modal-distance-text" class="text-xs md:text-sm font-medium mt-1"></p>
+                </div>
+            </div>
+            <div class="flex justify-end">
+                <button id="close-modal-btn" class="touch-button bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg text-sm md:text-base">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Location Confirmation Modal -->
+    <div id="locationConfirmationModal" class="confirmation-modal">
+        <div class="confirmation-modal-content">
+            <div class="confirmation-modal-header">
+                <div class="confirmation-modal-icon location">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <h3 class="confirmation-modal-title" id="confirmationModalTitle">Location Access Required</h3>
+            </div>
+            <div class="confirmation-modal-body">
+                <p id="confirmationModalMessage">This action requires access to your GPS location to verify your attendance.</p>
+                <div class="mt-4 p-3 bg-blue-50 rounded-lg">
+                    <div class="flex items-start gap-2">
+                        <i class="fas fa-info-circle text-blue-500 mt-1"></i>
+                        <div>
+                            <p class="text-sm text-blue-700 font-medium">Why we need your location?</p>
+                            <p class="text-xs text-blue-600 mt-1">To ensure you're within the allowed office premises and maintain accurate attendance records.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="confirmation-modal-footer">
+                <button type="button" class="confirmation-modal-btn cancel" id="confirmationModalCancel">
+                    <i class="fas fa-times mr-2"></i>Cancel
+                </button>
+                <button type="button" class="confirmation-modal-btn confirm" id="confirmationModalConfirm">
+                    <i class="fas fa-check mr-2"></i>Allow Location
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="breakDetailsModal"
+     class="fixed inset-0 bg-black bg-opacity-40 hidden z-50 flex items-center justify-center">
+    <div class="bg-white rounded-xl w-full max-w-md p-5 shadow-lg">
+        <div class="flex justify-between items-center mb-3">
+            <h3 class="text-lg font-semibold text-gray-800">Break Details</h3>
+            <button onclick="closeBreakDetails()" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div id="breakDetailsList"
+             class="space-y-2 max-h-80 overflow-y-auto text-sm text-gray-700">
+        </div>
+    </div>
+</div>
+
+    
+<script>
+
+   const BREAK_STORAGE_KEY = `active_break_${{{ auth()->id() }}}`;
+
+
+// ──────────────────────────────────────────────────────────────────────────────
+// CONSTANTS & CONFIG
+// ──────────────────────────────────────────────────────────────────────────────
+const OFFICE_LAT = 28.618711;
+const OFFICE_LON = 77.389686;
+const ALLOWED_DISTANCE_KM = 1;
+const MAX_BREAK_SECONDS = 3600; // 1 hour maximum break time
+
+// ──────────────────────────────────────────────────────────────────────────────
+// STATE VARIABLES
+// ──────────────────────────────────────────────────────────────────────────────
+let attendanceData = @json($jsAttendanceData);
+const initialAttendanceLog = @json($attendanceLog);
+
+let workTimer = null;
+let workSeconds = 0;
+let totalWorkSeconds = 0;
+
+let breakTimerInterval = null;
+let breakStartTime = null;
+let currentBreakSeconds = 0;
+
+let breakAlertShown = false;
+
+
+let punchInTime = attendanceData.punchIn ? new Date(attendanceData.punchIn) : null;
+let lunchStartTime = attendanceData.lunchStart ? new Date(attendanceData.lunchStart) : null;
+
+// ──────────────────────────────────────────────────────────────────────────────
+// DOM ELEMENTS
+// ──────────────────────────────────────────────────────────────────────────────
+const elements = {
+    punchInBtn: document.getElementById('punch-in-btn'),
+    punchOutBtn: document.getElementById('punch-out-btn'),
+    breakInBtn: document.getElementById('break-in-btn'),
+    breakOutBtn: document.getElementById('break-out-btn'),
+
+    locationDisplay: document.getElementById('location-display'),
+    locationStatus: document.getElementById('location-status'),
+    distanceDisplay: document.getElementById('distance-display'),
+
+    totalHours: document.getElementById('total-hours'),
+    breakDurationEl: document.getElementById('break-duration'),
+    currentPunchTime: document.getElementById('current-punch-time'),
+    currentDate: document.getElementById('current-date'),
+
+    todayProgress: document.getElementById('today-progress'),
+    progressFill: document.getElementById('progress-fill'),
+
+    employeeAttendanceLog: document.getElementById('employee-attendance-log'),
+    mobileAttendanceCards: document.getElementById('mobile-attendance-cards'),
+
+    locationModal: document.getElementById('location-modal'),
+    modalLocationText: document.getElementById('modal-location-text'),
+    modalDistanceText: document.getElementById('modal-distance-text'),
+
+    // Break timer specific elements
+    activeBreakTimer: document.getElementById('active-break-timer'),
+    noActiveBreak: document.getElementById('no-active-break'),
+    breakStartTimeEl: document.getElementById('break-start-time'),
+    breakTimerDisplay: document.getElementById('break-timer-display'),
+    breakProgressBar: document.getElementById('break-progress-bar'),
+    breakTimerProgress: document.getElementById('break-timer-progress'),
+    endBreakTimerBtn: document.getElementById('end-break-timer-btn'),
+};
+
+// CSRF Token
+const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+// ──────────────────────────────────────────────────────────────────────────────
+// INITIALIZATION
+// ──────────────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function () {
+    initEventListeners();
+    initializeTimersAndUI();
+    initializeBreakTimer();
+
+    // Periodic updates
+    setInterval(updateCurrentDateTime, 60000);
+    setInterval(checkBreakStatus, 30000);
+
+    // Initial UI setup
+    updateCurrentDateTime();
+    generateEmployeeAttendanceLog(initialAttendanceLog);
+    generateMobileAttendanceCards(initialAttendanceLog);
+    updateButtonStates();
+    handleResize();
+
+    window.addEventListener('resize', handleResize);
+});
+
+// ──────────────────────────────────────────────────────────────────────────────
+// EVENT LISTENERS
+// ──────────────────────────────────────────────────────────────────────────────
+function initEventListeners() {
+    elements.punchInBtn?.addEventListener('click', () => handleAttendanceAction('punchIn', '{{ route("my-attendance.punch-in") }}'));
+    elements.punchOutBtn?.addEventListener('click', () => handleAttendanceAction('punchOut', '{{ route("my-attendance.punch-out") }}'));
+
+    elements.breakInBtn?.addEventListener('click', handleBreakIn);
+    elements.breakOutBtn?.addEventListener('click', () => handleBreakEndAction('breakOut', '{{ route("my-attendance.break-out") }}'));
+    elements.endBreakTimerBtn?.addEventListener('click', () => handleBreakEndAction('breakOut', '{{ route("my-attendance.break-out") }}'));
+
+    document.getElementById('close-modal')?.addEventListener('click', closeLocationModal);
+    document.getElementById('close-modal-btn')?.addEventListener('click', closeLocationModal);
+
+    document.getElementById('attendance-month-filter')?.addEventListener('change', filterEmployeeAttendance);
 }
 
-// Update on date changes
-document.getElementById('startDate').addEventListener('change', updateDateRange);
-document.getElementById('endDate').addEventListener('change', updateDateRange);
+// ──────────────────────────────────────────────────────────────────────────────
+// BREAK TIMER MANAGEMENT
+// ──────────────────────────────────────────────────────────────────────────────
+function initializeBreakTimer() {
+    const storedBreakTime = localStorage.getItem(BREAK_STORAGE_KEY);
 
-// Initial update if values present
-updateDateRange();
+    if (attendanceData.breakRunning && storedBreakTime) {
+        breakStartTime = new Date(storedBreakTime);
+
+        if (!isNaN(breakStartTime.getTime())) {
+            currentBreakSeconds = Math.floor(
+                (Date.now() - breakStartTime.getTime()) / 1000
+            );
+
+            showActiveBreakTimer();
+            startBreakTimerDisplay();
+        }
+    }
+
+    checkBreakStatus();
+}
+
+
+
+
+
+async function checkBreakStatus() {
+    try {
+        const response = await fetch('{{ route("my-attendance.break-status") }}');
+        if (!response.ok) throw new Error('Break status check failed');
+
+        const data = await response.json();
+        if (data.error) {
+            console.error('Break status error:', data.error);
+            return;
+        }
+
+        attendanceData.breakRunning = data.break_running;
+
+    if (data.break_running && data.break_data?.break_in) {
+
+    // 🔒 SET ONLY ONCE
+    if (!breakStartTime) {
+        breakStartTime = new Date(data.break_data.break_in);
+
+        if (isNaN(breakStartTime.getTime())) return;
+
+        currentBreakSeconds = Math.floor(
+            data.break_data.break_duration_seconds || 0
+        );
+    }
+
+    showActiveBreakTimer();
+
+    if (!breakTimerInterval && breakStartTime) {
+    startBreakTimerDisplay();
+}
+
+}
+
+
+
+
+        updateButtonStates();
+    } catch (err) {
+        console.error('Failed to check break status:', err);
+    }
+}
+
+function showActiveBreakTimer() {
+    if (!elements.activeBreakTimer) return;
+
+    elements.activeBreakTimer.classList.remove('hidden');
+    elements.noActiveBreak?.classList.add('hidden');
+}
+
+
+
+function hideActiveBreakTimer() {
+    if (!elements.activeBreakTimer) return;
+
+    elements.activeBreakTimer.classList.add('hidden');
+    elements.noActiveBreak?.classList.remove('hidden');
+
+    if (breakTimerInterval) {
+        clearInterval(breakTimerInterval);
+        breakTimerInterval = null;
+    }
+}
+
+
+function startBreakTimerDisplay() {
+    if (breakTimerInterval) return;
+
+    breakTimerInterval = setInterval(() => {
+        // 🛑 HARD GUARD
+        if (!breakStartTime || isNaN(breakStartTime.getTime())) {
+            return;
+        }
+
+        currentBreakSeconds = Math.floor(
+            (Date.now() - breakStartTime.getTime()) / 1000
+        );
+
+        updateBreakTimerDisplay();
+
+        if (currentBreakSeconds >= MAX_BREAK_SECONDS && !breakAlertShown) {
+            breakAlertShown = true;
+            alert('⚠️ Maximum break time (1 hour) exceeded! Please end your break.');
+        }
+    }, 1000);
+}
+
+
+
+
+function updateBreakTimerDisplay() {
+    if (
+        !elements.breakTimerDisplay ||
+        isNaN(currentBreakSeconds)
+    ) return;
+
+    const totalSeconds = Math.max(0, Math.floor(currentBreakSeconds));
+
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+
+    elements.breakTimerDisplay.textContent =
+        `${padZero(minutes)}:${padZero(seconds)}`;
+
+    const percent = Math.min(
+        (totalSeconds / MAX_BREAK_SECONDS) * 100,
+        100
+    );
+
+    elements.breakProgressBar.style.width = `${percent}%`;
+}
+
+
+
+
+// ──────────────────────────────────────────────────────────────────────────────
+// BREAK ACTIONS
+// ──────────────────────────────────────────────────────────────────────────────
+async function handleBreakIn() {
+    if (attendanceData.breakRunning) {
+        alert('ℹ️ Break is already in progress!');
+        location.reload();
+        return;
+    }
+
+    try {
+        const confirmLocation = await showLocationConfirmation('breakIn');
+        if (!confirmLocation) return;
+
+        const locationData = await getLocation();
+        const postData = createLocationPostData(locationData);
+
+        const result = await ajaxPost('{{ route("my-attendance.break-in") }}', postData);
+
+        if (result.error) {
+            alert(result.error);
+            return;
+        }
+
+        // ✅ SET STATE
+        // ✅ SET STATE
+attendanceData.breakRunning = true;
+
+breakStartTime = new Date(result.break_in ?? Date.now());
+localStorage.setItem(BREAK_STORAGE_KEY, breakStartTime.toISOString());
+
+
+currentBreakSeconds = 0;
+breakAlertShown = false;
+
+showActiveBreakTimer();
+startBreakTimerDisplay();
+updateButtonStates();
+
+// location.reload();
+
+
+    } catch (err) {
+        console.error('Break in failed:', err);
+        alert('Break in failed');
+    }
+}
+
+
+async function handleBreakEndAction(actionType, route) {
+    try {
+        const confirmLocation = await showLocationConfirmation(actionType);
+        if (!confirmLocation) return;
+
+        const locationData = await getLocation();
+        showLocationModal(locationData);
+
+        if (!locationData.isWithinRange && !locationData.error) {
+            const proceed = confirm(
+                `📍 You are ${locationData.distance}km away from office (allowed: ${ALLOWED_DISTANCE_KM}km).\n\nDo you want to proceed anyway?`
+            );
+            if (!proceed) return;
+        }
+
+        const postData = createLocationPostData(locationData);
+        const result = await ajaxPost(route, postData);
+
+        if (result.error) {
+            alert(`❌ Error: ${result.error}`);
+            return;
+        }
+
+        // ────────────────────────────────
+        // SUCCESS: API call succeeded
+        // ────────────────────────────────
+
+        updateLocationDisplay(locationData);
+
+        let message = `✅ Break Ended Successfully!`;
+        if (result.break_duration) message += `\nBreak Duration: ${result.break_duration}`;
+        if (result.total_break_time) message += `\nTotal Break Today: ${result.total_break_time}`;
+        alert(message);
+
+        if (result.total_break_time) {
+            elements.breakDurationEl.textContent = result.total_break_time;
+        }
+
+        // ────────────────────────────────
+        // FINAL CLEANUP & STATE RESET (ONLY ON SUCCESS)
+        // ────────────────────────────────
+
+        // Clear persisted break data from localStorage
+        localStorage.removeItem(BREAK_STORAGE_KEY);
+
+        // Stop and clear the break timer interval
+        if (breakTimerInterval) {
+            clearInterval(breakTimerInterval);
+            breakTimerInterval = null;
+        }
+
+        // Reset all break-related variables
+        breakStartTime = null;
+        currentBreakSeconds = 0;
+        breakAlertShown = false;
+
+        // Update attendance state
+        attendanceData.breakRunning = false;
+
+        // Update UI
+        hideActiveBreakTimer();
+        updateButtonStates();
+
+        // Refresh break history and reload page (or update UI dynamically)
+        updateBreakHistory();
+        location.reload(); // Consider replacing with dynamic UI updates in production
+
+
+    } catch (error) {
+        console.error('Break end error:', error);
+        alert(`❌ Error during break out: ${error.message || error}`);
+    }
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// GENERAL ATTENDANCE ACTIONS
+// ──────────────────────────────────────────────────────────────────────────────
+async function handleAttendanceAction(actionType, route) {
+    try {
+        const confirmLocation = await showLocationConfirmation(actionType);
+        if (!confirmLocation) return;
+
+        const locationData = await getLocation();
+        showLocationModal(locationData);
+
+        if (!locationData.isWithinRange && !locationData.error) {
+            const proceed = confirm(`📍 Location Alert\n\nYou are ${locationData.distance}km away from office (allowed: ${ALLOWED_DISTANCE_KM}km).\n\nProceed with ${actionType.replace(/([A-Z])/g, ' $1').trim()} anyway?`);
+            if (!proceed) return;
+        }
+
+        const postData = createLocationPostData(locationData);
+        const result = await ajaxPost(route, postData);
+
+        if (result.error) {
+            alert(`❌ Error: ${result.error}`);
+            return;
+        }
+
+        updateLocationDisplay(locationData);
+
+        const actionNames = {
+            'punchIn': 'Punched In',
+            'punchOut': 'Punched Out',
+            'breakIn': 'Break Started',
+            'breakOut': 'Break Ended'
+        };
+
+        let successMessage = `✅ ${actionNames[actionType]} Successfully!`;
+        if (result.work_hours) successMessage += `\nTotal Work Hours: ${result.work_hours}`;
+        if (result.break_duration) successMessage += `\nBreak Duration: ${result.break_duration}`;
+        if (result.total_break_time) successMessage += `\nTotal Break Today: ${result.total_break_time}`;
+        if (locationData.distance) successMessage += `\nDistance: ${locationData.distance}km`;
+
+
+        alert(successMessage);
+
+        // location.reload(); 
+
+    } catch (error) {
+        console.error(`${actionType} error:`, error);
+        alert(`❌ Error during ${actionType}: ${error.message}`);
+    }
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// HELPERS
+// ──────────────────────────────────────────────────────────────────────────────
+function padZero(num) {
+    return num.toString().padStart(2, '0');
+}
+
+function createLocationPostData(locationData) {
+    const data = { location: locationData.fullLocation || locationData.message };
+    if (locationData.latitude && locationData.longitude) {
+        Object.assign(data, {
+            latitude: locationData.latitude,
+            longitude: locationData.longitude,
+            accuracy: locationData.accuracy,
+            distance: locationData.distance,
+            is_within_range: locationData.isWithinRange
+        });
+    }
+    return data;
+}
+
+function getLocation() {
+    return new Promise((resolve) => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude, accuracy } = position.coords;
+                    const distance = calculateDistance(latitude, longitude, OFFICE_LAT, OFFICE_LON);
+                    const isWithinRange = distance <= ALLOWED_DISTANCE_KM;
+
+                    resolve({
+                        latitude: latitude.toFixed(6),
+                        longitude: longitude.toFixed(6),
+                        accuracy: accuracy.toFixed(2),
+                        distance: distance.toFixed(2),
+                        isWithinRange,
+                        location: `Lat: ${latitude.toFixed(6)}, Lng: ${longitude.toFixed(6)}`,
+                        fullLocation: `Lat: ${latitude.toFixed(6)}, Lng: ${longitude.toFixed(6)}, Accuracy: ${accuracy.toFixed(2)}m, Distance: ${distance.toFixed(2)}km`
+                    });
+                },
+                () => {
+                    resolve({
+                        error: true,
+                        message: 'Location access denied or unavailable',
+                        isWithinRange: false
+                    });
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            );
+        } else {
+            resolve({
+                error: true,
+                message: 'Geolocation not supported',
+                isWithinRange: false
+            });
+        }
+    });
+}
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+}
+
+function updateLocationDisplay(locationData) {
+    if (locationData.error) {
+        elements.locationDisplay.textContent = locationData.message;
+        elements.locationStatus.textContent = '❌ Location Error';
+        elements.locationStatus.className = 'ml-2 text-sm font-medium location-status-invalid';
+        elements.distanceDisplay.textContent = '';
+        return false;
+    }
+
+    elements.locationDisplay.textContent = locationData.location;
+    elements.distanceDisplay.textContent = `Distance from office: ${locationData.distance}km | Accuracy: ${locationData.accuracy}m`;
+
+    if (locationData.isWithinRange) {
+        elements.locationStatus.textContent = '✅ Within Range';
+        elements.locationStatus.className = 'ml-2 text-sm font-medium location-status-valid';
+    } else {
+        elements.locationStatus.textContent = '❌ Out of Range';
+        elements.locationStatus.className = 'ml-2 text-sm font-medium location-status-invalid';
+    }
+
+    return locationData.isWithinRange;
+}
+
+function showLocationConfirmation(actionType) {
+    return new Promise((resolve) => {
+        const actionNames = {
+            punchIn: 'Punch In',
+            punchOut: 'Punch Out',
+            breakIn: 'Break Start',
+            breakOut: 'Break End'
+        };
+
+        const modal = document.getElementById('locationConfirmationModal');
+        if (!modal) {
+            resolve(true); // fallback if no confirmation modal
+            return;
+        }
+
+        const title = document.getElementById('confirmationModalTitle');
+        const message = document.getElementById('confirmationModalMessage');
+        const confirmBtn = document.getElementById('confirmationModalConfirm');
+        const cancelBtn = document.getElementById('confirmationModalCancel');
+
+        title.textContent = `📍 ${actionNames[actionType]} - Location Access`;
+        message.textContent = `This action requires access to your GPS location to verify you're within office premises.`;
+
+        modal.style.display = 'block';
+
+        const handleConfirm = () => { cleanup(); resolve(true); };
+        const handleCancel = () => { cleanup(); resolve(false); };
+        const handleEscape = (e) => { if (e.key === 'Escape') handleCancel(); };
+        const handleOutside = (e) => { if (e.target === modal) handleCancel(); };
+
+        const cleanup = () => {
+            modal.style.display = 'none';
+            confirmBtn.removeEventListener('click', handleConfirm);
+            cancelBtn.removeEventListener('click', handleCancel);
+            document.removeEventListener('keydown', handleEscape);
+            modal.removeEventListener('click', handleOutside);
+        };
+
+        confirmBtn.addEventListener('click', handleConfirm);
+        cancelBtn.addEventListener('click', handleCancel);
+        document.addEventListener('keydown', handleEscape);
+        modal.addEventListener('click', handleOutside);
+
+        confirmBtn.focus();
+    });
+}
+
+function showLocationModal(locationData) {
+    if (locationData.error) {
+        elements.modalLocationText.textContent = locationData.message;
+        elements.modalDistanceText.textContent = '';
+    } else {
+        elements.modalLocationText.textContent = locationData.fullLocation;
+        elements.modalDistanceText.textContent = `Distance from office: ${locationData.distance}km ${locationData.isWithinRange ? '✅' : '❌'}`;
+        elements.modalDistanceText.className = locationData.isWithinRange ? 'location-status-valid' : 'location-status-invalid';
+    }
+    elements.locationModal?.classList.remove('hidden');
+}
+
+function closeLocationModal() {
+    elements.locationModal?.classList.add('hidden');
+}
+
+function updateCurrentDateTime() {
+    const now = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+    const date = new Date(now).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: '2-digit', month: '2-digit', year: 'numeric' });
+    const parts = date.split('/');
+    elements.currentDate.textContent = `${parts[0]}-${parts[1]}-${parts[2]}`;
+}
+
+async function ajaxPost(route, data = {}) {
+    const response = await fetch(route, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken,
+        },
+        body: JSON.stringify(data),
+    });
+
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    return await response.json();
+}
+
+function updateButtonStates() {
+  const isBreakActive = attendanceData.breakRunning === true;
+
+    // Punch In
+    elements.punchInBtn.disabled = !!attendanceData.punchIn;
+    if (attendanceData.punchIn) {
+        elements.punchInBtn.title = 'You have already punched in today';
+    }
+
+    // Punch Out
+    elements.punchOutBtn.disabled = !attendanceData.punchIn || !!attendanceData.punchOut || isBreakActive;
+    if (attendanceData.punchOut) {
+        elements.punchOutBtn.title = 'You have already punched out today';
+    } else if (isBreakActive) {
+        elements.punchOutBtn.title = 'Cannot punch out during break';
+    } else if (!attendanceData.punchIn) {
+        elements.punchOutBtn.title = 'Please punch in first';
+    }
+
+    // Break In
+    elements.breakInBtn.disabled = !attendanceData.punchIn || isBreakActive || !!attendanceData.punchOut;
+    if (isBreakActive) {
+        elements.breakInBtn.title = 'Break already in progress';
+    } else if (!attendanceData.punchIn) {
+        elements.breakInBtn.title = 'Please punch in first';
+    } else if (attendanceData.punchOut) {
+        elements.breakInBtn.title = 'Cannot start break after punch out';
+    }
+
+    // Break Out
+    elements.breakOutBtn.disabled = !isBreakActive || !!attendanceData.punchOut;
+    if (!isBreakActive) {
+        elements.breakOutBtn.title = 'No active break to end';
+    } else if (attendanceData.punchOut) {
+        elements.breakOutBtn.title = 'Cannot end break after punch out';
+    }
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// UI GENERATION
+// ──────────────────────────────────────────────────────────────────────────────
+function generateEmployeeAttendanceLog(data) {
+    if (!elements.employeeAttendanceLog) return;
+    elements.employeeAttendanceLog.innerHTML = '';
+
+    data.forEach((record) => {
+        const row = document.createElement('tr');
+        const statusClass = record.status === 'Present' ? 'bg-green-100 text-green-800' :
+                           record.status === 'Late' ? 'bg-yellow-100 text-yellow-800' :
+                           record.status === 'Half Day' ? 'bg-blue-100 text-blue-800' :
+                           'bg-red-100 text-red-800';
+
+        row.innerHTML = `
+            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${record.date}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${record.punchIn || '--'}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${record.punchOut || '--'}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${record.workHours || '--'}</td>
+            <td class="px-4 py-3 whitespace-nowrap">
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">
+                    ${record.status}
+                </span>
+            </td>
+          <td class="px-4 py-3 text-sm text-gray-700">
+    ${record.breaks?.length ? `
+        <div class="flex items-center gap-2">
+            <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800 font-medium">
+                ${record.breaks.length} breaks
+            </span>
+
+            <button
+                class="text-blue-600 text-xs underline hover:text-blue-800"
+                onclick="showBreakDetails(${JSON.stringify(record.breaks).replace(/"/g, '&quot;')})">
+                View
+            </button>
+        </div>
+    ` : '--'}
+</td>
+
+            <td class="px-4 py-3 text-sm font-medium">
+                ${record.totalBreak || '--'}
+            </td>
+        `;
+        elements.employeeAttendanceLog.appendChild(row);
+    });
+}
+
+function generateMobileAttendanceCards(data) {
+    if (!elements.mobileAttendanceCards) return;
+    elements.mobileAttendanceCards.innerHTML = '';
+
+    data.forEach((record) => {
+        const statusClass = record.status === 'Present' ? 'bg-green-100 text-green-800' :
+                           record.status === 'Late' ? 'bg-yellow-100 text-yellow-800' :
+                           record.status === 'Half Day' ? 'bg-blue-100 text-blue-800' :
+                           'bg-red-100 text-red-800';
+
+        const breaksHtml = record.breaks?.length
+            ? record.breaks.map(b => `<li>${b}</li>`).join('')
+            : '<li>--</li>';
+
+        const card = document.createElement('div');
+        card.className = 'mb-4 p-4 border border-gray-200 rounded-xl bg-white shadow-sm';
+
+        card.innerHTML = `
+            <div class="flex justify-between items-center mb-3 pb-3 border-b border-gray-100">
+                <div>
+                    <span class="font-medium text-gray-800">${record.date}</span>
+                    <span class="ml-2 px-2 py-1 text-xs font-semibold rounded-full ${statusClass}">
+                        ${record.status}
+                    </span>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Punch In:</span>
+                    <span class="font-medium">${record.punchIn || '--'}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Punch Out:</span>
+                    <span class="font-medium">${record.punchOut || '--'}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Lunch In:</span>
+                    <span class="font-medium">${record.lunchIn || '--'}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Lunch Out:</span>
+                    <span class="font-medium">${record.lunchOut || '--'}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Work Hours:</span>
+                    <span class="font-medium">${record.workHours || '--'}</span>
+                </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-gray-100 text-sm">
+                <p class="font-semibold text-gray-700 mb-1">Breaks:</p>
+                <ul class="list-disc pl-5 text-gray-600 space-y-0.5">
+                    ${breaksHtml}
+                </ul>
+                <p class="mt-2 font-medium text-gray-700">
+                    <span class="font-semibold">Total Break:</span> 
+                    ${record.totalBreak || record.breakHours || '--'}
+                </p>
+            </div>
+        `;
+
+        elements.mobileAttendanceCards.appendChild(card);
+    });
+}
+
+function handleResize() {
+    const isMobile = window.innerWidth < 768;
+    const table = document.querySelector('.responsive-table');
+    const cards = elements.mobileAttendanceCards;
+
+    if (isMobile) {
+        table?.classList.add('hidden');
+        cards?.classList.remove('hidden');
+    } else {
+        table?.classList.remove('hidden');
+        cards?.classList.add('hidden');
+    }
+}
+
+async function filterEmployeeAttendance() {
+    const month = parseInt(document.getElementById('attendance-month-filter').value, 10);
+    const year = {{ now()->year }};
+
+    try {
+        const response = await fetch(`{{ route("my-attendance.log") }}?month=${month}&year=${year}`);
+        const logData = await response.json();
+        generateEmployeeAttendanceLog(logData);
+        generateMobileAttendanceCards(logData);
+    } catch (error) {
+        console.error('Error fetching attendance log:', error);
+        alert('Error loading attendance data');
+    }
+}
+
+async function updateBreakHistory() {
+    try {
+        const today = new Date().toISOString().split('T')[0];
+        const response = await fetch(`{{ route("my-attendance.log") }}?month=${new Date().getMonth() + 1}&year=${new Date().getFullYear()}`);
+        const logData = await response.json();
+
+        const todayRecord = logData.find(record => {
+            const recordDate = record.date.split('-').reverse().join('-');
+            return recordDate === today;
+        });
+
+        const breakHistoryTable = document.getElementById('break-history-table');
+        const noBreaksMessage = document.getElementById('no-breaks-message');
+
+        if (todayRecord && todayRecord.breaks?.length > 0) {
+            breakHistoryTable.innerHTML = '';
+            noBreaksMessage.style.display = 'none';
+
+            let totalBreakSeconds = 0;
+            let breakCount = 0;
+
+            todayRecord.breaks.forEach((breakItem) => {
+                const [breakIn, breakOut] = breakItem.split(' - ');
+                const isActive = breakOut === 'Running';
+
+                let duration = '--';
+                if (!isActive && breakIn && breakOut) {
+                    const inTime = parseTime(breakIn);
+                    const outTime = parseTime(breakOut);
+                    if (inTime && outTime) {
+                        const diffMs = outTime - inTime;
+                        const diffSec = Math.floor(diffMs / 1000);
+                        const hours = Math.floor(diffSec / 3600);
+                        const minutes = Math.floor((diffSec % 3600) / 60);
+                        duration = `${padZero(hours)}:${padZero(minutes)}`;
+                        totalBreakSeconds += diffSec;
+                    }
+                }
+
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50';
+                row.innerHTML = `
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${breakIn || '--'}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${breakOut || 'Running'}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm font-medium ${isActive ? 'text-yellow-600' : 'text-gray-700'}">
+                        ${duration}
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${isActive ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}">
+                            ${isActive ? 'Active' : 'Completed'}
+                        </span>
+                    </td>
+                `;
+                breakHistoryTable.appendChild(row);
+                breakCount++;
+            });
+
+            document.getElementById('today-break-count').textContent = breakCount;
+            const totalH = Math.floor(totalBreakSeconds / 3600);
+            const totalM = Math.floor((totalBreakSeconds % 3600) / 60);
+            document.getElementById('today-total-break').textContent = `${padZero(totalH)}:${padZero(totalM)}`;
+        } else {
+            breakHistoryTable.innerHTML = '';
+            noBreaksMessage.style.display = 'block';
+            document.getElementById('today-break-count').textContent = '0';
+            document.getElementById('today-total-break').textContent = '00:00';
+        }
+    } catch (error) {
+        console.error('Error updating break history:', error);
+    }
+}
+
+function parseTime(timeStr) {
+    if (!timeStr || timeStr === '--' || timeStr === 'Running') return null;
+
+    try {
+        const [time, modifier] = timeStr.split(' ');
+        let [hours, minutes] = time.split(':');
+
+        if (modifier === 'PM' && hours !== '12') hours = parseInt(hours) + 12;
+        if (modifier === 'AM' && hours === '12') hours = '00';
+
+        const date = new Date();
+        date.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+        return date;
+    } catch (e) {
+        console.error('Error parsing time:', e);
+        return null;
+    }
+}
+
+// Optional: Keep these if you still use work timer display
+function startWorkTimer() {
+    if (workTimer) return;
+    workTimer = setInterval(() => {
+        workSeconds++;
+        // You can update work time display here if needed
+    }, 1000);
+}
+
+function initializeTimersAndUI() {
+    if (attendanceData.punchIn) {
+        const punchDate = new Date(attendanceData.punchIn);
+        elements.currentPunchTime.textContent = punchDate.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+
+        if (!attendanceData.punchOut) {
+            startWorkTimer();
+        }
+    }
+}
+
+
+
+
+function showBreakDetails(breaks) {
+    const modal = document.getElementById('breakDetailsModal');
+    const list = document.getElementById('breakDetailsList');
+
+    list.innerHTML = '';
+
+    breaks.forEach((b, index) => {
+        const isRunning = b.includes('Running');
+
+        list.innerHTML += `
+            <div class="flex justify-between items-center p-2 rounded-lg border ${isRunning ? 'bg-yellow-50' : 'bg-gray-50'}">
+                <span>${index + 1}. ${b}</span>
+                <span class="text-xs font-medium ${isRunning ? 'text-yellow-600' : 'text-green-600'}">
+                    ${isRunning ? 'Active' : 'Done'}
+                </span>
+            </div>
+        `;
+    });
+
+    modal.classList.remove('hidden');
+}
+
+function closeBreakDetails() {
+    document.getElementById('breakDetailsModal').classList.add('hidden');
+}
+
 </script>
-
-
-
-</div>
+</body>
+</html>
 @endsection

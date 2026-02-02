@@ -11,14 +11,21 @@ use Illuminate\Validation\Rule;
 
 class ClientController extends Controller
 {
+    private function baseQuery()
+{
+    return Client::where('company_id', auth()->user()->company_id);
+}
+
     public function index()
-    {
-       $clients = Client::with(['leadAction' => function ($query) {
-        $query->with('user');
-    }])->latest()->get();
-    // return $clients;
-        return view('admin.client', compact('clients'));
-    }
+{
+    $clients = $this->baseQuery()
+        ->with(['leadAction.user'])
+        ->latest()
+        ->get();
+
+    return view('admin.client', compact('clients'));
+}
+
 
     public function store(Request $request): JsonResponse
     {
@@ -45,13 +52,24 @@ class ClientController extends Controller
         ]);
     }
 
-    public function show(Client $client): JsonResponse
-    {
-        return response()->json($client);
-    }
-
-public function update(Request $request, Client $client): JsonResponse
+  public function show(Client $client): JsonResponse
 {
+    $this->authorize('manage', $client);
+    return response()->json($client);
+}
+
+
+  public function edit(Client $client)
+{
+    $this->authorize('manage', $client);
+    return view('admin.editlead', compact('client'));
+}
+
+
+public function update(Request $request, Client $client)
+{
+    $this->authorize('manage', $client);
+
     $validated = $request->validate([
         'company_name' => 'required|string|max:255',
         'contact_person' => 'required|string|max:255',
@@ -75,15 +93,20 @@ public function update(Request $request, Client $client): JsonResponse
     ]);
 }
 
-    public function destroy(Client $client): JsonResponse
-    {
-        $client->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Client deleted successfully!'
-        ]);
-    }
+public function destroy($id)
+{
+    $client = $this->baseQuery()->findOrFail($id);
+    $this->authorize('manage', $client);
+
+    $client->delete();
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Client deleted successfully!',
+        'client_id' => $id
+    ]);
+}
 
     public function import(Request $request): JsonResponse
     {
@@ -380,7 +403,12 @@ public function update(Request $request, Client $client): JsonResponse
                 }
                 
                 // Check for duplicate email
-                if (Client::where('email', $row['email'])->exists()) {
+               if (
+    Client::where('company_id', auth()->user()->company_id)
+        ->where('email', $row['email'])
+        ->exists()
+)
+ {
                     $skipped++;
                     $skippedRows[] = "Row " . ($index + 2) . ": Duplicate email - " . $row['email'];
                     continue;
@@ -469,4 +497,7 @@ public function update(Request $request, Client $client): JsonResponse
             return null;
         }
     }
+
+
+    
 }

@@ -122,8 +122,8 @@
                             <label class="flex items-center p-3 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer transition-colors">
                                 <input type="checkbox" 
                                        name="roles[]" 
-                                       value="{{ $role->name }}"
-                                       {{ in_array($role->name, old('roles', [])) ? 'checked' : '' }}
+                                       value="{{ $role->id }}"
+                                       {{ in_array($role->id, old('roles', [])) ? 'checked' : '' }}
                                        class="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500">
                                 <span class="ml-3 text-sm font-medium text-gray-700 capitalize">{{ $role->name }}</span>
                                 <span class="ml-auto text-xs text-gray-500">
