@@ -12,7 +12,8 @@ return new class extends Migration {
             $table->dropUnique('roles_name_guard_name_unique');
 
             // Add tenant-aware unique index
-            $table->unique(['name', 'guard_name', 'company_id'], 'roles_company_unique');
+           $table->unique(['name', 'guard_name']);
+
         });
     }
 
