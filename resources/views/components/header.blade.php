@@ -4,9 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Responsive Notification Header</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOutRight {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+    </style>
 </head>
 <body class="bg-gray-100">
 
@@ -41,8 +52,6 @@
                 class="hidden absolute top-12 right-0 
                        w-[90vw] sm:w-80 
                        max-w-sm sm:max-w-none
-                       left-1/2 sm:left-auto 
-                       -translate-x-1/2 sm:translate-x-0
                        bg-white border border-gray-200 
                        rounded-lg shadow-lg overflow-hidden z-50">
 
@@ -97,18 +106,73 @@
 <script>
     const btn = document.getElementById('notificationBtn');
     const dropdown = document.getElementById('notificationDropdown');
+    const countEl = document.getElementById('notify-count');
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    const userId = {{ auth()->id() }};
+    const storageKey = 'notifyLastSeenCount_' + userId;
+    const currentCount = parseInt((countEl?.textContent || '0').trim()) || 0;
+    let autoHideTimer = null;
+    function markNotificationsRead() {
+        if (!csrfToken) return;
+        fetch('/notifications/read', {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' }
+        }).then(() => {
+            if (countEl) {
+                countEl.textContent = '0';
+                countEl.classList.add('hidden');
+            }
+            localStorage.setItem(storageKey, String(0));
+        }).catch(() => {});
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+        const lastCount = localStorage.getItem(storageKey);
+        const shouldAutoSlide = currentCount > 0 && lastCount !== String(currentCount);
+        if (shouldAutoSlide) {
+            dropdown.classList.remove('hidden');
+            dropdown.style.animation = 'slideInRight 0.3s ease-out';
+            if (autoHideTimer) clearTimeout(autoHideTimer);
+            autoHideTimer = setTimeout(() => {
+                dropdown.style.animation = 'slideOutRight 0.3s ease-in';
+                setTimeout(() => dropdown.classList.add('hidden'), 300);
+            }, 2000);
+            localStorage.setItem(storageKey, String(currentCount));
+        }
+        if (currentCount === 0 && countEl) countEl.classList.add('hidden');
+    });
 
     btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        dropdown.classList.toggle('hidden');
+        if (!dropdown.classList.contains('hidden')) {
+            return;
+        }
+        dropdown.classList.remove('hidden');
+        dropdown.style.animation = 'slideInRight 0.2s ease-out';
+        if (autoHideTimer) { clearTimeout(autoHideTimer); autoHideTimer = null; }
     });
 
+
     dropdown.addEventListener('click', (e) => {
-        e.stopPropagation();
+        const a = e.target.closest('a[href]');
+        if (a) {
+            e.preventDefault();
+            e.stopPropagation();
+            fetch('/notifications/read', {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' }
+            }).finally(() => {
+                window.location.href = a.href;
+            });
+        } else {
+            e.stopPropagation();
+        }
     });
 
     document.addEventListener('click', () => {
-        dropdown.classList.add('hidden');
+        if (!dropdown.classList.contains('hidden')) {
+            dropdown.style.animation = 'slideOutRight 0.3s ease-in';
+            setTimeout(() => dropdown.classList.add('hidden'), 300);
+        }
     });
 </script>
 
