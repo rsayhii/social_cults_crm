@@ -358,10 +358,22 @@ Route::middleware('permission:admin portal')->group(function () {
 });
 
 
+// ------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------
 
+//   Route::middleware(['auth', 'permission:client serive interation'])->group(function () {
 
-  Route::middleware(['auth', 'permission:client serive interation'])->group(function () {
+//     Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+//     Route::get('/chat/list', [ChatController::class, 'chatList']);
+//     Route::get('/chat/messages/{id}', [ChatController::class, 'getMessages']);
+//     Route::post('/chat/send', [ChatController::class, 'sendMessage']);
+//     Route::post('/chat/create-conversation', [ChatController::class, 'createConversation']);
+//     Route::get('/chat/teams', [ChatController::class, 'teams']);
+//     Route::get('/chat/clients', [ChatController::class, 'clients']);
 
+// });
+
+Route::middleware(['auth', 'permission:client serive interation'])->group(function () {
     Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
     Route::get('/chat/list', [ChatController::class, 'chatList']);
     Route::get('/chat/messages/{id}', [ChatController::class, 'getMessages']);
@@ -369,8 +381,25 @@ Route::middleware('permission:admin portal')->group(function () {
     Route::post('/chat/create-conversation', [ChatController::class, 'createConversation']);
     Route::get('/chat/teams', [ChatController::class, 'teams']);
     Route::get('/chat/clients', [ChatController::class, 'clients']);
-
+    // Role-based chat routes
+    Route::get('/chat/same-role-users', [ChatController::class, 'sameRoleUsers']);
+    Route::get('/chat/role-groups', [ChatController::class, 'roleGroupChats']);
+    Route::get('/chat/group-members/{id}', [ChatController::class, 'getGroupMembers']);
+    Route::get('/chat/all-groups', [ChatController::class, 'allGroupChats']); // Admin only
+    // Admin Group Management Routes
+    Route::post('/chat/create-group', [ChatController::class, 'createGroup']); // Admin only
+    Route::post('/chat/add-group-members', [ChatController::class, 'addGroupMembers']); // Admin only
+    Route::post('/chat/remove-group-member', [ChatController::class, 'removeGroupMember']); // Admin only
+    Route::delete('/chat/delete-group', [ChatController::class, 'deleteGroup']); // Admin only
+    Route::get('/chat/users-by-role/{roleId}', [ChatController::class, 'getUsersByRole']);
+    Route::get('/chat/clients-list', [ChatController::class, 'getClientsForGroup']);
+    Route::get('/chat/roles-list', [ChatController::class, 'getAllRoles']);
+    // Client Team Targeting
+    Route::get('/chat/group-teams/{id}', [ChatController::class, 'getGroupTeams']);
 });
+
+// ------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------
 
 
 
