@@ -292,12 +292,10 @@
 
                 <!-- Tabs for Direct/Group Chats -->
                 <div class="flex border-b border-gray-200">
-                    <button id="directTab" class="flex-1 py-3 px-4 text-sm font-medium tab-active"
-                        onclick="switchTab('direct')">
+                    <button id="directTab" class="flex-1 py-3 px-4 text-sm font-medium tab-active">
                         <i class="fas fa-user mr-2"></i>Direct
                     </button>
-                    <button id="groupTab" class="flex-1 py-3 px-4 text-sm font-medium tab-inactive"
-                        onclick="switchTab('group')">
+                    <button id="groupTab" class="flex-1 py-3 px-4 text-sm font-medium tab-inactive">
                         <i class="fas fa-users mr-2"></i>Groups
                     </button>
                 </div>
@@ -545,9 +543,8 @@
             let lastMessageCounts = new Map();
             let selectedTargetRole = null; // For client team targeting
             let groupTeams = []; // Teams in current group
-            const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+            // csrfToken and userId are already declared globally in header.blade.php
             const userRole = "{{ auth()->user()->getRoleNames()->first() ?? '' }}";
-            const userId = {{ auth()->id() ?? 'null' }};
             const isAdmin = {{ auth()->user()->hasRole('admin') ? 'true' : 'false' }};
             const isClient = userRole.toLowerCase() === 'client';
 
@@ -643,6 +640,19 @@
                 if (isAdmin) {
                     setupCreateGroupModal();
                 }
+
+                // Add tab click event listeners
+                const directTabBtn = document.getElementById('directTab');
+                const groupTabBtn = document.getElementById('groupTab');
+
+                if (directTabBtn) {
+                    directTabBtn.addEventListener('click', () => switchTab('direct'));
+                }
+
+                if (groupTabBtn) {
+                    groupTabBtn.addEventListener('click', () => switchTab('group'));
+                }
+
                 setInterval(loadChatList, 10000);
                 setInterval(() => {
                     if (activeChat) refreshMessages();
@@ -702,10 +712,10 @@
                             const label = document.createElement('label');
                             label.className = 'flex items-center p-1 hover:bg-gray-100 rounded cursor-pointer';
                             label.innerHTML = `
-                                                                                                                                            <input type="checkbox" class="mr-2 client-checkbox" data-id="${client.id}" data-name="${escapeHtml(client.name)}">
-                                                                                                                                            <span class="text-sm">${escapeHtml(client.name)}</span>
-                                                                                                                                            <span class="text-xs text-gray-400 ml-1">(${escapeHtml(client.email)})</span>
-                                                                                                                                                                   `;
+                                                                                                                                                        <input type="checkbox" class="mr-2 client-checkbox" data-id="${client.id}" data-name="${escapeHtml(client.name)}">
+                                                                                                                                                        <span class="text-sm">${escapeHtml(client.name)}</span>
+                                                                                                                                                        <span class="text-xs text-gray-400 ml-1">(${escapeHtml(client.email)})</span>
+                                                                                                                                                                               `;
                             label.querySelector('input').addEventListener('change', (e) => {
                                 if (e.target.checked) {
                                     selectedMembers.set(client.id, { name: client.name, type: 'client' });
@@ -768,9 +778,9 @@
                         const selectAllLabel = document.createElement('label');
                         selectAllLabel.className = 'flex items-center p-1 hover:bg-indigo-100 rounded cursor-pointer font-medium border-b mb-1 pb-1';
                         selectAllLabel.innerHTML = `
-                                                                                                                                        <input type="checkbox" class="mr-2" id="selectAllRoleUsers">
-                                                                                                                                        <span class="text-sm text-indigo-600">Select All (${data.users.length})</span>
-                                                                                                                                    `;
+                                                                                                                                                    <input type="checkbox" class="mr-2" id="selectAllRoleUsers">
+                                                                                                                                                    <span class="text-sm text-indigo-600">Select All (${data.users.length})</span>
+                                                                                                                                                `;
                         selectAllLabel.querySelector('input').addEventListener('change', (e) => {
                             const checkboxes = container.querySelectorAll('.role-user-checkbox');
                             checkboxes.forEach(cb => {
@@ -793,9 +803,9 @@
                             label.className = 'flex items-center p-1 hover:bg-gray-100 rounded cursor-pointer';
                             const isChecked = selectedMembers.has(user.id);
                             label.innerHTML = `
-                                                                                                                                            <input type="checkbox" class="mr-2 role-user-checkbox" data-id="${user.id}" data-name="${escapeHtml(user.name)}" ${isChecked ? 'checked' : ''}>
-                                                                                                                                            <span class="text-sm">${escapeHtml(user.name)}</span>
-                                                                                                                                        `;
+                                                                                                                                                        <input type="checkbox" class="mr-2 role-user-checkbox" data-id="${user.id}" data-name="${escapeHtml(user.name)}" ${isChecked ? 'checked' : ''}>
+                                                                                                                                                        <span class="text-sm">${escapeHtml(user.name)}</span>
+                                                                                                                                                    `;
                             label.querySelector('input').addEventListener('change', (e) => {
                                 if (e.target.checked) {
                                     selectedMembers.set(user.id, { name: user.name, type: 'team' });
@@ -831,11 +841,11 @@
                     const badge = document.createElement('span');
                     badge.className = `inline-flex items-center px-2 py-1 rounded-full text-xs ${data.type === 'client' ? 'bg-sky-100 text-sky-700' : 'bg-indigo-100 text-indigo-700'}`;
                     badge.innerHTML = `
-                                                                                                                                    ${escapeHtml(data.name)}
-                                                                                                                                    <button class="ml-1 hover:text-red-500" onclick="removeMemberFromSelection(${id})">
-                                                                                                                                        <i class="fas fa-times"></i>
-                                                                                                                                    </button>
-                                                                                                                                `;
+                                                                                                                                                ${escapeHtml(data.name)}
+                                                                                                                                                <button class="ml-1 hover:text-red-500" onclick="removeMemberFromSelection(${id})">
+                                                                                                                                                    <i class="fas fa-times"></i>
+                                                                                                                                                </button>
+                                                                                                                                            `;
                     container.appendChild(badge);
                 });
             }
@@ -1022,16 +1032,16 @@
                                 : '';
 
                             div.innerHTML = `
-                                                                                                                                                                        <div class="flex items-center">
-                                                                                                                                                                            <div class="w-10 h-10 rounded-full ${member.is_client ? 'bg-amber-100' : 'bg-indigo-100'} flex items-center justify-center mr-3">
-                                                                                                                                                                                <i class="fas ${member.is_client ? 'fa-building text-amber-600' : 'fa-user text-indigo-600'}"></i>
-                                                                                                                                                                            </div>
-                                                                                                                                                                            <div>
-                                                                                                                                                                                <p class="font-medium text-gray-800">${escapeHtml(member.name)}${clientBadge}</p>
-                                                                                                                                                                                <p class="text-xs text-gray-500">${escapeHtml(member.email)}</p>
-                                                                                                                                                                            </div>
-                                                                                                                                                                        </div>
-                                                                                                                                                                    `;
+                                                                                                                                                                                    <div class="flex items-center">
+                                                                                                                                                                                        <div class="w-10 h-10 rounded-full ${member.is_client ? 'bg-amber-100' : 'bg-indigo-100'} flex items-center justify-center mr-3">
+                                                                                                                                                                                            <i class="fas ${member.is_client ? 'fa-building text-amber-600' : 'fa-user text-indigo-600'}"></i>
+                                                                                                                                                                                        </div>
+                                                                                                                                                                                        <div>
+                                                                                                                                                                                            <p class="font-medium text-gray-800">${escapeHtml(member.name)}${clientBadge}</p>
+                                                                                                                                                                                            <p class="text-xs text-gray-500">${escapeHtml(member.email)}</p>
+                                                                                                                                                                                        </div>
+                                                                                                                                                                                    </div>
+                                                                                                                                                                                `;
                             membersList.appendChild(div);
                         });
                     })
@@ -1082,11 +1092,11 @@
                         ? 'No direct chats yet. Select a user above to start chatting.'
                         : 'No group chats yet. Click "Join My Role Group" to get started.';
                     chatListEl.innerHTML = `
-                            <div class="p-8 text-center text-gray-500">
-                                <i class="fas fa-${currentTab === 'direct' ? 'user' : 'users'} text-3xl mb-4 text-gray-300"></i>
-                                <p>${emptyMsg}</p>
-                            </div>
-                        `;
+                                        <div class="p-8 text-center text-gray-500">
+                                            <i class="fas fa-${currentTab === 'direct' ? 'user' : 'users'} text-3xl mb-4 text-gray-300"></i>
+                                            <p>${emptyMsg}</p>
+                                        </div>
+                                    `;
                     return;
                 }
 
@@ -1115,24 +1125,24 @@
                             const header = document.createElement('div');
                             header.className = 'p-3 hover:bg-gray-50 cursor-pointer flex items-center transition-colors';
                             header.innerHTML = `
-                                    <i class="fas fa-chevron-right text-gray-400 mr-2 transition-transform duration-200 expand-icon text-xs"></i>
-                                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mr-3 relative flex-shrink-0">
-                                        <i class="fas fa-users text-white text-lg"></i>
-                                    </div>
-                                    <div class="flex-1 min-w-0 grid grid-cols-[1fr_auto] gap-x-2">
-                                        <div class="flex items-center min-w-0">
-                                            <h4 class="font-semibold text-gray-900 truncate">${escapeHtml(name)}</h4>
-                                            ${unreadBadge}
-                                        </div>
-                                        <span class="text-xs text-gray-400 whitespace-nowrap">${ts}</span>
+                                                <i class="fas fa-chevron-right text-gray-400 mr-2 transition-transform duration-200 expand-icon text-xs"></i>
+                                                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mr-3 relative flex-shrink-0">
+                                                    <i class="fas fa-users text-white text-lg"></i>
+                                                </div>
+                                                <div class="flex-1 min-w-0 grid grid-cols-[1fr_auto] gap-x-2">
+                                                    <div class="flex items-center min-w-0">
+                                                        <h4 class="font-semibold text-gray-900 truncate">${escapeHtml(name)}</h4>
+                                                        ${unreadBadge}
+                                                    </div>
+                                                    <span class="text-xs text-gray-400 whitespace-nowrap">${ts}</span>
 
-                                        <div class="col-span-2 flex items-center mt-0.5">
-                                            <span class="text-[10px] bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded-full mr-2 flex-shrink-0">
-                                                ${chat.participant_count || 0} members
-                                            </span>
-                                        </div>
-                                    </div>
-                                `;
+                                                    <div class="col-span-2 flex items-center mt-0.5">
+                                                        <span class="text-[10px] bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded-full mr-2 flex-shrink-0">
+                                                            ${chat.participant_count || 0} members
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            `;
 
                             // Subgroups container
                             const subgroupsContainer = document.createElement('div');
@@ -1165,26 +1175,26 @@
                             el.dataset.chatType = 'group';
 
                             el.innerHTML = `
-                                    <div class="flex items-center">
-                                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mr-3 flex-shrink-0">
-                                            <i class="fas fa-users text-white text-lg"></i>
-                                        </div>
-                                        <div class="flex-1 min-w-0 grid grid-cols-[1fr_auto] gap-x-2">
-                                            <div class="flex items-center min-w-0">
-                                                <h4 class="font-semibold text-gray-900 truncate">${escapeHtml(name)}</h4>
-                                                ${unreadBadge}
-                                            </div>
-                                            <span class="text-xs text-gray-400 whitespace-nowrap">${ts}</span>
+                                                <div class="flex items-center">
+                                                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mr-3 flex-shrink-0">
+                                                        <i class="fas fa-users text-white text-lg"></i>
+                                                    </div>
+                                                    <div class="flex-1 min-w-0 grid grid-cols-[1fr_auto] gap-x-2">
+                                                        <div class="flex items-center min-w-0">
+                                                            <h4 class="font-semibold text-gray-900 truncate">${escapeHtml(name)}</h4>
+                                                            ${unreadBadge}
+                                                        </div>
+                                                        <span class="text-xs text-gray-400 whitespace-nowrap">${ts}</span>
 
-                                            <div class="col-span-2 flex items-center mt-0.5 min-w-0">
-                                                 <span class="text-[10px] bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded-full mr-2 flex-shrink-0">
-                                                    ${chat.participant_count || 0} members
-                                                </span>
-                                                <p class="text-sm text-gray-500 truncate flex-1">${escapeHtml(last)}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                `;
+                                                        <div class="col-span-2 flex items-center mt-0.5 min-w-0">
+                                                             <span class="text-[10px] bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded-full mr-2 flex-shrink-0">
+                                                                ${chat.participant_count || 0} members
+                                                            </span>
+                                                            <p class="text-sm text-gray-500 truncate flex-1">${escapeHtml(last)}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            `;
                             el.addEventListener('click', () => {
                                 openChat(chat.id, name, 'group', chat.participant_count || 0);
                             });
@@ -1198,23 +1208,23 @@
                         el.dataset.chatType = 'direct';
 
                         el.innerHTML = `
-                                <div class="flex items-center">
-                                    <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center mr-3 flex-shrink-0">
-                                        <span class="text-indigo-700 font-bold text-lg">${(name[0] || 'U').toUpperCase()}</span>
-                                    </div>
-                                    <div class="flex-1 min-w-0 grid grid-cols-[1fr_auto] gap-x-2">
-                                        <div class="flex items-center min-w-0">
-                                            <h4 class="font-semibold text-gray-900 truncate">${escapeHtml(name)}</h4>
-                                            ${unreadBadge}
-                                        </div>
-                                        <span class="text-xs text-gray-400 whitespace-nowrap">${ts}</span>
+                                            <div class="flex items-center">
+                                                <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center mr-3 flex-shrink-0">
+                                                    <span class="text-indigo-700 font-bold text-lg">${(name[0] || 'U').toUpperCase()}</span>
+                                                </div>
+                                                <div class="flex-1 min-w-0 grid grid-cols-[1fr_auto] gap-x-2">
+                                                    <div class="flex items-center min-w-0">
+                                                        <h4 class="font-semibold text-gray-900 truncate">${escapeHtml(name)}</h4>
+                                                        ${unreadBadge}
+                                                    </div>
+                                                    <span class="text-xs text-gray-400 whitespace-nowrap">${ts}</span>
 
-                                        <div class="col-span-2 mt-0.5 min-w-0">
-                                            <p class="text-sm text-gray-500 truncate">${escapeHtml(last)}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
+                                                    <div class="col-span-2 mt-0.5 min-w-0">
+                                                        <p class="text-sm text-gray-500 truncate">${escapeHtml(last)}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        `;
                         el.addEventListener('click', () => {
                             openChat(chat.id, name, 'direct', 0);
                         });
@@ -1241,10 +1251,10 @@
                         allTeamsBtn.className = 'p-3 hover:bg-indigo-50 cursor-pointer flex items-center border-l-2 border-transparent hover:border-indigo-400 subgroup-item';
                         allTeamsBtn.dataset.targetRoleId = '';
                         allTeamsBtn.innerHTML = `
-                                                                                        <i class="fas fa-users text-gray-500 mr-3"></i>
-                                                                                        <span class="text-sm font-medium text-gray-700">All Teams</span>
-                                                                                        <span class="ml-auto text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">${totalMembers}</span>
-                                                                                    `;
+                                                                                                    <i class="fas fa-users text-gray-500 mr-3"></i>
+                                                                                                    <span class="text-sm font-medium text-gray-700">All Teams</span>
+                                                                                                    <span class="ml-auto text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">${totalMembers}</span>
+                                                                                                `;
                         allTeamsBtn.addEventListener('click', (e) => {
                             e.stopPropagation();
                             openChat(groupId, `${groupName} - All Teams`, 'group', totalMembers, null);
@@ -1258,10 +1268,10 @@
                                 teamBtn.className = 'p-3 hover:bg-indigo-50 cursor-pointer flex items-center border-l-2 border-transparent hover:border-indigo-400 subgroup-item';
                                 teamBtn.dataset.targetRoleId = team.id;
                                 teamBtn.innerHTML = `
-                                                            <i class="fas fa-user-tie text-indigo-500 mr-3"></i>
-                                                            <span class="text-sm font-medium text-gray-700">${escapeHtml(team.name)}</span>
-                                                            <span class="ml-auto text-xs bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full">${team.member_count}</span>
-                                                        `;
+                                                                        <i class="fas fa-user-tie text-indigo-500 mr-3"></i>
+                                                                        <span class="text-sm font-medium text-gray-700">${escapeHtml(team.name)}</span>
+                                                                        <span class="ml-auto text-xs bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full">${team.member_count}</span>
+                                                                    `;
                                 teamBtn.addEventListener('click', (e) => {
                                     e.stopPropagation();
                                     // Clear previous highlights and add new
@@ -1344,9 +1354,9 @@
 
                 // Clear messages immediately and show loading
                 messagesArea.innerHTML = `<div class="p-6 text-center text-gray-400">
-                                                        <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
-                                                        <p>Loading messages...</p>
-                                                    </div>`;
+                                                                    <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                                                                    <p>Loading messages...</p>
+                                                                </div>`;
 
                 // Build URL with optional target_role_id for subgroup filtering
                 let messagesUrl = `/chat/messages/${id}`;
@@ -1401,9 +1411,9 @@
 
                 if (messages.length === 0) {
                     messagesArea.innerHTML = `<div class="p-6 text-center text-gray-400">
-                                                            <i class="fas fa-comments text-3xl mb-2"></i>
-                                                            <p>No messages yet in this channel</p>
-                                                        </div>`;
+                                                                        <i class="fas fa-comments text-3xl mb-2"></i>
+                                                                        <p>No messages yet in this channel</p>
+                                                                    </div>`;
                 } else {
                     let lastDate = null;
                     messages.forEach(msg => {
@@ -1448,8 +1458,8 @@
                 let targetBadge = '';
                 if (msg.target_role_name && activeChatType === 'group') {
                     targetBadge = `<span class="ml-2 px-2 py-0.5 text-xs rounded-full bg-purple-100 text-purple-700">
-                                                                                                        <i class="fas fa-arrow-right mr-1"></i>@${escapeHtml(msg.target_role_name)}
-                                                                                                    </span>`;
+                                                                                                                    <i class="fas fa-arrow-right mr-1"></i>@${escapeHtml(msg.target_role_name)}
+                                                                                                                </span>`;
                 }
 
                 const senderName = activeChatType === 'group' && !isSent
@@ -1463,14 +1473,14 @@
                         : '';
 
                     wrapper.innerHTML = `
-                                                                                                                                                            <div class="max-w-xs lg:max-w-md">
-                                                                                                                                                                ${sentTargetBadge}
-                                                                                                                                                                <div class="bg-indigo-600 text-white p-3 rounded-xl chat-bubble-right shadow-sm">
-                                                                                                                                                                    <p>${escapeHtml(msg.message)}</p>
-                                                                                                                                                                </div>
-                                                                                                                                                                <div class="text-xs text-gray-500 mt-1 text-right">${new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} <i class="fas fa-check-double text-indigo-500 ml-1"></i></div>
-                                                                                                                                                            </div>
-                                                                                                                                                        `;
+                                                                                                                                                                        <div class="max-w-xs lg:max-w-md">
+                                                                                                                                                                            ${sentTargetBadge}
+                                                                                                                                                                            <div class="bg-indigo-600 text-white p-3 rounded-xl chat-bubble-right shadow-sm">
+                                                                                                                                                                                <p>${escapeHtml(msg.message)}</p>
+                                                                                                                                                                            </div>
+                                                                                                                                                                            <div class="text-xs text-gray-500 mt-1 text-right">${new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} <i class="fas fa-check-double text-indigo-500 ml-1"></i></div>
+                                                                                                                                                                        </div>
+                                                                                                                                                                    `;
                 } else {
                     // Special styling for client and admin messages
                     let messageBoxClass = 'bg-white p-3 rounded-xl chat-bubble-left shadow-sm';
@@ -1507,19 +1517,19 @@
 
 
                     wrapper.innerHTML = `
-                                                                                                                                                            <div class="max-w-xs lg:max-w-md">
-                                                                                                                                                                ${senderName}
-                                                                                                                                                                <div class="flex items-end">
-                                                                                                                                                                    <div class="w-8 h-8 rounded-full ${avatarClass} flex items-center justify-center mr-2 flex-shrink-0">
-                                                                                                                                                                        <i class="fas ${avatarIcon} text-xs"></i>
-                                                                                                                                                                    </div>
-                                                                                                                                                                    <div class="${messageBoxClass}">
-                                                                                                                                                                        <p class="${textClass}">${escapeHtml(msg.message)}</p>
-                                                                                                                                                                    </div>
-                                                                                                                                                                </div>
-                                                                                                                                                                <div class="text-xs text-gray-500 mt-1 ml-10">${new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-                                                                                                                                                            </div>
-                                                                                                                                                        `;
+                                                                                                                                                                        <div class="max-w-xs lg:max-w-md">
+                                                                                                                                                                            ${senderName}
+                                                                                                                                                                            <div class="flex items-end">
+                                                                                                                                                                                <div class="w-8 h-8 rounded-full ${avatarClass} flex items-center justify-center mr-2 flex-shrink-0">
+                                                                                                                                                                                    <i class="fas ${avatarIcon} text-xs"></i>
+                                                                                                                                                                                </div>
+                                                                                                                                                                                <div class="${messageBoxClass}">
+                                                                                                                                                                                    <p class="${textClass}">${escapeHtml(msg.message)}</p>
+                                                                                                                                                                                </div>
+                                                                                                                                                                            </div>
+                                                                                                                                                                            <div class="text-xs text-gray-500 mt-1 ml-10">${new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                                                                                                                                                                        </div>
+                                                                                                                                                                    `;
                 }
                 messagesArea.appendChild(wrapper);
             }
