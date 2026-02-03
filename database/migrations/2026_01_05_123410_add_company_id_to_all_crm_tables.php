@@ -36,6 +36,7 @@ return new class extends Migration
             'invoices',
             'invoice_items',
             'todos',
+            'roles',
             'my_attendance_breaks',
         ];
 
