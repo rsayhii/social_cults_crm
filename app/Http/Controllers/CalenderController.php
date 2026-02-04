@@ -10,6 +10,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
+use App\Models\CompanyHoliday;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Http\Controllers\Controller;
+use App\Imports\CompanyHolidaysImport;
+
 class CalenderController extends Controller
 {
     public function index()
@@ -17,104 +22,130 @@ class CalenderController extends Controller
         return view('admin.calender');
     }
 
-public function getCalendarData(Request $request)
-{
-    $year = $request->input('year', date('Y'));
-    $month = $request->input('month', date('m'));
+    public function getCalendarData(Request $request)
+    {
+        $year = $request->input('year', date('Y'));
+        $month = $request->input('month', date('m'));
+        $companyId = Auth::user()->company_id;
 
-    /* -------------------------
-       1. REMOVE 🔥 EXTERNAL API HOLIDAY FETCH  
-          (Improves Speed & Keeps Only Local JSON + DB)
-    ------------------------- */
+        $hasCompanyHolidays = CompanyHoliday::where('company_id', $companyId)->exists();
+        \Illuminate\Support\Facades\Log::info('Calendar Data Request', ['year' => $year, 'month' => $month, 'companyId' => $companyId, 'hasCompanyHolidays' => $hasCompanyHolidays]);
 
-    $apiHolidays = []; // EMPTY → No external API request
+        $holidays = [];
+
+        if ($hasCompanyHolidays) {
+            \Illuminate\Support\Facades\Log::info('Fetching Company Holidays from DB');
+            // 1. COMPANY CUSTOM HOLIDAYS (Overrides default)
+            $holidays = CompanyHoliday::where('company_id', $companyId)
+                ->whereYear('date', $year)
+                ->whereMonth('date', $month)
+                ->get()
+                ->map(function ($holiday) {
+                    return [
+                        'id' => $holiday->id,
+                        'title' => $holiday->title,
+                        'date' => $holiday->date->format('Y-m-d'),
+                        'category' => $holiday->category,
+                        'country' => 'Company',
+                        'type' => 'holiday' // treated mainly as holiday
+                    ];
+                })
+                ->toArray();
+        } else {
+            // 2. FALLBACK TO DEFAULT (DB + JSON)
+
+            /* DB Global Holidays */
+            $dbHolidays = Holiday::whereYear('date', $year)
+                ->whereMonth('date', $month)
+                ->get()
+                ->map(function ($holiday) {
+                    return [
+                        'id' => $holiday->id,
+                        'title' => $holiday->title,
+                        'date' => $holiday->date->format('Y-m-d'),
+                        'category' => $holiday->category,
+                        'country' => 'Local',
+                        'type' => 'holiday'
+                    ];
+                })
+                ->toArray();
+
+            /* JSON Indian Festivals */
+            $festivalHolidays = [];
+            $festivalFile = public_path('holidays/indian_festivals.json');
+
+            if (file_exists($festivalFile)) {
+                $jsonData = json_decode(file_get_contents($festivalFile), true);
+                if ($jsonData) {
+                    foreach ($jsonData as $festival) {
+                        if (
+                            date('Y', strtotime($festival['date'])) == $year &&
+                            date('m', strtotime($festival['date'])) == $month
+                        ) {
+                            $festivalHolidays[] = [
+                                'id' => null,
+                                'title' => $festival['title'],
+                                'date' => $festival['date'],
+                                'category' => $festival['category'],
+                                'country' => 'India',
+                                'type' => 'festival'
+                            ];
+                        }
+                    }
+                }
+            }
+
+            $holidays = array_merge($dbHolidays, $festivalHolidays);
+        }
+
+        /* -------------------------
+        5. LEAVES (From EmployeePortal)
+     ------------------------- */
+        $leaves = EmployeePortal::get()
+            ->map(function ($leave) {
+                return [
+                    'id' => $leave->id,
+                    'employee' => $leave->employee_name,
+                    'type' => $leave->leave_type,
+                    'fromDate' => $leave->from_date->format('Y-m-d'),
+                    'toDate' => $leave->to_date->format('Y-m-d'),
+                    'status' => $leave->status,
+                    'total_days' => $leave->total_days,
+                ];
+            });
 
 
-    /* -------------------------
-       2. DB HOLIDAYS
-    ------------------------- */
-    $dbHolidays = Holiday::whereYear('date', $year)
-        ->whereMonth('date', $month)
-        ->get()
-        ->map(function ($holiday) {
-            return [
-                'id'       => $holiday->id,
-                'title'    => $holiday->title,
-                'date'     => $holiday->date->format('Y-m-d'),
-                'category' => $holiday->category,
-                'country'  => 'Local',
-                'type'     => 'holiday'
-            ];
-        })
-        ->toArray();
-
-
-    /* -------------------------
-       3. JSON INDIAN FESTIVALS
-    ------------------------- */
-    $festivalHolidays = [];
-    $festivalFile = public_path('holidays/indian_festivals.json');
-
-    if (!file_exists($festivalFile)) {
         return response()->json([
-            'error' => "Festival JSON file not found at: $festivalFile"
+            'holidays' => $holidays,
+            'leaves' => $leaves
         ]);
     }
 
-    $jsonData = json_decode(file_get_contents($festivalFile), true);
-
-    if (!$jsonData) {
-        return response()->json([
-            'error' => "Festival file is invalid or empty"
+    public function importHolidays(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,csv,xls',
         ]);
-    }
 
-    foreach ($jsonData as $festival) {
-        if (
-            date('Y', strtotime($festival['date'])) == $year &&
-            date('m', strtotime($festival['date'])) == $month
-        ) {
-            $festivalHolidays[] = [
-                'id'       => null,
-                'title'    => $festival['title'],
-                'date'     => $festival['date'],
-                'category' => $festival['category'],
-                'country'  => 'India',
-                'type'     => 'festival'
-            ];
+        try {
+            $companyId = Auth::user()->company_id;
+
+            // Overwrite existing holidays
+            CompanyHoliday::where('company_id', $companyId)->delete();
+
+            Excel::import(new CompanyHolidaysImport, $request->file('file'));
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Holidays imported successfully!'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error importing holidays: ' . $e->getMessage()
+            ], 500);
         }
     }
-
-
-    /* -------------------------
-       4. MERGE ALL HOLIDAYS
-    ------------------------- */
-    $holidays = array_merge($dbHolidays, $festivalHolidays);
-
-
-   /* -------------------------
-   5. LEAVES (From EmployeePortal)
-------------------------- */
-$leaves = EmployeePortal::get()
-    ->map(function ($leave) {
-        return [
-            'id'         => $leave->id,
-            'employee'   => $leave->employee_name,
-            'type'       => $leave->leave_type,
-            'fromDate'   => $leave->from_date->format('Y-m-d'),
-            'toDate'     => $leave->to_date->format('Y-m-d'),
-            'status'     => $leave->status,
-            'total_days' => $leave->total_days,
-        ];
-    });
-
-
-    return response()->json([
-        'holidays' => $holidays,
-        'leaves'   => $leaves
-    ]);
-}
-
 
 
 
@@ -187,5 +218,5 @@ $leaves = EmployeePortal::get()
         return response()->json($users);
     }
 
-    
+
 }
