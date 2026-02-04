@@ -46,14 +46,15 @@
                             Add Holiday
                         </button>
 
-                        <button id="importHolidaysBtn"
-                            class="bg-indigo-50 text-indigo-700 py-2 px-4 rounded-lg text-xs font-medium border border-indigo-200 hover:bg-indigo-100 transition-all duration-300 shadow-sm hover:shadow-md flex items-center">
+                        @role('admin')
+                        <button onclick="handleImportModalOpen()"
+                            class="flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 shadow-sm transition-all">
                             <i class="fas fa-file-excel mr-2"></i>
                             Import Excel
-                        </button>
 
                         </button>
                         <!-- File input moved to modal -->
+                        @endrole
                     </div>
                 </div>
 
@@ -253,6 +254,7 @@
         </div>
 
         <!-- Confirmation Modal -->
+        @role('admin')
         <div id="confirmationModal"
             class="fixed inset-0 z-[1100] hidden items-center justify-center bg-gray-900 bg-opacity-50 backdrop-blur-sm">
             <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 transform transition-all scale-100 text-center">
@@ -275,6 +277,7 @@
                 </div>
             </div>
         </div>
+        @endrole
 
         <!-- Add Holiday Modal -->
         <div id="addHolidayModal"
@@ -340,6 +343,7 @@
         </div>
 
         <!-- Import Holidays Modal -->
+        @role('admin')
         <div id="importModal"
             class="fixed inset-0 z-50 hidden items-center justify-center bg-gray-900 bg-opacity-50 backdrop-blur-sm">
             <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg transform transition-all scale-100">
@@ -360,12 +364,12 @@
                         <form id="importFileForm">
                             <div class="flex items-center space-x-3">
                                 <input type="file" id="importFileInput" accept=".xlsx, .xls, .csv" class="block w-full text-sm text-gray-500
-                                            file:mr-4 file:py-2 file:px-4
-                                            file:rounded-full file:border-0
-                                            file:text-sm file:font-semibold
-                                            file:bg-indigo-50 file:text-indigo-700
-                                            hover:file:bg-indigo-100
-                                            cursor-pointer border border-gray-300 rounded-lg p-1">
+                                                    file:mr-4 file:py-2 file:px-4
+                                                    file:rounded-full file:border-0
+                                                    file:text-sm file:font-semibold
+                                                    file:bg-indigo-50 file:text-indigo-700
+                                                    hover:file:bg-indigo-100
+                                                    cursor-pointer border border-gray-300 rounded-lg p-1">
                             </div>
                         </form>
                         <div class="flex justify-between items-center mt-2">
@@ -394,13 +398,13 @@
                             </div>
                         </div>
                         <!-- <div>
-                                        <h4 class="text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Optional Columns
-                                        </h4>
-                                        <div class="flex flex-wrap gap-2">
+                                                <h4 class="text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Optional Columns
+                                                </h4>
+                                                <div class="flex flex-wrap gap-2">
 
 
-                                        </div>
-                                    </div> -->
+                                                </div>
+                                            </div> -->
                     </div>
 
                     <!-- Warning -->
@@ -427,6 +431,8 @@
                 </div>
             </div>
         </div>
+        @endrole
+    </div>
 
     </div>
     </div>
@@ -801,15 +807,15 @@
                         const leaveItem = document.createElement('div');
                         leaveItem.className = 'flex items-center justify-between bg-gray-50 p-2 rounded';
                         leaveItem.innerHTML = `
-                                                <div>
-                                                    <div class="text-sm font-medium text-gray-800">${leave.user.name}</div>
-                                                    <div class="text-xs text-gray-500">${leave.type}</div>
-                                                </div>
-                                                <span class="text-xs ${leave.status === 'approved' ? 'bg-green-100 text-green-800' :
+                                                        <div>
+                                                            <div class="text-sm font-medium text-gray-800">${leave.user.name}</div>
+                                                            <div class="text-xs text-gray-500">${leave.type}</div>
+                                                        </div>
+                                                        <span class="text-xs ${leave.status === 'approved' ? 'bg-green-100 text-green-800' :
                                 leave.status === 'rejected' ? 'bg-gray-100 text-gray-800' : 'bg-yellow-100 text-yellow-800'} px-2 py-1 rounded-full">
-                                                    ${leave.status}
-                                                </span>
-                                            `;
+                                                            ${leave.status}
+                                                        </span>
+                                                    `;
                         todayLeaves.appendChild(leaveItem);
                     });
                 } else {
@@ -826,14 +832,14 @@
                         holidayItem.className = 'flex items-center justify-between bg-gray-50 p-2 rounded';
                         const holidayDate = new Date(holiday.date);
                         holidayItem.innerHTML = `
-                                                <div>
-                                                    <div class="text-sm font-medium text-gray-800">${holiday.title}</div>
-                                                    <div class="text-xs text-gray-500">${holidayDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
-                                                </div>
-                                                <span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full">
-                                                    ${holiday.category}
-                                                </span>
-                                            `;
+                                                        <div>
+                                                            <div class="text-sm font-medium text-gray-800">${holiday.title}</div>
+                                                            <div class="text-xs text-gray-500">${holidayDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+                                                        </div>
+                                                        <span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full">
+                                                            ${holiday.category}
+                                                        </span>
+                                                    `;
                         upcomingHolidays.appendChild(holidayItem);
                     });
                 } else {
@@ -852,14 +858,14 @@
                         const fromDate = new Date(leave.from_date);
                         const toDate = new Date(leave.to_date);
                         requestItem.innerHTML = `
-                                                <div>
-                                                    <div class="text-sm font-medium text-gray-800">${leave.user.name}</div>
-                                                    <div class="text-xs text-gray-500">${fromDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${toDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
-                                                </div>
-                                                <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
-                                                    Pending
-                                                </span>
-                                            `;
+                                                        <div>
+                                                            <div class="text-sm font-medium text-gray-800">${leave.user.name}</div>
+                                                            <div class="text-xs text-gray-500">${fromDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${toDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+                                                        </div>
+                                                        <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
+                                                            Pending
+                                                        </span>
+                                                    `;
                         pendingRequests.appendChild(requestItem);
                     });
                 } else {
@@ -960,6 +966,14 @@
                 importModal.classList.remove('flex');
                 importFileForm.reset();
                 document.body.style.overflow = 'auto'; // Re-enable scroll
+            }
+        }
+
+        window.handleImportModalOpen = function () {
+            if (importModal) {
+                importModal.classList.remove('hidden');
+                importModal.classList.add('flex');
+                document.body.style.overflow = 'hidden'; // Disable scroll
             }
         }
 
@@ -1092,49 +1106,53 @@
         }
 
         // 2. Execute Import after Confirmation
-        document.getElementById('confirmOverwriteBtn').addEventListener('click', function () {
-            if (!fileToImport) return;
+        const confirmOverwriteBtn = document.getElementById('confirmOverwriteBtn');
+        if (confirmOverwriteBtn) {
+            confirmOverwriteBtn.addEventListener('click', function () {
+                if (!fileToImport) return;
 
-            const formData = new FormData();
-            formData.append('file', fileToImport);
+                const formData = new FormData();
+                formData.append('file', fileToImport);
 
-            // Close confirmation modal (clears fileToImport)
-            closeConfirmationModal();
+                // Close confirmation modal (clears fileToImport)
+                closeConfirmationModal();
 
-            // Show loading state on the MAIN import modal button
-            const submitBtn = document.getElementById('confirmImportBtn');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Importing...';
-            submitBtn.disabled = true;
+                // Show loading state on the MAIN import modal button
+                const submitBtn = document.getElementById('confirmImportBtn');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Importing...';
+                submitBtn.disabled = true;
 
-            fetch('/calendar/import-holidays', {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': calendarCsrfToken,
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: formData
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showToast(data.message, 'success');
-                        closeImportModal();
-                        loadCalendarData();
-                    } else {
-                        showToast(data.message || 'Error import failed', 'error');
-                    }
+                fetch('/calendar/import-holidays', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': calendarCsrfToken,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: formData
                 })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showToast('An unexpected error occurred during import.', 'error');
-                })
-                .finally(() => {
-                    submitBtn.innerHTML = originalText;
-                    submitBtn.disabled = false;
-                    fileToImport = null;
-                });
-        });
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showToast(data.message, 'success');
+                            closeImportModal();
+                            loadCalendarData();
+                        } else {
+                            showToast(data.message || 'Error import failed', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showToast('An unexpected error occurred during import.', 'error');
+                    })
+                    .finally(() => {
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                        fileToImport = null;
+                    });
+            });
+        };
+
 
         document.addEventListener('DOMContentLoaded', () => {
             initCalendar();
@@ -1163,11 +1181,11 @@
                 if (dateHolidays.length > 0) {
                     dateHolidays.forEach(h => {
                         upcomingHolidays.innerHTML += `
-                                                <div class="p-2 bg-red-50 rounded border border-red-200">
-                                                    <div class="font-bold text-red-700">${h.title}</div>
-                                                    <div class="text-xs text-gray-600">${h.category} (${h.country})</div>
-                                                </div>
-                                            `;
+                                                        <div class="p-2 bg-red-50 rounded border border-red-200">
+                                                            <div class="font-bold text-red-700">${h.title}</div>
+                                                            <div class="text-xs text-gray-600">${h.category} (${h.country})</div>
+                                                        </div>
+                                                    `;
                     });
                 } else {
                     upcomingHolidays.innerHTML = `<div class="text-center text-gray-500 text-sm">No Holidays for this date</div>`;
@@ -1180,11 +1198,11 @@
                 if (dateLeaves.length > 0) {
                     dateLeaves.forEach(l => {
                         todayLeaves.innerHTML += `
-                                                <div class="p-2 bg-green-50 border border-green-200 rounded">
-                                                    <div class="font-semibold">${l.employee}</div>
-                                                    <div class="text-xs">${l.type} (${l.status})</div>
-                                                </div>
-                                            `;
+                                                        <div class="p-2 bg-green-50 border border-green-200 rounded">
+                                                            <div class="font-semibold">${l.employee}</div>
+                                                            <div class="text-xs">${l.type} (${l.status})</div>
+                                                        </div>
+                                                    `;
                     });
                 } else {
                     todayLeaves.innerHTML = `<div class="text-center text-gray-500 text-sm">No Leaves for this date</div>`;

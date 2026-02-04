@@ -123,6 +123,10 @@ class CalenderController extends Controller
 
     public function importHolidays(Request $request)
     {
+        if (!Auth::user()->hasRole('admin')) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized action.'], 403);
+        }
+
         $request->validate([
             'file' => 'required',
         ]);
