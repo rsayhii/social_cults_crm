@@ -1,47 +1,47 @@
 <?php
 // app/Http/Controllers/TrialController.php
-
 namespace App\Http\Controllers\SuperAdmin;
+
 use App\Http\Controllers\Controller;
-use App\Models\SuperAdmin\Trial;
-use App\Models\SuperAdmin\Customer;
+use App\Models\Company;
 use Illuminate\Http\Request;
 
 class TrialController extends Controller
 {
     public function index()
-    {
-        $activeTrials = Customer::where('status', 'trial')
-            ->with(['trials' => function($query) {
-                $query->where('status', 'active');
-            }])
-            ->paginate(10);
-            
-        $trialsStats = [
-            'active' => Customer::where('status', 'trial')->count(),
-            'converted' => Trial::where('converted_to_paid', true)->count(),
-            'expired' => Trial::where('status', 'expired')->count(),
-        ];
-        
-        return view('superadmin.trials', compact('activeTrials', 'trialsStats'));
-    }
-    
+{
+    // All trial companies (active + expired)
+    $activeTrials = Company::where('is_paid', false)
+        ->orderBy('trial_ends_at', 'asc')
+        ->paginate(10);
+
+    // Stats
+    $trialsStats = [
+        'active' => Company::where('is_paid', false)
+            ->whereDate('trial_ends_at', '>=', now())
+            ->count(),
+
+        'converted' => Company::where('is_paid', true)->count(),
+
+        'expired' => Company::where('is_paid', false)
+            ->whereDate('trial_ends_at', '<', now())
+            ->count(),
+    ];
+
+    return view('superadmin.trials', compact('activeTrials', 'trialsStats'));
+}
+
+
     public function convertToPaid($id)
     {
-        $customer = Customer::findOrFail($id);
-        $customer->update([
+        $company = Company::findOrFail($id);
+
+        $company->update([
+            'is_paid' => true,
             'status' => 'active',
-            'plan' => 'Paid (₹5000/year)',
-            'amount_paid' => 5000,
-            'subscription_start_date' => now(),
-            'subscription_end_date' => now()->addYear(),
+            'trial_ends_at' => null,
         ]);
-        
-        Trial::where('customer_id', $id)->update([
-            'converted_to_paid' => true,
-            'status' => 'converted'
-        ]);
-        
-        return back()->with('success', 'Trial converted to paid successfully.');
+
+        return back()->with('success', 'Company converted to paid successfully.');
     }
 }

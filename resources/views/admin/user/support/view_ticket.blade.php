@@ -115,12 +115,20 @@
                 <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6 mb-6">
                     <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Ticket Details</h3>
                     <dl class="space-y-4">
+                        @if(is_array($ticket->issue_permissions) && count($ticket->issue_permissions) > 0)
                         <div>
-                            <dt class="text-sm text-gray-500">Category</dt>
-                            <dd class="text-sm font-medium text-gray-900 mt-1 flex items-center gap-2">
-                                <i class="fas fa-folder text-gray-400"></i> {{ ucfirst($ticket->category) }}
+                            <dt class="text-sm text-gray-500">Issue-Facing Items</dt>
+                            <dd class="mt-2">
+                                <div class="flex flex-wrap gap-2">
+                                    @foreach($ticket->issue_permissions as $perm)
+                                        <span class="px-2 py-1 text-xs rounded-lg bg-gray-100 text-gray-700">
+                                            {{ ucwords(str_replace(['-', '_'], ' ', $perm)) }}
+                                        </span>
+                                    @endforeach
+                                </div>
                             </dd>
                         </div>
+                        @endif
                         <div>
                             <dt class="text-sm text-gray-500">Priority</dt>
                             <dd class="text-sm font-medium text-gray-900 mt-1 flex items-center gap-2">

@@ -35,7 +35,6 @@ class PermissionSeeder extends Seeder
             'report',
             'notepad',
             'contact',
-            'ticket records',
             'ticket raise',
 
         ];

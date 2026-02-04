@@ -7,6 +7,7 @@ use App\Models\HelpAndSupport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Spatie\Permission\Models\Permission;
 
 class TicketController extends Controller
 {
@@ -16,7 +17,8 @@ class TicketController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        return view('admin.user.support.my_tickets', compact('tickets'));
+        $permissions = Permission::orderBy('name')->pluck('name')->toArray();
+        return view('admin.user.support.my_tickets', compact('tickets', 'permissions'));
     }
 
     public function create()
@@ -29,9 +31,10 @@ class TicketController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'category' => 'required|in:website,social-media,ads-manager,email,billing,others',
             'priority' => 'required|in:low,medium,high,urgent',
             'attachments.*' => 'file|max:10240',
+            'permissions' => 'array',
+            'permissions.*' => 'string'
         ]);
 
         try {
@@ -39,12 +42,13 @@ class TicketController extends Controller
             $ticket = HelpAndSupport::create([
                 'title' => $request->title,
                 'description' => $request->description,
-                'category' => $request->category,
+                'category' => 'others',
                 'priority' => $request->priority,
                 'client_id' => Auth::id(),
                 'company_id' => Auth::user()->company_id,
                 'status' => 'open',
                 'sla_due_at' => $this->calculateSLADueDate($request->priority),
+                'issue_permissions' => $request->permissions ? array_values(array_unique($request->permissions)) : []
             ]);
 
             // Handle attachments

@@ -59,43 +59,72 @@
                     <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trial Start</th>
                     <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trial End</th>
                     <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Days Remaining</th>
-                    <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Active Status</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200">
-                @foreach($activeTrials as $customer)
-                @php
-                    $daysRemaining = \Carbon\Carbon::parse($customer->trial_end_date)->diffInDays(now());
-                @endphp
+               @foreach($activeTrials as $company)
+
+               @php
+    $daysRemaining = now()->diffInDays($company->trial_ends_at, false);
+@endphp
+
                 <tr>
                     <td class="py-3 px-6">
-                        <div class="flex items-center">
-                            <div class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 mr-3"></div>
-                            <div>
-                                <p class="font-medium text-gray-800">{{ $customer->name }}</p>
-                                <p class="text-sm text-gray-500">{{ $customer->email }}</p>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="py-3 px-6">
-                        <span class="text-gray-800">{{ $customer->trial_start_date }}</span>
-                    </td>
-                    <td class="py-3 px-6">
-                        <span class="text-gray-800">{{ $customer->trial_end_date }}</span>
-                    </td>
-                    <td class="py-3 px-6">
-                        <span class="font-medium {{ $daysRemaining > 7 ? 'text-green-600' : ($daysRemaining > 0 ? 'text-yellow-600' : 'text-red-600') }}">
-                            {{ $daysRemaining > 0 ? $daysRemaining . ' days' : 'Expired' }}
-                        </span>
-                    </td>
-                    <td class="py-3 px-6">
-                        <form action="{{ route('superadmin.trials.convert', $customer->id) }}" method="POST" class="inline">
-                            @csrf
-                            <button type="submit" class="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700">
-                                Convert to Paid
-                            </button>
-                        </form>
-                    </td>
+    <div class="flex items-center">
+        <img src="{{ $company->logo_url }}" class="w-8 h-8 rounded-full mr-3">
+        <div>
+            <p class="font-medium text-gray-800">{{ $company->name }}</p>
+            <p class="text-sm text-gray-500">{{ $company->email }}</p>
+        </div>
+    </div>
+</td>
+
+<td class="py-3 px-6">
+    {{ $company->created_at->format('d M Y') }}
+</td>
+
+<td class="py-3 px-6">
+    {{ $company->trial_ends_at->format('d M Y') }}
+</td>
+
+<td class="py-3 px-6">
+    @if($company && !$company->is_paid && now()->lt($company->trial_ends_at))
+
+        @php
+            $diff = now()->diff($company->trial_ends_at);
+            $days = $diff->days;
+            $hours = $diff->h;
+        @endphp
+
+        <span class="font-medium
+            {{ $days > 7 ? 'text-green-600' : ($days > 0 ? 'text-yellow-600' : 'text-red-600') }}">
+            Trial ends in {{ $days }} days {{ $hours }} hours
+        </span>
+
+    @else
+        <span class="font-medium text-red-600">
+            Expired
+        </span>
+    @endif
+</td>
+
+
+<td class="py-3 px-6">
+    @if(now()->lt($company->trial_ends_at))
+        <span class="inline-flex items-center px-3 py-1 rounded-full
+            bg-green-100 text-green-700 text-sm font-semibold">
+            Active
+        </span>
+    @else
+        <span class="inline-flex items-center px-3 py-1 rounded-full
+            bg-red-100 text-red-700 text-sm font-semibold">
+            Expired
+        </span>
+    @endif
+</td>
+
+
                 </tr>
                 @endforeach
             </tbody>

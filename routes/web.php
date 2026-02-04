@@ -524,13 +524,23 @@ Route::get('/notepad', function () {
 
 
 
+Route::middleware('permission:ticket raise')->prefix('user/support/ticket')
+    ->name('user.support.ticket.')
+    ->group(function () {
+
+        Route::get('/', [TicketController::class, 'index'])->name('index');
+        Route::get('/create', [TicketController::class, 'create'])->name('create');
+        Route::post('/', [TicketController::class, 'store'])->name('store');
+        Route::get('/{id}', [TicketController::class, 'show'])->name('show');
+        Route::post('/{id}/reply', [TicketController::class, 'reply'])->name('reply');
+});
 
 
 
 
 
 
-
+});
 
 
 
@@ -634,7 +644,7 @@ Route::post('/invoices/{invoice}/mark-paid', [SuperAdminInvoiceController::class
 
 
 
-Route::middleware('permission:ticket records')->prefix('ticket/record')->name('ticket.record.')->group(function () {
+Route::prefix('ticket/record')->name('ticket.record.')->group(function () {
         Route::get('/', [TicketRecordController::class, 'index'])->name('index');
         Route::get('/{id}', [TicketRecordController::class, 'show'])->name('show');
         Route::put('/{id}', [TicketRecordController::class, 'update'])->name('update');
@@ -644,16 +654,7 @@ Route::middleware('permission:ticket records')->prefix('ticket/record')->name('t
 
 
 
-Route::middleware('permission:ticket raise')->prefix('user/support/ticket')
-    ->name('user.support.ticket.')
-    ->group(function () {
 
-        Route::get('/', [TicketController::class, 'index'])->name('index');
-        Route::get('/create', [TicketController::class, 'create'])->name('create');
-        Route::post('/', [TicketController::class, 'store'])->name('store');
-        Route::get('/{id}', [TicketController::class, 'show'])->name('show');
-        Route::post('/{id}/reply', [TicketController::class, 'reply'])->name('reply');
-});
 
 
 
@@ -712,7 +713,6 @@ Route::get('superadmin/help', function () {
 
 
 
-});
 
 
 // -------------------------------------------------------------------

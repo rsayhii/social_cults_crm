@@ -23,14 +23,16 @@ class HelpAndSupport extends Model
         'sla_due_at',
         'resolved_at',
         'conversations', // Store conversations as JSON
-        'attachments'    // Store attachments as JSON
+        'attachments',   // Store attachments as JSON
+        'issue_permissions'
     ];
 
     protected $casts = [
         'sla_due_at' => 'datetime',
         'resolved_at' => 'datetime',
         'conversations' => 'array',
-        'attachments' => 'array'
+        'attachments' => 'array',
+        'issue_permissions' => 'array'
     ];
 
     /**
