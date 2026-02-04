@@ -33,70 +33,80 @@ class CalenderController extends Controller
 
         $holidays = [];
 
-        if ($hasCompanyHolidays) {
-            \Illuminate\Support\Facades\Log::info('Fetching Company Holidays from DB');
-            // 1. COMPANY CUSTOM HOLIDAYS (Overrides default)
-            $holidays = CompanyHoliday::where('company_id', $companyId)
-                ->whereYear('date', $year)
-                ->whereMonth('date', $month)
-                ->get()
-                ->map(function ($holiday) {
-                    return [
-                        'id' => $holiday->id,
-                        'title' => $holiday->title,
-                        'date' => $holiday->date->format('Y-m-d'),
-                        'category' => $holiday->category,
-                        'country' => 'Company',
-                        'type' => 'holiday' // treated mainly as holiday
-                    ];
-                })
-                ->toArray();
-        } else {
-            // 2. FALLBACK TO DEFAULT (DB + JSON)
+        $holidays = [];
 
-            /* DB Global Holidays */
-            $dbHolidays = Holiday::whereYear('date', $year)
-                ->whereMonth('date', $month)
-                ->get()
-                ->map(function ($holiday) {
-                    return [
-                        'id' => $holiday->id,
-                        'title' => $holiday->title,
-                        'date' => $holiday->date->format('Y-m-d'),
-                        'category' => $holiday->category,
-                        'country' => 'Local',
-                        'type' => 'holiday'
-                    ];
-                })
-                ->toArray();
+        // 1. COMPANY CUSTOM HOLIDAYS
+        $companyHolidaysRaw = CompanyHoliday::where('company_id', $companyId)
+            ->whereYear('date', $year)
+            ->whereMonth('date', $month)
+            ->get();
 
-            /* JSON Indian Festivals */
-            $festivalHolidays = [];
-            $festivalFile = public_path('holidays/indian_festivals.json');
+        $companyHolidays = $companyHolidaysRaw->map(function ($holiday) {
+            return [
+                'id' => $holiday->id,
+                'title' => $holiday->title,
+                'date' => $holiday->date->format('Y-m-d'),
+                'category' => $holiday->category,
+                'country' => 'Company',
+                'type' => 'holiday'
+            ];
+        })->toArray();
 
-            if (file_exists($festivalFile)) {
-                $jsonData = json_decode(file_get_contents($festivalFile), true);
-                if ($jsonData) {
-                    foreach ($jsonData as $festival) {
-                        if (
-                            date('Y', strtotime($festival['date'])) == $year &&
-                            date('m', strtotime($festival['date'])) == $month
-                        ) {
-                            $festivalHolidays[] = [
-                                'id' => null,
-                                'title' => $festival['title'],
-                                'date' => $festival['date'],
-                                'category' => $festival['category'],
-                                'country' => 'India',
-                                'type' => 'festival'
-                            ];
-                        }
+        // 2. DEFAULT SYSTEM HOLIDAYS (DB Global)
+        $dbHolidays = Holiday::whereYear('date', $year)
+            ->whereMonth('date', $month)
+            ->get()
+            ->map(function ($holiday) {
+                return [
+                    'id' => $holiday->id,
+                    'title' => $holiday->title,
+                    'date' => $holiday->date->format('Y-m-d'),
+                    'category' => $holiday->category,
+                    'country' => 'Local',
+                    'type' => 'holiday'
+                ];
+            })
+            ->toArray();
+
+        // 3. JSON FESTIVALS
+        $festivalHolidays = [];
+        $festivalFile = public_path('holidays/indian_festivals.json');
+
+        if (file_exists($festivalFile)) {
+            $jsonData = json_decode(file_get_contents($festivalFile), true);
+            if ($jsonData) {
+                foreach ($jsonData as $festival) {
+                    if (
+                        date('Y', strtotime($festival['date'])) == $year &&
+                        date('m', strtotime($festival['date'])) == $month
+                    ) {
+                        $festivalHolidays[] = [
+                            'id' => null,
+                            'title' => $festival['title'],
+                            'date' => $festival['date'],
+                            'category' => $festival['category'],
+                            'country' => 'India',
+                            'type' => 'festival'
+                        ];
                     }
                 }
             }
+        }
 
+        // 4. EXCLUSIVE DISPLAY LOGIC
+        // Logic: If the company has ANY custom holidays (Manual or Imported), show ONLY those.
+        // Otherwise, show the System Defaults (DB + JSON).
+
+        $hasCustomHolidays = CompanyHoliday::where('company_id', $companyId)->exists();
+
+        if ($hasCustomHolidays) {
+            // SHOW ONLY COMPANY HOLIDAYS
+            $holidays = $companyHolidays;
+        } else {
+            // SHOW SYSTEM DEFAULTS
             $holidays = array_merge($dbHolidays, $festivalHolidays);
         }
+
 
         /* -------------------------
         5. LEAVES (From EmployeePortal)
@@ -144,8 +154,8 @@ class CalenderController extends Controller
         try {
             $companyId = Auth::user()->company_id;
 
-            // Overwrite existing holidays
-            CompanyHoliday::where('company_id', $companyId)->delete();
+            // Overwrite existing holidays - MOVED AFTER VALIDATION
+            // CompanyHoliday::where('company_id', $companyId)->delete();
 
             // Validate Headings
             $headings = (new \Maatwebsite\Excel\HeadingRowImport)->toArray($request->file('file'));
@@ -174,6 +184,12 @@ class CalenderController extends Controller
                     ], 400);
                 }
             }
+
+
+
+            // Safe to delete now - Validation passed
+            $deletedCount = CompanyHoliday::where('company_id', $companyId)->delete();
+            \Illuminate\Support\Facades\Log::info("Deleted $deletedCount existing company holidays before import.");
 
             Excel::import(new CompanyHolidaysImport, $request->file('file'));
 
@@ -226,6 +242,10 @@ class CalenderController extends Controller
 
     public function addHoliday(Request $request)
     {
+        if (!Auth::user()->hasRole('admin')) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized action.'], 403);
+        }
+
         $request->validate([
             'title' => 'required|string|max:255',
             'date' => 'required|date',
@@ -234,7 +254,9 @@ class CalenderController extends Controller
         ]);
 
         try {
-            $holiday = Holiday::create([
+            // Store as Company Holiday
+            $holiday = CompanyHoliday::create([
+                'company_id' => Auth::user()->company_id,
                 'title' => $request->title,
                 'date' => $request->date,
                 'category' => $request->category,
@@ -250,6 +272,31 @@ class CalenderController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error adding holiday: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function deleteHoliday($id)
+    {
+        if (!Auth::user()->hasRole('admin')) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized action.'], 403);
+        }
+
+        try {
+            $holiday = CompanyHoliday::where('company_id', Auth::user()->company_id)
+                ->where('id', $id)
+                ->firstOrFail();
+
+            $holiday->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Holiday deleted successfully!'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting holiday: ' . $e->getMessage()
             ], 500);
         }
     }
