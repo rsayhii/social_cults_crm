@@ -51,7 +51,9 @@
                             <i class="fas fa-file-excel mr-2"></i>
                             Import Excel
                         </button>
-                        <input type="file" id="holidayImportInput" class="hidden" accept=".xlsx, .xls, .csv">
+
+                        </button>
+                        <!-- File input moved to modal -->
                     </div>
                 </div>
 
@@ -230,71 +232,203 @@
                 </div>
             </div>
 
-            <!-- Add Holiday Modal -->
-            <div id="addHolidayModal"
-                class="fixed inset-0 z-50 flex items-center justify-center modal-overlay hidden bg-gray-800 bg-opacity-50">
-                <div class="bg-white rounded-xl shadow-lg max-w-md w-full mx-4 fade-in">
-                    <div class="p-6 border-b border-gray-200 flex justify-between items-center">
-                        <h2 class="text-xl font-bold text-gray-800">Add Holiday</h2>
-                        <button id="closeHolidayModal" class="text-gray-500 hover:text-gray-700">
-                            <i class="fas fa-times text-xl"></i>
-                        </button>
+            <!-- Toast Notification -->
+            <div id="toast-notification"
+                class="fixed top-5 right-5 z-[1000] transform transition-all duration-300 translate-x-full opacity-0">
+                <div class="flex items-center w-full max-w-xs p-4 space-x-4 text-gray-500 bg-white rounded-lg shadow-2xl border-l-4"
+                    role="alert">
+                    <div id="toast-icon-container"
+                        class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 rounded-lg">
+                        <i id="toast-icon" class="fas text-sm"></i>
                     </div>
-
-                    <form id="holidayForm" class="p-6 space-y-4">
-                        @csrf
-                        <div>
-                            <label for="holidayTitle" class="block text-sm font-medium text-gray-700 mb-1">Holiday
-                                Title</label>
-                            <input type="text" id="holidayTitle" name="title"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500"
-                                placeholder="Enter holiday name" required>
-                        </div>
-
-                        <div>
-                            <label for="holidayDate" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
-                            <input type="date" id="holidayDate" name="date"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500"
-                                required>
-                        </div>
-
-                        <div>
-                            <label for="holidayCategory"
-                                class="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                            <select id="holidayCategory" name="category"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500"
-                                required>
-                                <option value="">Select Category</option>
-                                <option value="Public Holiday">Public Holiday</option>
-                                <option value="Company Holiday">Company Holiday</option>
-                                <option value="Observance">Observance</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label for="holidayDescription" class="block text-sm font-medium text-gray-700 mb-1">Description
-                                (Optional)</label>
-                            <textarea id="holidayDescription" name="description" rows="2"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500"
-                                placeholder="Holiday description"></textarea>
-                        </div>
-
-                        <div class="flex space-x-4 pt-4">
-                            <button type="button" id="cancelHoliday"
-                                class="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg font-medium hover:bg-gray-300 transition-all duration-300">
-                                Cancel
-                            </button>
-                            <button type="submit" id="submitHoliday"
-                                class="flex-1 bg-indigo-600 text-white py-3 rounded-lg font-medium hover:bg-indigo-700 transition-all duration-300 shadow-sm hover:shadow-md flex items-center justify-center">
-                                <i class="fas fa-spinner fa-spin hidden mr-2"></i>
-                                Save Holiday
-                            </button>
-                        </div>
-                    </form>
+                    <div class="ml-3 text-sm font-normal text-gray-800" id="toast-message">Notification message</div>
+                    <button type="button"
+                        class="ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex h-8 w-8"
+                        onclick="hideToast()">
+                        <span class="sr-only">Close</span>
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
             </div>
-
         </div>
+
+        <!-- Confirmation Modal -->
+        <div id="confirmationModal"
+            class="fixed inset-0 z-[1100] hidden items-center justify-center bg-gray-900 bg-opacity-50 backdrop-blur-sm">
+            <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 transform transition-all scale-100 text-center">
+                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                    <i class="fas fa-exclamation-triangle text-red-600 text-lg"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2">Overwrite Holidays?</h3>
+                <p class="text-sm text-gray-500 mb-6">
+                    This will delete all existing imported holidays for your company and replace them with this file. This
+                    action cannot be undone.
+                </p>
+                <div class="flex justify-center space-x-3">
+                    <button type="button" onclick="closeConfirmationModal()"
+                        class="px-4 py-2 bg-white text-gray-700 text-sm font-medium rounded-lg border border-gray-300 hover:bg-gray-50 transition-all">
+                        Cancel
+                    </button>
+                    <button type="button" id="confirmOverwriteBtn"
+                        class="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 shadow-md transition-all">
+                        Yes, Overwrite</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Holiday Modal -->
+        <div id="addHolidayModal"
+            class="fixed inset-0 z-50 flex items-center justify-center modal-overlay hidden bg-gray-800 bg-opacity-50">
+            <div class="bg-white rounded-xl shadow-lg max-w-md w-full mx-4 fade-in">
+                <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+                    <h2 class="text-xl font-bold text-gray-800">Add Holiday</h2>
+                    <button id="closeHolidayModal" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+
+                <form id="holidayForm" class="p-6 space-y-4">
+                    @csrf
+                    <div>
+                        <label for="holidayTitle" class="block text-sm font-medium text-gray-700 mb-1">Holiday
+                            Title</label>
+                        <input type="text" id="holidayTitle" name="title"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500"
+                            placeholder="Enter holiday name" required>
+                    </div>
+
+                    <div>
+                        <label for="holidayDate" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                        <input type="date" id="holidayDate" name="date"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500"
+                            required>
+                    </div>
+
+                    <div>
+                        <label for="holidayCategory" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                        <select id="holidayCategory" name="category"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500"
+                            required>
+                            <option value="">Select Category</option>
+                            <option value="Public Holiday">Public Holiday</option>
+                            <option value="Company Holiday">Company Holiday</option>
+                            <option value="Observance">Observance</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="holidayDescription" class="block text-sm font-medium text-gray-700 mb-1">Description
+                            (Optional)</label>
+                        <textarea id="holidayDescription" name="description" rows="2"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500"
+                            placeholder="Holiday description"></textarea>
+                    </div>
+
+                    <div class="flex space-x-4 pt-4">
+                        <button type="button" id="cancelHoliday"
+                            class="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg font-medium hover:bg-gray-300 transition-all duration-300">
+                            Cancel
+                        </button>
+                        <button type="submit" id="submitHoliday"
+                            class="flex-1 bg-indigo-600 text-white py-3 rounded-lg font-medium hover:bg-indigo-700 transition-all duration-300 shadow-sm hover:shadow-md flex items-center justify-center">
+                            <i class="fas fa-spinner fa-spin hidden mr-2"></i>
+                            Save Holiday
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Import Holidays Modal -->
+        <div id="importModal"
+            class="fixed inset-0 z-50 hidden items-center justify-center bg-gray-900 bg-opacity-50 backdrop-blur-sm">
+            <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg transform transition-all scale-100">
+                <!-- Modal Header -->
+                <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-indigo-50 rounded-t-xl">
+                    <h3 class="text-lg font-bold text-indigo-900">Import Holidays from Excel</h3>
+                    <button id="closeImportModalBtn" class="text-gray-400 hover:text-gray-600 transition-colors">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="p-6 space-y-4">
+
+                    <!-- File Input Section -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Excel / CSV File</label>
+                        <form id="importFileForm">
+                            <div class="flex items-center space-x-3">
+                                <input type="file" id="importFileInput" accept=".xlsx, .xls, .csv" class="block w-full text-sm text-gray-500
+                                            file:mr-4 file:py-2 file:px-4
+                                            file:rounded-full file:border-0
+                                            file:text-sm file:font-semibold
+                                            file:bg-indigo-50 file:text-indigo-700
+                                            hover:file:bg-indigo-100
+                                            cursor-pointer border border-gray-300 rounded-lg p-1">
+                            </div>
+                        </form>
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="text-xs text-gray-500">Supported formats: .xlsx, .xls, .csv</span>
+                            <a href="/samples/holiday_sample.xlsx" download
+                                class="text-lg font-medium text-indigo-600 hover:text-indigo-800 hover:underline">
+                                Download Sample File
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Guidance Section -->
+                    <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                        <div class="mb-3">
+                            <h4 class="text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Required Columns
+                            </h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span
+                                    class="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-md border border-red-200 font-mono">title</span>
+                                <span
+                                    class="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-md border border-red-200 font-mono">date</span>
+                                <span
+                                    class="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-md border border-red-200 font-mono">category</span>
+                                <span
+                                    class="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-md border border-red-200 font-mono">description</span>
+                            </div>
+                        </div>
+                        <!-- <div>
+                                        <h4 class="text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Optional Columns
+                                        </h4>
+                                        <div class="flex flex-wrap gap-2">
+
+
+                                        </div>
+                                    </div> -->
+                    </div>
+
+                    <!-- Warning -->
+                    <div class="flex items-start p-3 bg-yellow-50 border-l-4 border-yellow-400 rounded-r-md">
+                        <i class="fas fa-exclamation-triangle text-yellow-500 mt-0.5 mr-3"></i>
+                        <p class="text-xs text-yellow-700">
+                            Column names must <strong>match exactly</strong> as shown above. Dates should be in
+                            <code>YYYY-MM-DD</code> format.
+                        </p>
+                    </div>
+
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="px-6 py-4 bg-gray-50 rounded-b-xl flex justify-end space-x-3">
+                    <button type="button" id="cancelImportBtn"
+                        class="px-4 py-2 bg-white text-gray-700 text-sm font-medium rounded-lg border border-gray-300 hover:bg-gray-50 shadow-sm transition-all">
+                        Cancel
+                    </button>
+                    <button type="submit" form="importFileForm" id="confirmImportBtn"
+                        class="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 shadow-md transition-all flex items-center">
+                        Import Holidays
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
     </div>
 
     <script>
@@ -340,7 +474,11 @@
 
         // Import 
         const importHolidaysBtn = document.getElementById('importHolidaysBtn');
-        const holidayImportInput = document.getElementById('holidayImportInput');
+        // const holidayImportInput = document.getElementById('holidayImportInput'); // Moved to modal
+        const importModal = document.getElementById('importModal');
+        const closeImportModalBtn = document.getElementById('closeImportModalBtn');
+        const cancelImportBtn = document.getElementById('cancelImportBtn');
+        const importFileForm = document.getElementById('importFileForm');
 
         const todayLeaves = document.getElementById('todayLeaves');
         const noLeavesToday = document.getElementById('noLeavesToday');
@@ -424,12 +562,23 @@
             }
 
             // Import Events
-            if (importHolidaysBtn && holidayImportInput) {
+            if (importHolidaysBtn && importModal) {
                 importHolidaysBtn.addEventListener('click', () => {
-                    holidayImportInput.click();
+                    log('Import Holidays button clicked');
+                    openModal(importModal);
                 });
+            }
 
-                holidayImportInput.addEventListener('change', handleImportHolidays);
+            if (closeImportModalBtn) {
+                closeImportModalBtn.addEventListener('click', closeImportModal);
+            }
+
+            if (cancelImportBtn) {
+                cancelImportBtn.addEventListener('click', closeImportModal);
+            }
+
+            if (importFileForm) {
+                importFileForm.addEventListener('submit', handleImportHolidays);
             }
         }
 
@@ -450,10 +599,16 @@
             if (e.target === addHolidayModal) {
                 closeModal(addHolidayModal);
             }
+            if (e.target === importModal) {
+                closeModal(importModal);
+            }
+            if (e.target === document.getElementById('confirmationModal')) {
+                closeConfirmationModal();
+            }
         });
 
         log('Calendar initialization complete');
-                
+
 
         // Load calendar data via Ajax
         function loadCalendarData() {
@@ -646,15 +801,15 @@
                         const leaveItem = document.createElement('div');
                         leaveItem.className = 'flex items-center justify-between bg-gray-50 p-2 rounded';
                         leaveItem.innerHTML = `
-                                    <div>
-                                        <div class="text-sm font-medium text-gray-800">${leave.user.name}</div>
-                                        <div class="text-xs text-gray-500">${leave.type}</div>
-                                    </div>
-                                    <span class="text-xs ${leave.status === 'approved' ? 'bg-green-100 text-green-800' :
+                                                <div>
+                                                    <div class="text-sm font-medium text-gray-800">${leave.user.name}</div>
+                                                    <div class="text-xs text-gray-500">${leave.type}</div>
+                                                </div>
+                                                <span class="text-xs ${leave.status === 'approved' ? 'bg-green-100 text-green-800' :
                                 leave.status === 'rejected' ? 'bg-gray-100 text-gray-800' : 'bg-yellow-100 text-yellow-800'} px-2 py-1 rounded-full">
-                                        ${leave.status}
-                                    </span>
-                                `;
+                                                    ${leave.status}
+                                                </span>
+                                            `;
                         todayLeaves.appendChild(leaveItem);
                     });
                 } else {
@@ -671,14 +826,14 @@
                         holidayItem.className = 'flex items-center justify-between bg-gray-50 p-2 rounded';
                         const holidayDate = new Date(holiday.date);
                         holidayItem.innerHTML = `
-                                    <div>
-                                        <div class="text-sm font-medium text-gray-800">${holiday.title}</div>
-                                        <div class="text-xs text-gray-500">${holidayDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
-                                    </div>
-                                    <span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full">
-                                        ${holiday.category}
-                                    </span>
-                                `;
+                                                <div>
+                                                    <div class="text-sm font-medium text-gray-800">${holiday.title}</div>
+                                                    <div class="text-xs text-gray-500">${holidayDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+                                                </div>
+                                                <span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full">
+                                                    ${holiday.category}
+                                                </span>
+                                            `;
                         upcomingHolidays.appendChild(holidayItem);
                     });
                 } else {
@@ -697,14 +852,14 @@
                         const fromDate = new Date(leave.from_date);
                         const toDate = new Date(leave.to_date);
                         requestItem.innerHTML = `
-                                    <div>
-                                        <div class="text-sm font-medium text-gray-800">${leave.user.name}</div>
-                                        <div class="text-xs text-gray-500">${fromDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${toDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
-                                    </div>
-                                    <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
-                                        Pending
-                                    </span>
-                                `;
+                                                <div>
+                                                    <div class="text-sm font-medium text-gray-800">${leave.user.name}</div>
+                                                    <div class="text-xs text-gray-500">${fromDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${toDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+                                                </div>
+                                                <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
+                                                    Pending
+                                                </span>
+                                            `;
                         pendingRequests.appendChild(requestItem);
                     });
                 } else {
@@ -718,6 +873,7 @@
             log(`Opening modal: ${modal.id}`);
             if (modal) {
                 modal.classList.remove('hidden');
+                modal.classList.add('flex'); // Ensure it's flex for centering
                 document.body.style.overflow = 'hidden';
             }
         }
@@ -726,6 +882,7 @@
             log(`Closing modal: ${modal.id}`);
             if (modal) {
                 modal.classList.add('hidden');
+                modal.classList.remove('flex'); // Remove flex when hidden
                 document.body.style.overflow = 'auto';
             }
         }
@@ -797,6 +954,15 @@
                 });
         }
 
+        function closeImportModal() {
+            if (importModal) {
+                importModal.classList.add('hidden');
+                importModal.classList.remove('flex');
+                importFileForm.reset();
+                document.body.style.overflow = 'auto'; // Re-enable scroll
+            }
+        }
+
         function handleHolidaySubmit(e) {
             e.preventDefault();
             log('Holiday form submitted');
@@ -852,23 +1018,94 @@
                 });
         }
 
-        // Handle Import
-        function handleImportHolidays(e) {
-            const file = e.target.files[0];
-            if (!file) return;
+        // Toast Notification Logic
+        const toast = document.getElementById('toast-notification');
+        const toastMessage = document.getElementById('toast-message');
+        const toastIcon = document.getElementById('toast-icon');
+        const toastIconContainer = document.getElementById('toast-icon-container');
+        let toastTimeout;
 
-            if (!confirm('This will overwrite all existing imported holidays for your company. Do you want to continue?')) {
-                e.target.value = ''; // reset
+        window.hideToast = function () {
+            toast.classList.add('translate-x-full', 'opacity-0');
+        }
+
+        function showToast(message, type = 'success') {
+            // Reset classes
+            toast.classList.remove('translate-x-full', 'opacity-0');
+            toastIconContainer.className = 'inline-flex items-center justify-center flex-shrink-0 w-8 h-8 rounded-lg';
+
+            // Set content and style based on type
+            toastMessage.textContent = message;
+
+            if (type === 'success') {
+                toastIconContainer.classList.add('text-green-500', 'bg-green-100');
+                toast.querySelector('.border-l-4').className = 'flex items-center w-full max-w-xs p-4 space-x-4 text-gray-500 bg-white rounded-lg shadow-2xl border-l-4 border-green-500';
+                toastIcon.className = 'fas fa-check text-sm';
+            } else if (type === 'error') {
+                toastIconContainer.classList.add('text-red-500', 'bg-red-100');
+                toast.querySelector('.border-l-4').className = 'flex items-center w-full max-w-xs p-4 space-x-4 text-gray-500 bg-white rounded-lg shadow-2xl border-l-4 border-red-500 z-1000';
+                toastIcon.className = 'fas fa-exclamation-triangle text-sm';
+            }
+
+            // Auto hide
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(hideToast, 5000);
+        }
+
+        // Import Logic
+        let fileToImport = null;
+
+        function closeConfirmationModal() {
+            const modal = document.getElementById('confirmationModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            fileToImport = null;
+            // Note: We don't necessarily reset overflow here if we want to return to the parent modal's state? 
+            // But if the parent modal (importModal) handles it, it's fine.
+            // However, usually confirmation is top-most. If we close it, and import modal is still there, we might NOT want to enable scroll yet?
+            // Actually, let's leave confirmation modal as is for now regarding overflow, 
+            // OR if it was effectively hiding scroll, we might need to check if ANY modal is open.
+            // But the main issue is closeImportModal.
+            // Let's safe-guard it:
+            // document.body.style.overflow = 'auto'; 
+        }
+
+        // 1. Initial Check & Open Confirmation
+        function handleImportHolidays(e) {
+            e.preventDefault();
+
+            const fileInput = document.getElementById('importFileInput');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                showToast('Please select a file to import.', 'error');
                 return;
             }
 
-            const formData = new FormData();
-            formData.append('file', file);
+            // Store file globally for the next step
+            fileToImport = file;
 
-            // Show global loading or toast
-            const originalText = importHolidaysBtn.innerHTML;
-            importHolidaysBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Importing...';
-            importHolidaysBtn.disabled = true;
+            // Show Custom Confirmation Modal
+            const modal = document.getElementById('confirmationModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        // 2. Execute Import after Confirmation
+        document.getElementById('confirmOverwriteBtn').addEventListener('click', function () {
+            if (!fileToImport) return;
+
+            const formData = new FormData();
+            formData.append('file', fileToImport);
+
+            // Close confirmation modal (clears fileToImport)
+            closeConfirmationModal();
+
+            // Show loading state on the MAIN import modal button
+            const submitBtn = document.getElementById('confirmImportBtn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Importing...';
+            submitBtn.disabled = true;
 
             fetch('/calendar/import-holidays', {
                 method: 'POST',
@@ -881,22 +1118,23 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        alert(data.message);
+                        showToast(data.message, 'success');
+                        closeImportModal();
                         loadCalendarData();
                     } else {
-                        alert(data.message || 'Error import failed');
+                        showToast(data.message || 'Error import failed', 'error');
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('Error during import');
+                    showToast('An unexpected error occurred during import.', 'error');
                 })
                 .finally(() => {
-                    importHolidaysBtn.innerHTML = originalText;
-                    importHolidaysBtn.disabled = false;
-                    e.target.value = ''; // reset input
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                    fileToImport = null;
                 });
-        }
+        });
 
         document.addEventListener('DOMContentLoaded', () => {
             initCalendar();
@@ -925,11 +1163,11 @@
                 if (dateHolidays.length > 0) {
                     dateHolidays.forEach(h => {
                         upcomingHolidays.innerHTML += `
-                                    <div class="p-2 bg-red-50 rounded border border-red-200">
-                                        <div class="font-bold text-red-700">${h.title}</div>
-                                        <div class="text-xs text-gray-600">${h.category} (${h.country})</div>
-                                    </div>
-                                `;
+                                                <div class="p-2 bg-red-50 rounded border border-red-200">
+                                                    <div class="font-bold text-red-700">${h.title}</div>
+                                                    <div class="text-xs text-gray-600">${h.category} (${h.country})</div>
+                                                </div>
+                                            `;
                     });
                 } else {
                     upcomingHolidays.innerHTML = `<div class="text-center text-gray-500 text-sm">No Holidays for this date</div>`;
@@ -942,11 +1180,11 @@
                 if (dateLeaves.length > 0) {
                     dateLeaves.forEach(l => {
                         todayLeaves.innerHTML += `
-                                    <div class="p-2 bg-green-50 border border-green-200 rounded">
-                                        <div class="font-semibold">${l.employee}</div>
-                                        <div class="text-xs">${l.type} (${l.status})</div>
-                                    </div>
-                                `;
+                                                <div class="p-2 bg-green-50 border border-green-200 rounded">
+                                                    <div class="font-semibold">${l.employee}</div>
+                                                    <div class="text-xs">${l.type} (${l.status})</div>
+                                                </div>
+                                            `;
                     });
                 } else {
                     todayLeaves.innerHTML = `<div class="text-center text-gray-500 text-sm">No Leaves for this date</div>`;

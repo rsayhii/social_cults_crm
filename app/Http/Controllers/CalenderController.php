@@ -124,14 +124,52 @@ class CalenderController extends Controller
     public function importHolidays(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:xlsx,csv,xls',
+            'file' => 'required',
         ]);
+
+        if ($request->hasFile('file')) {
+            $extension = strtolower($request->file('file')->getClientOriginalExtension());
+            if (!in_array($extension, ['xlsx', 'csv', 'xls'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'The file must be a file of type: xlsx, csv, xls.'
+                ], 422);
+            }
+        }
 
         try {
             $companyId = Auth::user()->company_id;
 
             // Overwrite existing holidays
             CompanyHoliday::where('company_id', $companyId)->delete();
+
+            // Validate Headings
+            $headings = (new \Maatwebsite\Excel\HeadingRowImport)->toArray($request->file('file'));
+
+            // HeadingRowImport returns [0 => [['title', 'date', ...]]]
+            if (isset($headings[0][0])) {
+                $fileHeadings = $headings[0][0];
+
+                // key is usually normalized to slug (lowercase, no spaces) by default in Laravel Excel
+                // but HeadingRowImport might return raw if not configured, usually it returns slugged
+                // Let's check for containment of 'title' and 'date'
+
+                $required = ['title', 'date', 'category', 'description'];
+                $missing = array_diff($required, $fileHeadings);
+
+                \Illuminate\Support\Facades\Log::info('Header Validation:', [
+                    'file_headers' => $fileHeadings,
+                    'required' => $required,
+                    'missing' => $missing
+                ]);
+
+                if (count($missing) > 0) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => "The import file format doesn't match. Please check the sample file and do not count on editing the headings."
+                    ], 400);
+                }
+            }
 
             Excel::import(new CompanyHolidaysImport, $request->file('file'));
 
