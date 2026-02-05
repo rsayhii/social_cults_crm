@@ -646,7 +646,7 @@ Route::middleware('permission:ticket raise')->prefix('user/support/ticket')
 
 
 
-    Route::middleware('permission:ticket records')->prefix('ticket/record')->name('ticket.record.')->group(function () {
+    Route::prefix('ticket/record')->name('ticket.record.')->group(function () {
         Route::get('/', [TicketRecordController::class, 'index'])->name('index');
         Route::get('/{id}', [TicketRecordController::class, 'show'])->name('show');
         Route::put('/{id}', [TicketRecordController::class, 'update'])->name('update');
