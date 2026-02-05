@@ -107,49 +107,8 @@
                 color: #ef4444;
             }
 
-            /* Mobile-first responsive table */
-            @media (max-width: 768px) {
-                .responsive-table {
-                    display: block;
-                }
+            /* Mobile-first responsive table - REMOVED to avoid duplicate/broken view (using JS cards instead) */
 
-                .responsive-table thead {
-                    display: none;
-                }
-
-                .responsive-table tbody {
-                    display: block;
-                }
-
-                .responsive-table tr {
-                    display: block;
-                    margin-bottom: 1rem;
-                    border: 1px solid #e5e7eb;
-                    border-radius: 0.5rem;
-                    padding: 1rem;
-                    background-color: white;
-                }
-
-                .responsive-table td {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    padding: 0.5rem 0;
-                    border-bottom: 1px solid #f3f4f6;
-                }
-
-                .responsive-table td:last-child {
-                    border-bottom: none;
-                }
-
-                .responsive-table td::before {
-                    content: attr(data-label);
-                    font-weight: 600;
-                    color: #6b7280;
-                    font-size: 0.875rem;
-                    min-width: 120px;
-                }
-            }
 
             /* Touch-friendly buttons for mobile */
             .touch-button {
@@ -352,17 +311,10 @@
             /* Responsive adjustments for break timer */
             @media (max-width: 640px) {
                 #break-timer-display {
-                    font-size: 2rem;
+                    font-size: 1.5rem; /* Adjusted for better fit in bottom sheet */
                 }
 
-                #active-break-timer .flex {
-                    flex-direction: column;
-                }
-
-                #end-break-timer-btn {
-                    margin-top: 1rem;
-                    width: 100%;
-                }
+                /* Mobile specific adjustments if needed */
             }
 
             @media (min-width: 641px) and (max-width: 1024px) {
@@ -465,7 +417,7 @@
                             <!-- Active Break Timer Display -->
                             <!-- Compact Break Timer -->
                             <div id="active-break-timer"
-                                class="hidden fixed bottom-4 right-4 z-50 bg-white shadow-lg rounded-full px-4 py-2 flex items-center gap-3 border border-yellow-200">
+                                class="hidden fixed bottom-0 inset-x-0 md:bottom-4 md:right-4 md:left-auto md:w-auto z-50 bg-white shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] md:shadow-lg rounded-t-2xl md:rounded-full px-6 py-4 md:px-4 md:py-2 flex flex-row md:items-center justify-between md:justify-start gap-4 md:gap-3 border-t md:border border-yellow-200">
 
                                 <!-- Icon -->
                                 <div
@@ -591,12 +543,14 @@
                                     class="appearance-none bg-white/80 backdrop-blur-md
                                     border border-gray-200
                                     rounded-xl
+                                    w-full md:w-auto
                                     px-4 py-2.5 pr-10
                                     text-gray-900 text-sm md:text-base
                                     shadow-sm
                                     transition-all duration-200
                                     hover:shadow-md hover:border-gray-300
-                                    focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500">
+                                    focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500"
+                                    id="attendance-month-filter">
                                     @for ($m = 1; $m <= 12; $m++)
                                         <option class="text-gray-900" value="{{ $m }}" {{ $currentMonth == $m ? 'selected' : '' }}>
                                             {{ date('F Y', mktime(0, 0, 0, $m, 1, now()->year)) }}
