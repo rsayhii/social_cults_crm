@@ -65,28 +65,28 @@ Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->na
 Route::post('/register', [RegisterController::class, 'register'])->name('register.submit');
 
 // Protected routes
-Route::middleware(['auth',  CheckCompanyAccess::class])->group(function () {
+Route::middleware(['auth', CheckCompanyAccess::class])->group(function () {
 
-Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
+    Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
-        // ->middleware('permission:dashboard');
+    // ->middleware('permission:dashboard');
 
-   
-   // Clients
-Route::middleware('permission:besdex')->group(function () {
-    Route::get('/clients', [ClientController::class, 'index'])->name('clients.index'); // Note: renamed from 'clients' to 'clients.index' for consistency
-    Route::get('/clients/create', [ClientController::class, 'create'])->name('clients.create'); // Optional: if you want to separate add too, but keeping modal for now
-    Route::post('/clients', [ClientController::class, 'store'])->name('clients.store');
-    Route::get('/clients/{client}', [ClientController::class, 'show'])->name('clients.show');
-    Route::get('/clients/{client}/edit', [ClientController::class, 'edit'])->name('clients.edit'); // NEW
-    Route::put('/clients/{client}', [ClientController::class, 'update'])->name('clients.update');
-    Route::delete('/clients/{client}', [ClientController::class, 'destroy'])->name('clients.destroy');
-    Route::post('/clients/import', [ClientController::class, 'import'])->name('clients.import');
-    Route::delete('/clients/{client}', [ClientController::class, 'destroy'])->name('clients.destroy');
-});
+
+    // Clients
+    Route::middleware('permission:besdex')->group(function () {
+        Route::get('/clients', [ClientController::class, 'index'])->name('clients.index'); // Note: renamed from 'clients' to 'clients.index' for consistency
+        Route::get('/clients/create', [ClientController::class, 'create'])->name('clients.create'); // Optional: if you want to separate add too, but keeping modal for now
+        Route::post('/clients', [ClientController::class, 'store'])->name('clients.store');
+        Route::get('/clients/{client}', [ClientController::class, 'show'])->name('clients.show');
+        Route::get('/clients/{client}/edit', [ClientController::class, 'edit'])->name('clients.edit'); // NEW
+        Route::put('/clients/{client}', [ClientController::class, 'update'])->name('clients.update');
+        Route::delete('/clients/{client}', [ClientController::class, 'destroy'])->name('clients.destroy');
+        Route::post('/clients/import', [ClientController::class, 'import'])->name('clients.import');
+        Route::delete('/clients/{client}', [ClientController::class, 'destroy'])->name('clients.destroy');
+    });
 
     // Campaigns
     Route::get('/campaigns', [CampaignsController::class, 'index'])
@@ -100,16 +100,16 @@ Route::middleware('permission:besdex')->group(function () {
 
     // Attendance
     Route::middleware('permission:attendance records')->group(function () {
-    
-    // Main view for attendance summary
-    Route::get('/attendance-record', [AttendanceRecordController::class, 'index'])->name('attendance-record.index');
-    
-    // AJAX endpoint for monthly details
-    Route::get('/attendance-record/monthly', [AttendanceRecordController::class, 'getMonthlyAttendance'])->name('attendance-record.monthly');
 
-});
+        // Main view for attendance summary
+        Route::get('/attendance-record', [AttendanceRecordController::class, 'index'])->name('attendance-record.index');
 
-// Remove ALL other role routes and keep only this:
+        // AJAX endpoint for monthly details
+        Route::get('/attendance-record/monthly', [AttendanceRecordController::class, 'getMonthlyAttendance'])->name('attendance-record.monthly');
+
+    });
+
+    // Remove ALL other role routes and keep only this:
 // Route::middleware('permission:roles')->group(function () {
     Route::get('/roles', [RolesController::class, 'index'])->name('roles');
     Route::get('/roles/create', [RolesController::class, 'create'])->name('roles.create');
@@ -118,10 +118,10 @@ Route::middleware('permission:besdex')->group(function () {
     Route::get('/roles/{id}/edit', [RolesController::class, 'edit'])->name('roles.edit');
     Route::put('/roles/{id}', [RolesController::class, 'update'])->name('roles.update');
     Route::delete('/roles/{id}', [RolesController::class, 'destroy'])->name('roles.destroy');
-// });
+    // });
 
 
-  // Users
+    // Users
 // Route::middleware('permission:users')->group(function () {
     Route::get('/users', [UserController::class, 'index'])->name('users');
     Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
@@ -137,45 +137,45 @@ Route::middleware('permission:besdex')->group(function () {
 
     Route::middleware('permission:salary')->group(function () {
 
-    Route::get('/salary/generate', [SalaryController::class, 'showGenerateForm'])->name('salary.index');
+        Route::get('/salary/generate', [SalaryController::class, 'showGenerateForm'])->name('salary.index');
 
-    // Salary list page (missing route)
-    Route::get('/salary/list', [SalaryController::class, 'index'])->name('salary.list');
+        // Salary list page (missing route)
+        Route::get('/salary/list', [SalaryController::class, 'index'])->name('salary.list');
 
-    // HTML slip
-    Route::get('/salary/slip/{id}', [SalaryController::class, 'showSlip'])->name('salary.slip');
+        // HTML slip
+        Route::get('/salary/slip/{id}', [SalaryController::class, 'showSlip'])->name('salary.slip');
 
-    // Generate salary
-    Route::post('/salary/generate', [SalaryController::class, 'generateSalary'])->name('salary.generate');
+        // Generate salary
+        Route::post('/salary/generate', [SalaryController::class, 'generateSalary'])->name('salary.generate');
 
-    // Bulk generate
-    Route::post('/salary/bulk-generate', [SalaryController::class, 'bulkGenerate'])->name('salary.bulk-generate');
+        // Bulk generate
+        Route::post('/salary/bulk-generate', [SalaryController::class, 'bulkGenerate'])->name('salary.bulk-generate');
 
-    // JSON slip
-    Route::get('/salary/slip-json/{id}', [SalaryController::class, 'getSalarySlip']);
+        // JSON slip
+        Route::get('/salary/slip-json/{id}', [SalaryController::class, 'getSalarySlip']);
 
-    // Mark as paid
-    Route::put('/salary/mark-paid/{id}', [SalaryController::class, 'markAsPaid']);
+        // Mark as paid
+        Route::put('/salary/mark-paid/{id}', [SalaryController::class, 'markAsPaid']);
 
-    // Employee salary history
-    Route::get('/salary/employee/{id}', [SalaryController::class, 'getEmployeeSalaries']);
+        // Employee salary history
+        Route::get('/salary/employee/{id}', [SalaryController::class, 'getEmployeeSalaries']);
 
-    // Config
-    Route::get('/salary/config', [SalaryConfigController::class, 'getConfig'])->name('salary.config');
-    Route::put('/salary/config', [SalaryConfigController::class, 'updateConfig']);
+        // Config
+        Route::get('/salary/config', [SalaryConfigController::class, 'getConfig'])->name('salary.config');
+        Route::put('/salary/config', [SalaryConfigController::class, 'updateConfig']);
 
 
-    // Export route
-Route::get('/salary/export', [SalaryController::class, 'export'])->name('salary.export');
+        // Export route
+        Route::get('/salary/export', [SalaryController::class, 'export'])->name('salary.export');
 
 
 
         Route::get('/edit/{id}', [SalaryController::class, 'edit'])->name('salary.edit');
         Route::delete('/salary/{id}', [SalaryController::class, 'destroy'])
-    ->name('salary.delete');
+            ->name('salary.delete');
 
 
-});
+    });
 
 
 
@@ -219,18 +219,18 @@ Route::get('/salary/export', [SalaryController::class, 'export'])->name('salary.
 
 
 
-  Route::middleware('permission:my attendance')->group(function () {  
-    Route::get('/my-attendance', [MyAttendanceController::class, 'index'])->name('my-attendance.index');
-    Route::post('/my-attendance/punch-in', [MyAttendanceController::class, 'punchIn'])->name('my-attendance.punch-in');
-    Route::post('/my-attendance/punch-out', [MyAttendanceController::class, 'punchOut'])->name('my-attendance.punch-out');
-    
-    // ✅ BREAK ROUTES
-    Route::post('/my-attendance/break-in', [MyAttendanceController::class, 'breakIn'])->name('my-attendance.break-in');
-    Route::post('/my-attendance/break-out', [MyAttendanceController::class, 'breakOut'])->name('my-attendance.break-out');
-    Route::get('/my-attendance/break-status', [MyAttendanceController::class, 'getCurrentBreakStatus'])->name('my-attendance.break-status');
-    
-    Route::get('/my-attendance/log', [MyAttendanceController::class, 'getLog'])->name('my-attendance.log');
-});
+    Route::middleware('permission:my attendance')->group(function () {
+        Route::get('/my-attendance', [MyAttendanceController::class, 'index'])->name('my-attendance.index');
+        Route::post('/my-attendance/punch-in', [MyAttendanceController::class, 'punchIn'])->name('my-attendance.punch-in');
+        Route::post('/my-attendance/punch-out', [MyAttendanceController::class, 'punchOut'])->name('my-attendance.punch-out');
+
+        // ✅ BREAK ROUTES
+        Route::post('/my-attendance/break-in', [MyAttendanceController::class, 'breakIn'])->name('my-attendance.break-in');
+        Route::post('/my-attendance/break-out', [MyAttendanceController::class, 'breakOut'])->name('my-attendance.break-out');
+        Route::get('/my-attendance/break-status', [MyAttendanceController::class, 'getCurrentBreakStatus'])->name('my-attendance.break-status');
+
+        Route::get('/my-attendance/log', [MyAttendanceController::class, 'getLog'])->name('my-attendance.log');
+    });
 
 
 
@@ -242,47 +242,47 @@ Route::get('/salary/export', [SalaryController::class, 'export'])->name('salary.
 
 
     // Employee Portal Routes with Permission Middleware
-Route::middleware('permission:employeeportal')->group(function () {
-    Route::get('/employeeportal', [EmployeePortalController::class, 'index'])->name('employeeportal.index');
-    Route::prefix('employeeportal')->group(function () {
-    Route::get('/leaves', [EmployeePortalController::class, 'getLeaves'])->name('employeeportal.leaves');
-    Route::get('/leaves/{id}', [EmployeePortalController::class, 'getLeave'])->name('employeeportal.leave.show');
-    Route::post('/leaves', [EmployeePortalController::class, 'store'])->name('employeeportal.leave.store');
-    Route::put('/leaves/{id}', [EmployeePortalController::class, 'update'])->name('employeeportal.leave.update');
-    Route::delete('/leaves/{id}', [EmployeePortalController::class, 'destroy'])->name('employeeportal.leave.destroy');
-    Route::get('/statistics', [EmployeePortalController::class, 'getStatistics'])->name('employeeportal.statistics');
-    Route::get('/filters', [EmployeePortalController::class, 'getFilters'])->name('employeeportal.filters');
-    Route::get('/export/{format}', [EmployeePortalController::class, 'export'])->name('employeeportal.export');
+    Route::middleware('permission:employeeportal')->group(function () {
+        Route::get('/employeeportal', [EmployeePortalController::class, 'index'])->name('employeeportal.index');
+        Route::prefix('employeeportal')->group(function () {
+            Route::get('/leaves', [EmployeePortalController::class, 'getLeaves'])->name('employeeportal.leaves');
+            Route::get('/leaves/{id}', [EmployeePortalController::class, 'getLeave'])->name('employeeportal.leave.show');
+            Route::post('/leaves', [EmployeePortalController::class, 'store'])->name('employeeportal.leave.store');
+            Route::put('/leaves/{id}', [EmployeePortalController::class, 'update'])->name('employeeportal.leave.update');
+            Route::delete('/leaves/{id}', [EmployeePortalController::class, 'destroy'])->name('employeeportal.leave.destroy');
+            Route::get('/statistics', [EmployeePortalController::class, 'getStatistics'])->name('employeeportal.statistics');
+            Route::get('/filters', [EmployeePortalController::class, 'getFilters'])->name('employeeportal.filters');
+            Route::get('/export/{format}', [EmployeePortalController::class, 'export'])->name('employeeportal.export');
 
-    Route::get('/employeeportal/roles', [App\Http\Controllers\EmployeePortalController::class, 'getRoles'])->name('employeeportal.roles');
-    });
-});
-
-
-
-   Route::middleware('permission:todo')->group(function () {
-    Route::get('/todo', [TodoController::class, 'index'])->name('todo.index');
-    Route::post('/todo', [TodoController::class, 'store'])->name('todo.store');
-    Route::put('/todo/{todo}', [TodoController::class, 'update'])->name('todo.update');
-    Route::delete('/todo/{todo}', [TodoController::class, 'destroy'])->name('todo.destroy');
-    Route::post('/todo/toggle-completed/{todo}', [TodoController::class, 'toggleCompleted'])->name('todo.toggle');
-    Route::post('/todo/toggle-starred/{todo}', [TodoController::class, 'toggleStarred'])->name('todo.toggle-starred');
-});
-
-
-
-
-        // Project Management Routes with Permission Middleware
-        Route::middleware('permission:project management')->group(function () {
-            Route::get('/projectmanagement', [ProjectManagementController::class, 'index'])->name('projectmanagement.index');
-            Route::get('/projectmanagement/projects', [ProjectManagementController::class, 'getProjects'])->name('projectmanagement.projects');
-            Route::get('/projectmanagement/projects/{id}', [ProjectManagementController::class, 'getProject'])->name('projectmanagement.project.show');
-            Route::post('/projectmanagement/projects', [ProjectManagementController::class, 'store'])->name('projectmanagement.project.store');
-            Route::put('/projectmanagement/projects/{id}', [ProjectManagementController::class, 'update'])->name('projectmanagement.project.update');
-            Route::delete('/projectmanagement/projects/{id}', [ProjectManagementController::class, 'destroy'])->name('projectmanagement.project.destroy');
-            Route::get('/projectmanagement/statistics', [ProjectManagementController::class, 'getStatistics'])->name('projectmanagement.statistics');
-            Route::get('/projectmanagement/filters', [ProjectManagementController::class, 'getFilters'])->name('projectmanagement.filters');
+            Route::get('/employeeportal/roles', [App\Http\Controllers\EmployeePortalController::class, 'getRoles'])->name('employeeportal.roles');
         });
+    });
+
+
+
+    Route::middleware('permission:todo')->group(function () {
+        Route::get('/todo', [TodoController::class, 'index'])->name('todo.index');
+        Route::post('/todo', [TodoController::class, 'store'])->name('todo.store');
+        Route::put('/todo/{todo}', [TodoController::class, 'update'])->name('todo.update');
+        Route::delete('/todo/{todo}', [TodoController::class, 'destroy'])->name('todo.destroy');
+        Route::post('/todo/toggle-completed/{todo}', [TodoController::class, 'toggleCompleted'])->name('todo.toggle');
+        Route::post('/todo/toggle-starred/{todo}', [TodoController::class, 'toggleStarred'])->name('todo.toggle-starred');
+    });
+
+
+
+
+    // Project Management Routes with Permission Middleware
+    Route::middleware('permission:project management')->group(function () {
+        Route::get('/projectmanagement', [ProjectManagementController::class, 'index'])->name('projectmanagement.index');
+        Route::get('/projectmanagement/projects', [ProjectManagementController::class, 'getProjects'])->name('projectmanagement.projects');
+        Route::get('/projectmanagement/projects/{id}', [ProjectManagementController::class, 'getProject'])->name('projectmanagement.project.show');
+        Route::post('/projectmanagement/projects', [ProjectManagementController::class, 'store'])->name('projectmanagement.project.store');
+        Route::put('/projectmanagement/projects/{id}', [ProjectManagementController::class, 'update'])->name('projectmanagement.project.update');
+        Route::delete('/projectmanagement/projects/{id}', [ProjectManagementController::class, 'destroy'])->name('projectmanagement.project.destroy');
+        Route::get('/projectmanagement/statistics', [ProjectManagementController::class, 'getStatistics'])->name('projectmanagement.statistics');
+        Route::get('/projectmanagement/filters', [ProjectManagementController::class, 'getFilters'])->name('projectmanagement.filters');
+    });
 
 
 
@@ -292,30 +292,31 @@ Route::middleware('permission:employeeportal')->group(function () {
 
 
 
-    Route::middleware('permission:task')->group(function () { 
-         Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
-         Route::get('/tasks/create', [TaskController::class, 'create'])->name('tasks.create');
-         Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
-         Route::get('/tasks/{task}', [TaskController::class, 'show'])->name('tasks.show');
-         Route::get('/tasks/{task}/edit', [TaskController::class, 'edit'])->name('tasks.edit');
-         Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
-         Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
+    Route::middleware('permission:task')->group(function () {
+        Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
+        Route::get('/tasks/create', [TaskController::class, 'create'])->name('tasks.create');
+        Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
+        Route::get('/tasks/{task}', [TaskController::class, 'show'])->name('tasks.show');
+        Route::get('/tasks/{task}/edit', [TaskController::class, 'edit'])->name('tasks.edit');
+        Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
+        Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
     });
 
 
     Route::middleware('permission:calender')->group(function () {
-    Route::get('/calender', [CalenderController::class, 'index'])->name('calender.index');
-    Route::get('/calendar/data', [CalenderController::class, 'getCalendarData'])->name('calendar.data');
-    Route::post('/calendar/apply-leave', [CalenderController::class, 'applyLeave'])->name('calendar.apply-leave');
-    Route::post('/calendar/add-holiday', [CalenderController::class, 'addHoliday'])->name('calendar.add-holiday');
-    Route::get('/calendar/users', [CalenderController::class, 'getUsers'])->name('calendar.users');
+        Route::get('/calender', [CalenderController::class, 'index'])->name('calender.index');
+        Route::get('/calendar/data', [CalenderController::class, 'getCalendarData'])->name('calendar.data');
+        Route::post('/calendar/apply-leave', [CalenderController::class, 'applyLeave'])->name('calendar.apply-leave');
+        Route::post('/calendar/add-holiday', [CalenderController::class, 'addHoliday'])->name('calendar.add-holiday');
+        Route::post('/calendar/import-holidays', [CalenderController::class, 'importHolidays'])->name('calendar.import');
+        Route::get('/calendar/users', [CalenderController::class, 'getUsers'])->name('calendar.users');
 
     });
 
 
 
 
-    
+
 
 
     Route::middleware('permission:links and remark')->group(function () {
@@ -329,41 +330,41 @@ Route::middleware('permission:employeeportal')->group(function () {
 
 
 
- Route::middleware('permission:links and remark')->group(function () {    
-    Route::get('/links', [LinkAndRemarkController::class, 'index'])->name('index');
-    Route::get('/links/fetch-all', [LinkAndRemarkController::class, 'fetchAll'])->name('fetch');
-    Route::post('/links/store', [LinkAndRemarkController::class, 'store'])->name('store');
-    Route::put('/links/update/{id}', [LinkAndRemarkController::class, 'update'])->name('update');
-    Route::delete('/links/delete/{id}', [LinkAndRemarkController::class, 'destroy'])->name('delete');
-    Route::get('/links/show/{id}', [LinkAndRemarkController::class, 'show'])->name('show');
-});
-
-
-     //Admin Portal Routes with Permission Middleware
-    
-Route::middleware('permission:admin portal')->group(function () {
-    Route::get('/adminportal', [AdminPortalController::class, 'index'])->name('adminportal.index');
-    Route::prefix('adminportal')->group(function () {
-    Route::get('/leaves', [AdminPortalController::class, 'getLeaves'])->name('adminportal.leaves');
-    Route::get('/leaves/{id}', [AdminPortalController::class, 'getLeave'])->name('adminportal.leave.show');
-    Route::post('/leaves/{id}/approve', [AdminPortalController::class, 'approveLeave'])->name('adminportal.leave.approve');
-    Route::post('/leaves/{id}/reject', [AdminPortalController::class, 'rejectLeave'])->name('adminportal.leave.reject');
-    Route::post('/leaves/{id}/remarks', [AdminPortalController::class, 'addRemarks'])->name('adminportal.leave.remarks');
-    Route::put('/leaves/{id}', [AdminPortalController::class, 'update'])->name('adminportal.leave.update');
-    Route::delete('/leaves/{id}', [AdminPortalController::class, 'destroy'])->name('adminportal.leave.destroy');
-    Route::get('/analytics', [AdminPortalController::class, 'getAnalytics'])->name('adminportal.analytics');
-    Route::get('/filters', [AdminPortalController::class, 'getFilters'])->name('adminportal.filters');
-    Route::get('/export/{format}', [AdminPortalController::class, 'export'])->name('adminportal.export');
+    Route::middleware('permission:links and remark')->group(function () {
+        Route::get('/links', [LinkAndRemarkController::class, 'index'])->name('index');
+        Route::get('/links/fetch-all', [LinkAndRemarkController::class, 'fetchAll'])->name('fetch');
+        Route::post('/links/store', [LinkAndRemarkController::class, 'store'])->name('store');
+        Route::put('/links/update/{id}', [LinkAndRemarkController::class, 'update'])->name('update');
+        Route::delete('/links/delete/{id}', [LinkAndRemarkController::class, 'destroy'])->name('delete');
+        Route::get('/links/show/{id}', [LinkAndRemarkController::class, 'show'])->name('show');
     });
-});
 
 
+    //Admin Portal Routes with Permission Middleware
+
+    Route::middleware('permission:admin portal')->group(function () {
+        Route::get('/adminportal', [AdminPortalController::class, 'index'])->name('adminportal.index');
+        Route::prefix('adminportal')->group(function () {
+            Route::get('/leaves', [AdminPortalController::class, 'getLeaves'])->name('adminportal.leaves');
+            Route::get('/leaves/{id}', [AdminPortalController::class, 'getLeave'])->name('adminportal.leave.show');
+            Route::post('/leaves/{id}/approve', [AdminPortalController::class, 'approveLeave'])->name('adminportal.leave.approve');
+            Route::post('/leaves/{id}/reject', [AdminPortalController::class, 'rejectLeave'])->name('adminportal.leave.reject');
+            Route::post('/leaves/{id}/remarks', [AdminPortalController::class, 'addRemarks'])->name('adminportal.leave.remarks');
+            Route::put('/leaves/{id}', [AdminPortalController::class, 'update'])->name('adminportal.leave.update');
+            Route::delete('/leaves/{id}', [AdminPortalController::class, 'destroy'])->name('adminportal.leave.destroy');
+            Route::get('/analytics', [AdminPortalController::class, 'getAnalytics'])->name('adminportal.analytics');
+            Route::get('/filters', [AdminPortalController::class, 'getFilters'])->name('adminportal.filters');
+            Route::get('/export/{format}', [AdminPortalController::class, 'export'])->name('adminportal.export');
+        });
+    });
+
+
+    // ------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------
-// ------------------------------------------------------------------------------------
 
-//   Route::middleware(['auth', 'permission:client serive interation'])->group(function () {
+    //   Route::middleware(['auth', 'permission:client serive interation'])->group(function () {
 
-//     Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+    //     Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
 //     Route::get('/chat/list', [ChatController::class, 'chatList']);
 //     Route::get('/chat/messages/{id}', [ChatController::class, 'getMessages']);
 //     Route::post('/chat/send', [ChatController::class, 'sendMessage']);
@@ -371,83 +372,83 @@ Route::middleware('permission:admin portal')->group(function () {
 //     Route::get('/chat/teams', [ChatController::class, 'teams']);
 //     Route::get('/chat/clients', [ChatController::class, 'clients']);
 
-// });
+    // });
 
-Route::middleware(['auth', 'permission:client serive interation'])->group(function () {
-    Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
-    Route::get('/chat/list', [ChatController::class, 'chatList']);
-    Route::get('/chat/messages/{id}', [ChatController::class, 'getMessages']);
-    Route::post('/chat/send', [ChatController::class, 'sendMessage']);
-    Route::post('/chat/create-conversation', [ChatController::class, 'createConversation']);
-    Route::get('/chat/teams', [ChatController::class, 'teams']);
-    Route::get('/chat/clients', [ChatController::class, 'clients']);
-    // Role-based chat routes
-    Route::get('/chat/same-role-users', [ChatController::class, 'sameRoleUsers']);
-    Route::get('/chat/role-groups', [ChatController::class, 'roleGroupChats']);
-    Route::get('/chat/group-members/{id}', [ChatController::class, 'getGroupMembers']);
-    Route::get('/chat/all-groups', [ChatController::class, 'allGroupChats']); // Admin only
-    // Admin Group Management Routes
-    Route::post('/chat/create-group', [ChatController::class, 'createGroup']); // Admin only
-    Route::post('/chat/add-group-members', [ChatController::class, 'addGroupMembers']); // Admin only
-    Route::post('/chat/remove-group-member', [ChatController::class, 'removeGroupMember']); // Admin only
-    Route::delete('/chat/delete-group', [ChatController::class, 'deleteGroup']); // Admin only
-    Route::get('/chat/users-by-role/{roleId}', [ChatController::class, 'getUsersByRole']);
-    Route::get('/chat/clients-list', [ChatController::class, 'getClientsForGroup']);
-    Route::get('/chat/roles-list', [ChatController::class, 'getAllRoles']);
-    // Client Team Targeting
-    Route::get('/chat/group-teams/{id}', [ChatController::class, 'getGroupTeams']);
-});
+    Route::middleware(['auth', 'permission:client serive interation'])->group(function () {
+        Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+        Route::get('/chat/list', [ChatController::class, 'chatList']);
+        Route::get('/chat/messages/{id}', [ChatController::class, 'getMessages']);
+        Route::post('/chat/send', [ChatController::class, 'sendMessage']);
+        Route::post('/chat/create-conversation', [ChatController::class, 'createConversation']);
+        Route::get('/chat/teams', [ChatController::class, 'teams']);
+        Route::get('/chat/clients', [ChatController::class, 'clients']);
+        // Role-based chat routes
+        Route::get('/chat/same-role-users', [ChatController::class, 'sameRoleUsers']);
+        Route::get('/chat/role-groups', [ChatController::class, 'roleGroupChats']);
+        Route::get('/chat/group-members/{id}', [ChatController::class, 'getGroupMembers']);
+        Route::get('/chat/all-groups', [ChatController::class, 'allGroupChats']); // Admin only
+        // Admin Group Management Routes
+        Route::post('/chat/create-group', [ChatController::class, 'createGroup']); // Admin only
+        Route::post('/chat/add-group-members', [ChatController::class, 'addGroupMembers']); // Admin only
+        Route::post('/chat/remove-group-member', [ChatController::class, 'removeGroupMember']); // Admin only
+        Route::delete('/chat/delete-group', [ChatController::class, 'deleteGroup']); // Admin only
+        Route::get('/chat/users-by-role/{roleId}', [ChatController::class, 'getUsersByRole']);
+        Route::get('/chat/clients-list', [ChatController::class, 'getClientsForGroup']);
+        Route::get('/chat/roles-list', [ChatController::class, 'getAllRoles']);
+        // Client Team Targeting
+        Route::get('/chat/group-teams/{id}', [ChatController::class, 'getGroupTeams']);
+    });
 
+    // ------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------
-// ------------------------------------------------------------------------------------
 
 
 
-// routes/web.php
-Route::middleware(['auth', 'permission:invoice'])->group(function () {
+    // routes/web.php
+    Route::middleware(['auth', 'permission:invoice'])->group(function () {
 
-    // Invoice listing
-    Route::get('/invoices', [InvoiceController::class, 'index'])
-        ->name('invoices.index');
+        // Invoice listing
+        Route::get('/invoices', [InvoiceController::class, 'index'])
+            ->name('invoices.index');
 
-    // ✅ Invoice History (NEW)
-    Route::get('/invoices/history', [InvoiceController::class, 'getHistory'])
-        ->name('invoices.history');
+        // ✅ Invoice History (NEW)
+        Route::get('/invoices/history', [InvoiceController::class, 'getHistory'])
+            ->name('invoices.history');
 
 
         Route::get('/invoices/recent', [InvoiceController::class, 'getRecentInvoices']);
-Route::post('/invoices/{id}/email', [InvoiceController::class, 'sendEmail']);
-Route::get('/invoices/{id}/share-link', [InvoiceController::class, 'getShareLink']);
+        Route::post('/invoices/{id}/email', [InvoiceController::class, 'sendEmail']);
+        Route::get('/invoices/{id}/share-link', [InvoiceController::class, 'getShareLink']);
 
 
-    // Company routes
-    Route::prefix('company')->group(function () {
-        Route::get('/', [CompanyController::class, 'index']);
-        Route::post('/', [CompanyController::class, 'store'])->name('company.store');
-        Route::delete('/{id}', [CompanyController::class, 'destroy']);
-        Route::get('/signature', [CompanyController::class, 'getSignature']);
-        Route::post('/signature', [CompanyController::class, 'saveSignature']);
+        // Company routes
+        Route::prefix('company')->group(function () {
+            Route::get('/', [CompanyController::class, 'index']);
+            Route::post('/', [CompanyController::class, 'store'])->name('company.store');
+            Route::delete('/{id}', [CompanyController::class, 'destroy']);
+            Route::get('/signature', [CompanyController::class, 'getSignature']);
+            Route::post('/signature', [CompanyController::class, 'saveSignature']);
+        });
+
+        // Invoice routes
+        Route::prefix('invoices')->group(function () {
+
+            // ✅ Already exists (NO duplication)
+            Route::post('/', [InvoiceController::class, 'store']);
+            Route::put('/{id}', [InvoiceController::class, 'update']);
+
+            Route::get('/{id}', [InvoiceController::class, 'show']);
+            Route::delete('/{id}', [InvoiceController::class, 'destroy']);
+            Route::get('/{id}/download', [InvoiceController::class, 'downloadPDF'])
+                ->name('invoice.download');
+
+            Route::post('/bulk-status', [InvoiceController::class, 'bulkUpdateStatus']);
+            Route::post('/bulk-delete', [InvoiceController::class, 'bulkDelete']);
+        });
     });
 
-    // Invoice routes
-    Route::prefix('invoices')->group(function () {
 
-        // ✅ Already exists (NO duplication)
-        Route::post('/', [InvoiceController::class, 'store']);
-        Route::put('/{id}', [InvoiceController::class, 'update']);
-
-        Route::get('/{id}', [InvoiceController::class, 'show']);
-        Route::delete('/{id}', [InvoiceController::class, 'destroy']);
-        Route::get('/{id}/download', [InvoiceController::class, 'downloadPDF'])
-            ->name('invoice.download');
-
-        Route::post('/bulk-status', [InvoiceController::class, 'bulkUpdateStatus']);
-        Route::post('/bulk-delete', [InvoiceController::class, 'bulkDelete']);
-    });
-});
-
-
- Route::middleware('permission:contact')->group(function () {
+    Route::middleware('permission:contact')->group(function () {
         Route::get('/contacts', [ContactController::class, 'index'])->name('contacts.index');
         Route::post('/contacts', [ContactController::class, 'store'])->name('contacts.store');
         Route::get('/contacts/{contact}', [ContactController::class, 'show'])->name('contacts.show');
@@ -458,65 +459,65 @@ Route::get('/invoices/{id}/share-link', [InvoiceController::class, 'getShareLink
 
 
     Route::middleware('permission:help and support')->group(function () {
-    Route::get('/helpandsupport', [HelpAndSupportController::class, 'index'])->name('helpandsupport.index');
-    Route::get('/helpandsupport/tickets', [HelpAndSupportController::class, 'getTickets']);
-    Route::post('/helpandsupport/tickets', [HelpAndSupportController::class, 'storeTicket']);
-    Route::get('/helpandsupport/tickets/{id}', [HelpAndSupportController::class, 'getTicket']);
-    Route::put('/helpandsupport/tickets/{id}', [HelpAndSupportController::class, 'updateTicket']);
-    Route::post('/helpandsupport/tickets/{ticketId}/conversation', [HelpAndSupportController::class, 'addConversation']);
-    Route::get('/helpandsupport/knowledge-base', [HelpAndSupportController::class, 'getKnowledgeBase']);
-    Route::get('/helpandsupport/knowledge-base/search', [HelpAndSupportController::class, 'searchKnowledgeBase']);
-    Route::post('/helpandsupport/export-tickets', [HelpAndSupportController::class, 'exportTickets']);
-});
-
-
-Route::middleware('permission:report')->group(function () {
-    Route::get('/reportsindex', [ReportController::class, 'index'])->name('rr.index');
-    Route::get('/reports', [ReportController::class, 'getReports'])->name('rr.reports');
-    Route::get('/reports/stats', [ReportController::class, 'getStats'])->name('rr.stats');
-
-    Route::post('/reports', [ReportController::class, 'store'])->name('rr.store');
-    Route::get('/reports/{id}', [ReportController::class, 'show'])->name('rr.show');
-    Route::put('/reports/{id}', [ReportController::class, 'update'])->name('rr.update');
-    Route::delete('/reports/{id}', [ReportController::class, 'destroy'])->name('rr.destroy');
-});
-
-
-
-Route::middleware('permission:notepad')->group(function () {
-Route::get('/notepad', function () {
-    return view('admin.notepad');
-})->name('notepad.index');
-
-  Route::middleware(['auth'])->group(function () {
-    // Dashboard view
-    Route::get('/notes', [NoteController::class, 'index'])->name('notes.dashboard');
-    
-    // API routes for AJAX calls
-    Route::prefix('api/notes')->group(function () {
-        Route::get('/', [NoteController::class, 'getNotes'])->name('notes.get');
-        Route::get('/stats', [NoteController::class, 'getStats'])->name('notes.stats');
-        Route::get('/{id}', [NoteController::class, 'show'])->name('notes.show');
-        Route::post('/', [NoteController::class, 'store'])->name('notes.store');
-        Route::put('/{id}', [NoteController::class, 'update'])->name('notes.update');
-        Route::delete('/{id}', [NoteController::class, 'destroy'])->name('notes.destroy');
-        Route::patch('/{id}/toggle-pin', [NoteController::class, 'togglePin'])->name('notes.toggle-pin');
+        Route::get('/helpandsupport', [HelpAndSupportController::class, 'index'])->name('helpandsupport.index');
+        Route::get('/helpandsupport/tickets', [HelpAndSupportController::class, 'getTickets']);
+        Route::post('/helpandsupport/tickets', [HelpAndSupportController::class, 'storeTicket']);
+        Route::get('/helpandsupport/tickets/{id}', [HelpAndSupportController::class, 'getTicket']);
+        Route::put('/helpandsupport/tickets/{id}', [HelpAndSupportController::class, 'updateTicket']);
+        Route::post('/helpandsupport/tickets/{ticketId}/conversation', [HelpAndSupportController::class, 'addConversation']);
+        Route::get('/helpandsupport/knowledge-base', [HelpAndSupportController::class, 'getKnowledgeBase']);
+        Route::get('/helpandsupport/knowledge-base/search', [HelpAndSupportController::class, 'searchKnowledgeBase']);
+        Route::post('/helpandsupport/export-tickets', [HelpAndSupportController::class, 'exportTickets']);
     });
-});
+
+
+    Route::middleware('permission:report')->group(function () {
+        Route::get('/reportsindex', [ReportController::class, 'index'])->name('rr.index');
+        Route::get('/reports', [ReportController::class, 'getReports'])->name('rr.reports');
+        Route::get('/reports/stats', [ReportController::class, 'getStats'])->name('rr.stats');
+
+        Route::post('/reports', [ReportController::class, 'store'])->name('rr.store');
+        Route::get('/reports/{id}', [ReportController::class, 'show'])->name('rr.show');
+        Route::put('/reports/{id}', [ReportController::class, 'update'])->name('rr.update');
+        Route::delete('/reports/{id}', [ReportController::class, 'destroy'])->name('rr.destroy');
+    });
+
+
+
+    Route::middleware('permission:notepad')->group(function () {
+        Route::get('/notepad', function () {
+            return view('admin.notepad');
+        })->name('notepad.index');
+
+        Route::middleware(['auth'])->group(function () {
+            // Dashboard view
+            Route::get('/notes', [NoteController::class, 'index'])->name('notes.dashboard');
+
+            // API routes for AJAX calls
+            Route::prefix('api/notes')->group(function () {
+                Route::get('/', [NoteController::class, 'getNotes'])->name('notes.get');
+                Route::get('/stats', [NoteController::class, 'getStats'])->name('notes.stats');
+                Route::get('/{id}', [NoteController::class, 'show'])->name('notes.show');
+                Route::post('/', [NoteController::class, 'store'])->name('notes.store');
+                Route::put('/{id}', [NoteController::class, 'update'])->name('notes.update');
+                Route::delete('/{id}', [NoteController::class, 'destroy'])->name('notes.destroy');
+                Route::patch('/{id}/toggle-pin', [NoteController::class, 'togglePin'])->name('notes.toggle-pin');
+            });
+        });
 
 
 
 
-});
+    });
 
 
-//     Route::middleware('permission:project')->group(function () {
+    //     Route::middleware('permission:project')->group(function () {
 // Route::get('/project', function () {
 //     return view('admin.project');
 // })->name('project.index');
 
 
-//     });
+    //     });
 
 
 
@@ -545,94 +546,90 @@ Route::middleware('permission:ticket raise')->prefix('user/support/ticket')
 
 
 
-// ***********************************************************************
+    // ***********************************************************************
 // ************************** END OF ROUTES FILE *************************
 // ***********************************************************************
 
 
-// Dashboard
-Route::get('/superadmin', [SuperAdminDashboardController::class, 'index'])->name('superadmin.dashboard');
+    // Dashboard
+    Route::get('/superadmin', [SuperAdminDashboardController::class, 'index'])->name('superadmin.dashboard');
 
-// Customers
- Route::prefix('superadmin')->group(function () {
-Route::get('customers', [CustomerController::class, 'index'])->name('superadmin.customers.index');
-Route::get('customers/create', [CustomerController::class, 'create'])->name('superadmin.customers.create');
-Route::post('customers', [CustomerController::class, 'store'])->name('superadmin.customers.store');
-Route::get('customers/{customer}', [CustomerController::class, 'show'])->name('superadmin.customers.show');
-Route::get('customers/{customer}/edit', [CustomerController::class, 'edit'])->name('superadmin.customers.edit');
-Route::put('customers/{customer}', [CustomerController::class, 'update'])->name('superadmin.customers.update');
-Route::delete('customers/{customer}', [CustomerController::class, 'destroy'])->name('superadmin.customers.destroy');
-});
+    // Customers
+    Route::prefix('superadmin')->group(function () {
+        Route::get('customers', [CustomerController::class, 'index'])->name('superadmin.customers.index');
+        Route::get('customers/create', [CustomerController::class, 'create'])->name('superadmin.customers.create');
+        Route::post('customers', [CustomerController::class, 'store'])->name('superadmin.customers.store');
+        Route::get('customers/{customer}', [CustomerController::class, 'show'])->name('superadmin.customers.show');
+        Route::get('customers/{customer}/edit', [CustomerController::class, 'edit'])->name('superadmin.customers.edit');
+        Route::put('customers/{customer}', [CustomerController::class, 'update'])->name('superadmin.customers.update');
+        Route::delete('customers/{customer}', [CustomerController::class, 'destroy'])->name('superadmin.customers.destroy');
+    });
 
-// Trials
- Route::prefix('superadmin')->group(function () {
-Route::get('trials', [TrialController::class, 'index'])->name('superadmin.trials.index');
-Route::post('trials/{id}/convert', [TrialController::class, 'convertToPaid'])->name('superadmin.trials.convert');
-});
+    // Trials
+    Route::prefix('superadmin')->group(function () {
+        Route::get('trials', [TrialController::class, 'index'])->name('superadmin.trials.index');
+        Route::post('trials/{id}/convert', [TrialController::class, 'convertToPaid'])->name('superadmin.trials.convert');
+    });
 
-// Subscription Routes
- Route::prefix('superadmin')->group(function () {
-Route::get('subscriptions', [SubscriptionController::class, 'index'])->name('superadmin.subscriptions.index');
-Route::get('subscriptions/create', [SubscriptionController::class, 'create'])->name('superadmin.subscriptions.create');
-Route::post('subscriptions', [SubscriptionController::class, 'store'])->name('superadmin.subscriptions.store');
-Route::post('subscriptions/{id}/renew', [SubscriptionController::class, 'renew'])->name('superadmin.subscriptions.renew');
-});
-
-
-// Payments Routes
- Route::prefix('superadmin')->group(function () {
-Route::get('payments', [PaymentController::class, 'index'])->name('superadmin.payments.index');
-Route::get('payments/create', [PaymentController::class, 'index'])->name('superadmin.payments.create');
-Route::post('payments', [PaymentController::class, 'store'])->name('superadmin.payments.store');
-Route::get('payments/{payment}', [PaymentController::class, 'show'])->name('superadmin.payments.show');
-Route::get('payments/{payment}/edit', [PaymentController::class, 'edit'])->name('superadmin.payments.edit');
-Route::put('payments/{payment}', [PaymentController::class, 'update'])->name('superadmin.payments.update');
-Route::delete('payments/{payment}', [PaymentController::class, 'destroy'])->name('superadmin.payments.destroy');
-});
+    // Subscription Routes
+    Route::prefix('superadmin')->group(function () {
+        Route::get('subscriptions', [SubscriptionController::class, 'index'])->name('superadmin.subscriptions.index');
+        Route::get('subscriptions/create', [SubscriptionController::class, 'create'])->name('superadmin.subscriptions.create');
+        Route::post('subscriptions', [SubscriptionController::class, 'store'])->name('superadmin.subscriptions.store');
+        Route::post('subscriptions/{id}/renew', [SubscriptionController::class, 'renew'])->name('superadmin.subscriptions.renew');
+    });
 
 
-// Additional routes
- Route::prefix('superadmin')->group(function () {
-Route::post('/payments/{payment}/process', [PaymentController::class, 'processPayment'])->name('superadmin.payments.process');
-Route::get('/payments/trashed', [PaymentController::class, 'trashed'])->name('superadmin.payments.trashed');
-Route::post('/payments/{id}/restore', [PaymentController::class, 'restore'])->name('superadmin.payments.restore');
-Route::delete('/payments/{id}/force-delete', [PaymentController::class, 'forceDelete'])->name('superadmin.payments.force-delete');
-Route::get('/payments/statistics', [PaymentController::class, 'getStatistics'])->name('superadmin.payments.statistics');
-});
-// Invoices
+    // Payments Routes
+    Route::prefix('superadmin')->group(function () {
+        Route::get('payments', [PaymentController::class, 'index'])->name('superadmin.payments.index');
+        Route::get('payments/create', [PaymentController::class, 'index'])->name('superadmin.payments.create');
+        Route::post('payments', [PaymentController::class, 'store'])->name('superadmin.payments.store');
+        Route::get('payments/{payment}', [PaymentController::class, 'show'])->name('superadmin.payments.show');
+        Route::get('payments/{payment}/edit', [PaymentController::class, 'edit'])->name('superadmin.payments.edit');
+        Route::put('payments/{payment}', [PaymentController::class, 'update'])->name('superadmin.payments.update');
+        Route::delete('payments/{payment}', [PaymentController::class, 'destroy'])->name('superadmin.payments.destroy');
+    });
+
+
+    // Additional routes
+    Route::prefix('superadmin')->group(function () {
+        Route::post('/payments/{payment}/process', [PaymentController::class, 'processPayment'])->name('superadmin.payments.process');
+        Route::get('/payments/trashed', [PaymentController::class, 'trashed'])->name('superadmin.payments.trashed');
+        Route::post('/payments/{id}/restore', [PaymentController::class, 'restore'])->name('superadmin.payments.restore');
+        Route::delete('/payments/{id}/force-delete', [PaymentController::class, 'forceDelete'])->name('superadmin.payments.force-delete');
+        Route::get('/payments/statistics', [PaymentController::class, 'getStatistics'])->name('superadmin.payments.statistics');
+    });
+    // Invoices
 // Route::get('invoices', [InvoiceController::class, 'index'])->name('invoices.index');
 // Route::get('invoices/{id}', [InvoiceController::class, 'show'])->name('invoices.show');
 // Route::get('invoices/{id}/download', [InvoiceController::class, 'download'])->name('invoices.download');
 // Invoices Routes
 // Invoices Routes
 
- Route::prefix('superadmin')->group(function () {
-Route::get('invoices', [SuperAdminInvoiceController::class, 'index'])->name('superadmin.invoices.index');
-Route::get('invoices/create', [SuperAdminInvoiceController::class, 'create'])->name('superadmin.invoices.create');
-Route::post('invoices', [SuperAdminInvoiceController::class, 'store'])->name('superadmin.invoices.store');
-Route::get('invoices/{id}', [SuperAdminInvoiceController::class, 'show'])->name('superadmin.invoices.show');
-Route::get('invoices/{id}/edit', [SuperAdminInvoiceController::class, 'edit'])->name('superadmin.invoices.edit');
-Route::put('invoices/{id}', [SuperAdminInvoiceController::class, 'update'])->name('superadmin.invoices.update');
-Route::delete('invoices/{id}', [SuperAdminInvoiceController::class, 'destroy'])->name('superadmin.invoices.destroy');
-Route::get('invoices/{id}/download', [SuperAdminInvoiceController::class, 'download'])->name('superadmin.invoices.download');
+    Route::prefix('superadmin')->group(function () {
+        Route::get('invoices', [SuperAdminInvoiceController::class, 'index'])->name('superadmin.invoices.index');
+        Route::get('invoices/create', [SuperAdminInvoiceController::class, 'create'])->name('superadmin.invoices.create');
+        Route::post('invoices', [SuperAdminInvoiceController::class, 'store'])->name('superadmin.invoices.store');
+        Route::get('invoices/{id}', [SuperAdminInvoiceController::class, 'show'])->name('superadmin.invoices.show');
+        Route::get('invoices/{id}/edit', [SuperAdminInvoiceController::class, 'edit'])->name('superadmin.invoices.edit');
+        Route::put('invoices/{id}', [SuperAdminInvoiceController::class, 'update'])->name('superadmin.invoices.update');
+        Route::delete('invoices/{id}', [SuperAdminInvoiceController::class, 'destroy'])->name('superadmin.invoices.destroy');
+        Route::get('invoices/{id}/download', [SuperAdminInvoiceController::class, 'download'])->name('superadmin.invoices.download');
 
 
 
-// Additional invoice routes
-Route::post('invoices/{id}/status', [SuperAdminInvoiceController::class, 'updateStatus'])->name('superadmin.invoices.status.update');
-Route::post('invoices/bulk-delete', [SuperAdminInvoiceController::class, 'bulkDelete'])->name('superadmin.invoices.bulk.delete');
-Route::post('invoices/bulk-download', [SuperAdminInvoiceController::class, 'bulkDownload'])->name('superadmin.invoices.bulk.download');
-Route::get('invoices/stats', [SuperAdminInvoiceController::class, 'getStats'])->name('superadmin.invoices.stats');
-Route::get('invoices/export', [SuperAdminInvoiceController::class, 'export'])->name('superadmin.invoices.export');
-Route::post('invoices/preview', [InvoiceController::class, 'preview'])->name('superadmin.invoices.preview');
-Route::get('invoices/search', [SuperAdminInvoiceController::class, 'search'])->name('superadmin.invoices.search');
+        // Additional invoice routes
+        Route::post('invoices/{id}/status', [SuperAdminInvoiceController::class, 'updateStatus'])->name('superadmin.invoices.status.update');
+        Route::post('invoices/bulk-delete', [SuperAdminInvoiceController::class, 'bulkDelete'])->name('superadmin.invoices.bulk.delete');
+        Route::post('invoices/bulk-download', [SuperAdminInvoiceController::class, 'bulkDownload'])->name('superadmin.invoices.bulk.download');
+        Route::get('invoices/stats', [SuperAdminInvoiceController::class, 'getStats'])->name('superadmin.invoices.stats');
+        Route::get('invoices/export', [SuperAdminInvoiceController::class, 'export'])->name('superadmin.invoices.export');
+        Route::post('invoices/preview', [InvoiceController::class, 'preview'])->name('superadmin.invoices.preview');
+        Route::get('invoices/search', [SuperAdminInvoiceController::class, 'search'])->name('superadmin.invoices.search');
 
-Route::post('/invoices/{invoice}/mark-paid', [SuperAdminInvoiceController::class, 'markAsPaid'])->name('superadmin.invoices.mark-paid');
-});
-
-
-
-
+        Route::post('/invoices/{invoice}/mark-paid', [SuperAdminInvoiceController::class, 'markAsPaid'])->name('superadmin.invoices.mark-paid');
+    });
 
 
 
@@ -644,13 +641,18 @@ Route::post('/invoices/{invoice}/mark-paid', [SuperAdminInvoiceController::class
 
 
 
-Route::prefix('ticket/record')->name('ticket.record.')->group(function () {
+
+
+
+
+
+    Route::middleware('permission:ticket records')->prefix('ticket/record')->name('ticket.record.')->group(function () {
         Route::get('/', [TicketRecordController::class, 'index'])->name('index');
         Route::get('/{id}', [TicketRecordController::class, 'show'])->name('show');
         Route::put('/{id}', [TicketRecordController::class, 'update'])->name('update');
         Route::delete('/{id}', [TicketRecordController::class, 'destroy'])->name('destroy');
         Route::post('/{id}/reply', [TicketRecordController::class, 'reply'])->name('reply');
-});
+    });
 
 
 
@@ -666,46 +668,46 @@ Route::prefix('ticket/record')->name('ticket.record.')->group(function () {
 
 
 
-// Revenue
- Route::prefix('superadmin')->group(function () {
-Route::get('revenue', [RevenueController::class, 'index'])->name('superadmin.revenue.index');
-});
+    // Revenue
+    Route::prefix('superadmin')->group(function () {
+        Route::get('revenue', [RevenueController::class, 'index'])->name('superadmin.revenue.index');
+    });
 
-// Settings
- Route::prefix('superadmin')->group(function () {
-Route::get('settings', [SettingsController::class, 'index'])->name('superadmin.settings.index');
-Route::post('settings', [SettingsController::class, 'update'])->name('superadmin.settings.update');
-});
+    // Settings
+    Route::prefix('superadmin')->group(function () {
+        Route::get('settings', [SettingsController::class, 'index'])->name('superadmin.settings.index');
+        Route::post('settings', [SettingsController::class, 'update'])->name('superadmin.settings.update');
+    });
 
-// Profile
-Route::get('superadmin/profile', function () {
-    return view('profile');
-})->name('superadmin.profile');
+    // Profile
+    Route::get('superadmin/profile', function () {
+        return view('profile');
+    })->name('superadmin.profile');
 
-// Notifications
-Route::get('superadmin/notifications', function () {
-    return view('notifications');
-})->name('superadmin.notifications');
+    // Notifications
+    Route::get('superadmin/notifications', function () {
+        return view('notifications');
+    })->name('superadmin.notifications');
 
-// Export
-Route::get('superadmin/export', function () {
-    return view('export');
-})->name('superadmin.export');
+    // Export
+    Route::get('superadmin/export', function () {
+        return view('export');
+    })->name('superadmin.export');
 
-// Reports
-Route::get('superadmin/reports', function () {
-    return view('reports');
-})->name('superadmin.reports');
+    // Reports
+    Route::get('superadmin/reports', function () {
+        return view('reports');
+    })->name('superadmin.reports');
 
-// Analytics
-Route::get('superadmin/analytics', function () {
-    return view('analytics');
-})->name('superadmin.analytics');
+    // Analytics
+    Route::get('superadmin/analytics', function () {
+        return view('analytics');
+    })->name('superadmin.analytics');
 
-// Help
-Route::get('superadmin/help', function () {
-    return view('help');
-})->name('superadmin.help');
+    // Help
+    Route::get('superadmin/help', function () {
+        return view('help');
+    })->name('superadmin.help');
 
 
 
@@ -727,7 +729,7 @@ Route::middleware('guest')->group(function () {
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // Upgrade Plan
- Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('/upgrade-plan', [UpgradePlanController::class, 'index'])
         ->name('upgrade.index');
 });
@@ -743,8 +745,8 @@ Route::get('/debug-roles', function () {
 
     // 1. Check Database Schema
     $hasCompanyId = \Illuminate\Support\Facades\Schema::hasColumn('roles', 'company_id');
-    $results['Database Check'] = $hasCompanyId 
-        ? '✅ SUCCESS: roles table has company_id column.' 
+    $results['Database Check'] = $hasCompanyId
+        ? '✅ SUCCESS: roles table has company_id column.'
         : '❌ FAILED: roles table MISSING company_id column. Run migrations!';
 
     // 2. Check Role Model Override
@@ -766,9 +768,9 @@ Route::get('/debug-roles', function () {
             'slug' => 'debug-test-' . \Illuminate\Support\Str::random(5),
             'status' => 'active'
         ]);
-        
+
         $role = \App\Models\Role::where('name', 'admin')->where('company_id', $testCompany->id)->first();
-        
+
         if ($role) {
             $results['Observer Test'] = '✅ SUCCESS: Observer ran and created an admin role (ID: ' . $role->id . ')';
         } else {
