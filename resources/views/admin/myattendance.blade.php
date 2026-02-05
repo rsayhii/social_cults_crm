@@ -462,11 +462,6 @@
                             </div>
                         </div>
 
-
-                        <!-- Add this HTML section after the break duration stat card -->
-                        <!-- <div class="bg-white rounded-xl shadow-custom p-4 md:p-6 mb-4 md:mb-6">
-                            <h3 class="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4">Break Timer</h3>
-                            <p>Total Break Time: {{ $todayBreakDuration }}</p> -->
                             <!-- Active Break Timer Display -->
                             <!-- Compact Break Timer -->
                             <div id="active-break-timer"
@@ -498,55 +493,6 @@
                                     <i class="fas fa-stop text-xs"></i>
                                 </button>
                             </div>
-
-
-                            <!-- No Active Break Message -->
-                            <!-- <div id="no-active-break" class="bg-gray-50 border border-gray-200 rounded-lg p-4 md:p-6 text-center">
-                    <i class="fas fa-coffee text-gray-400 text-3xl mb-3"></i>
-                    <h4 class="text-lg font-semibold text-gray-700 mb-2">No Active Break</h4>
-                    <p class="text-gray-600 text-sm mb-4">You're currently not on a break. Start a break to see the timer.</p> -->
-
-                            <!-- Break Statistics -->
-                            <!-- <div class="grid grid-cols-2 gap-4 mt-4">
-                        <div class="bg-white p-3 rounded-lg shadow-sm">
-                            <div class="text-xs text-gray-500">Today's Breaks</div>
-                            <div class="text-lg font-bold text-gray-800" id="today-break-count">0</div>
-                        </div>
-                        <div class="bg-white p-3 rounded-lg shadow-sm">
-                            <div class="text-xs text-gray-500">Total Break Time</div>
-                            <div class="text-lg font-bold text-gray-800" id="today-total-break">00:00</div>
-                        </div>
-                    </div>
-                </div> -->
-
-                            <!-- Break History -->
-                            <!-- <div class="mt-6">
-                                    <h5 class="text-sm font-semibold text-gray-700 mb-3">Today's Breaks</h5>
-                                    <div class="overflow-hidden bg-white shadow-sm rounded-lg">
-                                        <table class="min-w-full divide-y divide-gray-200">
-                                            <thead>
-                                                <tr class="bg-gray-50">
-                                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                                        Start Time</th>
-                                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                                        End Time</th>
-                                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                                        Duration</th>
-                                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                                        Status</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="break-history-table" class="divide-y divide-gray-200"> -->
-                            <!-- Break history rows will be populated by JavaScript -->
-                            <!-- </tbody>
-                                        </table>
-                                        <div id="no-breaks-message" class="p-4 text-center text-gray-500">
-                                            <i class="fas fa-history text-gray-300 text-2xl mb-2"></i>
-                                            <p>No breaks taken today</p>
-                                        </div>
-                                    </div>
-                                </div> -->
-                        <!-- </div> -->
 
                         <div class="bg-white rounded-xl shadow-custom p-4 md:p-6">
                             <div class="flex items-center">
@@ -642,14 +588,21 @@
                             <div class="flex items-center">
                                 <span class="text-xs md:text-sm text-gray-600 mr-2">Month:</span>
                                 <select
-                                    class="border border-gray-300 rounded-lg px-2 md:px-3 py-1 md:py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm md:text-base w-full sm:w-auto"
-                                    id="attendance-month-filter">
+                                    class="appearance-none bg-white/80 backdrop-blur-md
+                                    border border-gray-200
+                                    rounded-xl
+                                    px-4 py-2.5 pr-10
+                                    text-gray-900 text-sm md:text-base
+                                    shadow-sm
+                                    transition-all duration-200
+                                    hover:shadow-md hover:border-gray-300
+                                    focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500">
                                     @for ($m = 1; $m <= 12; $m++)
-                                        <option value="{{ $m }}" {{ $currentMonth == $m ? 'selected' : '' }}>
+                                        <option class="text-gray-900" value="{{ $m }}" {{ $currentMonth == $m ? 'selected' : '' }}>
                                             {{ date('F Y', mktime(0, 0, 0, $m, 1, now()->year)) }}
                                         </option>
                                     @endfor
-                                </select>
+                                </select>         
                             </div>
                             <div class="flex items-center justify-between">
                                 <span class="text-xs md:text-sm text-gray-600 mr-2">Page:</span>

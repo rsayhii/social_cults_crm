@@ -38,7 +38,7 @@ class MyAttendanceController extends Controller
             $profile = [
                 'name' => $employee->name ?? 'Employee',
                 'role' => $employee->role ?? 'Employee',
-                'company' => $employee->company ?? 'Company',
+                'company' => $employee->company?->name ?? 'Company',
                 'employee_id' => $employee->employee_id ?? 'EMP-001',
                 'department' => $employee->department ?? 'General',
                 'join_date' => $employee->join_date
