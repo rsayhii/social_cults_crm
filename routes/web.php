@@ -791,3 +791,27 @@ Route::post('/notifications/read', function () {
     auth()->user()->unreadNotifications->markAsRead();
     return response()->json(['success' => true]);
 });
+
+// TEMPORARY FIX ROUTE
+Route::get('/fix-permissions', function () {
+    $missing = ['admin portal', 'employeeportal', 'project management'];
+    foreach ($missing as $p) {
+        \Spatie\Permission\Models\Permission::firstOrCreate(['name' => $p, 'guard_name' => 'web']);
+    }
+
+    $user = auth()->user();
+    if (!$user)
+        return 'Login first';
+
+    $role = \App\Models\Role::where('name', 'admin')
+        ->where('company_id', $user->company_id)
+        ->first();
+
+    if ($role) {
+        // Sync ALL permissions to this admin role
+        $role->syncPermissions(\Spatie\Permission\Models\Permission::all());
+        return 'SUCCESS: Added missing permissions and synced Admin role for company: ' . $user->company->name;
+    }
+
+    return 'ERROR: Admin role not found for this company.';
+});

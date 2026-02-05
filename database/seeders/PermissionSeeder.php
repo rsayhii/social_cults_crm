@@ -37,6 +37,9 @@ class PermissionSeeder extends Seeder
             'contact',
             'ticket records',
             'ticket raise',
+            'admin portal',
+            'employeeportal',
+            'project management',
 
         ];
 
