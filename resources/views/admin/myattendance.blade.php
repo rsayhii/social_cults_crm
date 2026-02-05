@@ -464,9 +464,9 @@
 
 
                         <!-- Add this HTML section after the break duration stat card -->
-                        <div class="bg-white rounded-xl shadow-custom p-4 md:p-6 mb-4 md:mb-6">
+                        <!-- <div class="bg-white rounded-xl shadow-custom p-4 md:p-6 mb-4 md:mb-6">
                             <h3 class="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4">Break Timer</h3>
-                            <p>Total Break Time: {{ $todayBreakDuration }}</p>
+                            <p>Total Break Time: {{ $todayBreakDuration }}</p> -->
                             <!-- Active Break Timer Display -->
                             <!-- Compact Break Timer -->
                             <div id="active-break-timer"
@@ -502,51 +502,51 @@
 
                             <!-- No Active Break Message -->
                             <!-- <div id="no-active-break" class="bg-gray-50 border border-gray-200 rounded-lg p-4 md:p-6 text-center">
-                <i class="fas fa-coffee text-gray-400 text-3xl mb-3"></i>
-                <h4 class="text-lg font-semibold text-gray-700 mb-2">No Active Break</h4>
-                <p class="text-gray-600 text-sm mb-4">You're currently not on a break. Start a break to see the timer.</p> -->
+                    <i class="fas fa-coffee text-gray-400 text-3xl mb-3"></i>
+                    <h4 class="text-lg font-semibold text-gray-700 mb-2">No Active Break</h4>
+                    <p class="text-gray-600 text-sm mb-4">You're currently not on a break. Start a break to see the timer.</p> -->
 
                             <!-- Break Statistics -->
                             <!-- <div class="grid grid-cols-2 gap-4 mt-4">
-                    <div class="bg-white p-3 rounded-lg shadow-sm">
-                        <div class="text-xs text-gray-500">Today's Breaks</div>
-                        <div class="text-lg font-bold text-gray-800" id="today-break-count">0</div>
+                        <div class="bg-white p-3 rounded-lg shadow-sm">
+                            <div class="text-xs text-gray-500">Today's Breaks</div>
+                            <div class="text-lg font-bold text-gray-800" id="today-break-count">0</div>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg shadow-sm">
+                            <div class="text-xs text-gray-500">Total Break Time</div>
+                            <div class="text-lg font-bold text-gray-800" id="today-total-break">00:00</div>
+                        </div>
                     </div>
-                    <div class="bg-white p-3 rounded-lg shadow-sm">
-                        <div class="text-xs text-gray-500">Total Break Time</div>
-                        <div class="text-lg font-bold text-gray-800" id="today-total-break">00:00</div>
-                    </div>
-                </div>
-            </div> -->
+                </div> -->
 
                             <!-- Break History -->
                             <!-- <div class="mt-6">
-                                <h5 class="text-sm font-semibold text-gray-700 mb-3">Today's Breaks</h5>
-                                <div class="overflow-hidden bg-white shadow-sm rounded-lg">
-                                    <table class="min-w-full divide-y divide-gray-200">
-                                        <thead>
-                                            <tr class="bg-gray-50">
-                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                                    Start Time</th>
-                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                                    End Time</th>
-                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                                    Duration</th>
-                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                                    Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="break-history-table" class="divide-y divide-gray-200"> -->
-                                            <!-- Break history rows will be populated by JavaScript -->
-                                        <!-- </tbody>
-                                    </table>
-                                    <div id="no-breaks-message" class="p-4 text-center text-gray-500">
-                                        <i class="fas fa-history text-gray-300 text-2xl mb-2"></i>
-                                        <p>No breaks taken today</p>
+                                    <h5 class="text-sm font-semibold text-gray-700 mb-3">Today's Breaks</h5>
+                                    <div class="overflow-hidden bg-white shadow-sm rounded-lg">
+                                        <table class="min-w-full divide-y divide-gray-200">
+                                            <thead>
+                                                <tr class="bg-gray-50">
+                                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                                        Start Time</th>
+                                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                                        End Time</th>
+                                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                                        Duration</th>
+                                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                                        Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="break-history-table" class="divide-y divide-gray-200"> -->
+                            <!-- Break history rows will be populated by JavaScript -->
+                            <!-- </tbody>
+                                        </table>
+                                        <div id="no-breaks-message" class="p-4 text-center text-gray-500">
+                                            <i class="fas fa-history text-gray-300 text-2xl mb-2"></i>
+                                            <p>No breaks taken today</p>
+                                        </div>
                                     </div>
-                                </div>
-                            </div> -->
-                        </div>
+                                </div> -->
+                        <!-- </div> -->
 
                         <div class="bg-white rounded-xl shadow-custom p-4 md:p-6">
                             <div class="flex items-center">
@@ -1040,7 +1040,7 @@
                 const seconds = totalSeconds % 60;
 
                 elements.breakTimerDisplay.textContent =
-                    `${padZero(minutes)}:${padZero(seconds)}`;
+                    `${padZero(minutes)}m ${padZero(seconds)}s`;
 
                 const percent = Math.min(
                     (totalSeconds / MAX_BREAK_SECONDS) * 100,
@@ -1202,42 +1202,42 @@
 
                     updateLocationDisplay(locationData);
 
-            
-        const actionNames = {
-            'punchIn': 'Punched In',
-            'punchOut': 'Punched Out',
-            'breakIn': 'Break Started',
-            'breakOut': 'Break Ended'
-        };
 
-        // Update local state based on action
-        if (actionType === 'punchIn') {
-             attendanceData.punchIn = result.punch_time; // Expecting time string or true
-        } else if (actionType === 'punchOut') {
-             attendanceData.punchOut = result.punch_time;
-        } else if (actionType === 'breakIn') {
-             attendanceData.breakRunning = true;
-             // handleBreakIn handles its own state/timer, but good to sync
-        } else if (actionType === 'breakOut') {
-             attendanceData.breakRunning = false;
-        }
-        
-        updateButtonStates();
+                    const actionNames = {
+                        'punchIn': 'Punched In',
+                        'punchOut': 'Punched Out',
+                        'breakIn': 'Break Started',
+                        'breakOut': 'Break Ended'
+                    };
 
-        let successMessage = `✅ ${actionNames[actionType]} Successfully!`;
-        if (result.work_hours) successMessage += `\nTotal Work Hours: ${result.work_hours}`;
-        if (result.break_duration) successMessage += `\nBreak Duration: ${result.break_duration}`;
-        if (result.total_break_time) successMessage += `\nTotal Break Today: ${result.total_break_time}`;
-        if (locationData.distance) successMessage += `\nDistance: ${locationData.distance}km`;
+                    // Update local state based on action
+                    if (actionType === 'punchIn') {
+                        attendanceData.punchIn = result.punch_time; // Expecting time string or true
+                    } else if (actionType === 'punchOut') {
+                        attendanceData.punchOut = result.punch_time;
+                    } else if (actionType === 'breakIn') {
+                        attendanceData.breakRunning = true;
+                        // handleBreakIn handles its own state/timer, but good to sync
+                    } else if (actionType === 'breakOut') {
+                        attendanceData.breakRunning = false;
+                    }
+
+                    updateButtonStates();
+
+                    let successMessage = `✅ ${actionNames[actionType]} Successfully!`;
+                    if (result.work_hours) successMessage += `\nTotal Work Hours: ${result.work_hours}`;
+                    if (result.break_duration) successMessage += `\nBreak Duration: ${result.break_duration}`;
+                    if (result.total_break_time) successMessage += `\nTotal Break Today: ${result.total_break_time}`;
+                    if (locationData.distance) successMessage += `\nDistance: ${locationData.distance}km`;
 
 
-        // alert(successMessage); // Optional: removing alert if we want smoother UX, or keep it. Keeping for now.
-        // Use a non-blocking notification if possible, but alert is consistent with existing code.
-        
-        // Reload to refresh table/logs is good practice if we don't dynamically update the table
-        location.reload(); 
+                    // alert(successMessage); // Optional: removing alert if we want smoother UX, or keep it. Keeping for now.
+                    // Use a non-blocking notification if possible, but alert is consistent with existing code.
 
-    } catch (error) {
+                    // Reload to refresh table/logs is good practice if we don't dynamically update the table
+                    location.reload();
+
+                } catch (error) {
                     console.error(`${actionType} error:`, error);
                     alert(`❌ Error during ${actionType}: ${error.message}`);
                 }
@@ -1485,35 +1485,35 @@
                                 'bg-red-100 text-red-800';
 
                     row.innerHTML = `
-                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${record.date}</td>
-                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${record.punchIn || '--'}</td>
-                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${record.punchOut || '--'}</td>
-                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${record.workHours || '--'}</td>
-                    <td class="px-4 py-3 whitespace-nowrap">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">
-                            ${record.status}
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${record.date}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${record.punchIn || '--'}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${record.punchOut || '--'}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${record.workHours || '--'}</td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">
+                                ${record.status}
+                            </span>
+                        </td>
+                      <td class="px-4 py-3 text-sm text-gray-700">
+                ${record.breaks?.length ? `
+                    <div class="flex items-center gap-2">
+                        <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800 font-medium">
+                            ${record.breaks.length} breaks
                         </span>
-                    </td>
-                  <td class="px-4 py-3 text-sm text-gray-700">
-            ${record.breaks?.length ? `
-                <div class="flex items-center gap-2">
-                    <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800 font-medium">
-                        ${record.breaks.length} breaks
-                    </span>
 
-                    <button
-                        class="text-blue-600 text-xs underline hover:text-blue-800"
-                        onclick="showBreakDetails(${JSON.stringify(record.breaks).replace(/"/g, '&quot;')})">
-                        View
-                    </button>
-                </div>
-            ` : '--'}
-        </td>
+                        <button
+                            class="text-blue-600 text-xs underline hover:text-blue-800"
+                            onclick="showBreakDetails(${JSON.stringify(record.breaks).replace(/"/g, '&quot;')})">
+                            View
+                        </button>
+                    </div>
+                ` : '--'}
+            </td>
 
-                    <td class="px-4 py-3 text-sm font-medium">
-                        ${record.totalBreak || '--'}
-                    </td>
-                `;
+                        <td class="px-4 py-3 text-sm font-medium">
+                            ${record.totalBreak || '--'}
+                        </td>
+                    `;
                     elements.employeeAttendanceLog.appendChild(row);
                 });
             }
@@ -1536,49 +1536,49 @@
                     card.className = 'mb-4 p-4 border border-gray-200 rounded-xl bg-white shadow-sm';
 
                     card.innerHTML = `
-                    <div class="flex justify-between items-center mb-3 pb-3 border-b border-gray-100">
-                        <div>
-                            <span class="font-medium text-gray-800">${record.date}</span>
-                            <span class="ml-2 px-2 py-1 text-xs font-semibold rounded-full ${statusClass}">
-                                ${record.status}
-                            </span>
+                        <div class="flex justify-between items-center mb-3 pb-3 border-b border-gray-100">
+                            <div>
+                                <span class="font-medium text-gray-800">${record.date}</span>
+                                <span class="ml-2 px-2 py-1 text-xs font-semibold rounded-full ${statusClass}">
+                                    ${record.status}
+                                </span>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="space-y-2">
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Punch In:</span>
-                            <span class="font-medium">${record.punchIn || '--'}</span>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Punch In:</span>
+                                <span class="font-medium">${record.punchIn || '--'}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Punch Out:</span>
+                                <span class="font-medium">${record.punchOut || '--'}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Lunch In:</span>
+                                <span class="font-medium">${record.lunchIn || '--'}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Lunch Out:</span>
+                                <span class="font-medium">${record.lunchOut || '--'}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Work Hours:</span>
+                                <span class="font-medium">${record.workHours || '--'}</span>
+                            </div>
                         </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Punch Out:</span>
-                            <span class="font-medium">${record.punchOut || '--'}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Lunch In:</span>
-                            <span class="font-medium">${record.lunchIn || '--'}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Lunch Out:</span>
-                            <span class="font-medium">${record.lunchOut || '--'}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Work Hours:</span>
-                            <span class="font-medium">${record.workHours || '--'}</span>
-                        </div>
-                    </div>
 
-                    <div class="mt-4 pt-3 border-t border-gray-100 text-sm">
-                        <p class="font-semibold text-gray-700 mb-1">Breaks:</p>
-                        <ul class="list-disc pl-5 text-gray-600 space-y-0.5">
-                            ${breaksHtml}
-                        </ul>
-                        <p class="mt-2 font-medium text-gray-700">
-                            <span class="font-semibold">Total Break:</span> 
-                            ${record.totalBreak || record.breakHours || '--'}
-                        </p>
-                    </div>
-                `;
+                        <div class="mt-4 pt-3 border-t border-gray-100 text-sm">
+                            <p class="font-semibold text-gray-700 mb-1">Breaks:</p>
+                            <ul class="list-disc pl-5 text-gray-600 space-y-0.5">
+                                ${breaksHtml}
+                            </ul>
+                            <p class="mt-2 font-medium text-gray-700">
+                                <span class="font-semibold">Total Break:</span> 
+                                ${record.totalBreak || record.breakHours || '--'}
+                            </p>
+                        </div>
+                    `;
 
                     elements.mobileAttendanceCards.appendChild(card);
                 });
@@ -1655,17 +1655,17 @@
                             const row = document.createElement('tr');
                             row.className = 'hover:bg-gray-50';
                             row.innerHTML = `
-                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${breakIn || '--'}</td>
-                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${breakOut || 'Running'}</td>
-                            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium ${isActive ? 'text-yellow-600' : 'text-gray-700'}">
-                                ${duration}
-                            </td>
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${isActive ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}">
-                                    ${isActive ? 'Active' : 'Completed'}
-                                </span>
-                            </td>
-                        `;
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${breakIn || '--'}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${breakOut || 'Running'}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm font-medium ${isActive ? 'text-yellow-600' : 'text-gray-700'}">
+                                    ${duration}
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${isActive ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}">
+                                        ${isActive ? 'Active' : 'Completed'}
+                                    </span>
+                                </td>
+                            `;
                             breakHistoryTable.appendChild(row);
                             breakCount++;
                         });
@@ -1737,13 +1737,13 @@
                     const isRunning = b.includes('Running');
 
                     list.innerHTML += `
-                    <div class="flex justify-between items-center p-2 rounded-lg border ${isRunning ? 'bg-yellow-50' : 'bg-gray-50'}">
-                        <span>${index + 1}. ${b}</span>
-                        <span class="text-xs font-medium ${isRunning ? 'text-yellow-600' : 'text-green-600'}">
-                            ${isRunning ? 'Active' : 'Done'}
-                        </span>
-                    </div>
-                `;
+                        <div class="flex justify-between items-center p-2 rounded-lg border ${isRunning ? 'bg-yellow-50' : 'bg-gray-50'}">
+                            <span>${index + 1}. ${b}</span>
+                            <span class="text-xs font-medium ${isRunning ? 'text-yellow-600' : 'text-green-600'}">
+                                ${isRunning ? 'Active' : 'Done'}
+                            </span>
+                        </div>
+                    `;
                 });
 
                 modal.classList.remove('hidden');
