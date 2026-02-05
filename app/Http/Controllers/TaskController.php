@@ -37,45 +37,138 @@ class TaskController extends Controller
     }
 
     public function show(Task $task)
-{
-    $this->authorize('manage', $task);
+    {
+        $this->authorize('manage', $task);
 
-    $task->load('users', 'role', 'assigner.roles');
-    return view('admin.task-show', compact('task'));
-}
+        $task->load('users', 'role', 'assigner.roles');
+        return view('admin.task-show', compact('task'));
+    }
 
 
-   public function edit(Task $task)
-{
-    $this->authorize('manage', $task);
+    public function edit(Task $task)
+    {
+        $this->authorize('manage', $task);
 
-    $task->load('users', 'role', 'assigner.roles');
-    $users = User::with('roles')->get();
-    $roles = Role::forCompany(Auth::user()->company_id)->get();
+        $task->load('users', 'role', 'assigner.roles');
+        $users = User::with('roles')->get();
+        $roles = Role::forCompany(Auth::user()->company_id)->get();
 
-    return view('admin.task-edit', compact('task', 'users', 'roles'));
-}
+        return view('admin.task-edit', compact('task', 'users', 'roles'));
+    }
 
 
     public function store(Request $request)
     {
-        // (Unchanged from your original)
+        try {
+            $rules = [
+                'title' => 'required|string|max:255',
+                'description' => 'nullable|string',
+                'category' => 'nullable|string',
+                'priority' => 'required|in:Low,Medium,High',
+                'due_date' => 'nullable|date|after_or_equal:today',
+                'assigned_type' => 'required|in:individual,team',
+                'attachments.*' => 'file|mimes:pdf,jpg,png,doc|max:10240',
+            ];
+
+            $assignedType = $request->input('assigned_type');
+            if ($assignedType === 'individual') {
+                $rules['assigned_users'] = 'required|array|min:1';
+                $rules['assigned_users.*'] = 'exists:users,id';
+            } elseif ($assignedType === 'team') {
+                $rules['assigned_role'] = 'required|exists:roles,id';
+            }
+
+            $validator = Validator::make($request->all(), $rules);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed.',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $validated = $validator->validated();
+
+            $task = Task::create([
+                'title' => $validated['title'],
+                'description' => $validated['description'] ?? null,
+                'category' => $validated['category'] ?? null,
+                'priority' => $validated['priority'],
+                'status' => 'Pending',
+                'due_date' => $validated['due_date'] ?? null,
+                'assigned_by' => Auth::id(),
+            ]);
+
+            // Handle attachments
+            $attachments = [];
+            if ($request->hasFile('attachments')) {
+                foreach ($request->file('attachments') as $file) {
+                    $path = $file->store('task_attachments', 'public');
+                    $attachments[] = $path;
+                }
+                $task->update(['attachments' => $attachments]);
+            }
+
+            // Handle assignment
+            if ($assignedType === 'individual') {
+                $userIds = $validated['assigned_users'];
+                $task->assignToUsers($userIds);
+            } else {
+                $roleId = $validated['assigned_role'];
+                $task->assignToTeam($roleId);
+            }
+
+            try {
+                if (function_exists('notifyCompany')) {
+                    notifyCompany(auth()->user()->company_id, [
+                        'title' => 'Task Assigned',
+                        'message' => 'A new task was assigned',
+                        'module' => 'task',
+                        'url' => route('tasks.index'),
+                        'icon' => 'task',
+                    ]);
+                }
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Task Notification Failed: ' . $e->getMessage());
+            }
+
+            return response()->json([
+                'success' => true,
+                'task' => $task->load('users', 'role', 'assigner.roles')->toArray()
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Task Creation Error: ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString());
+            return response()->json([
+                'success' => false,
+                'message' => 'Server Error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function update(Request $request, Task $task)
+    {
+        $this->authorize('manage', $task);
+        // Similar validation to store, but allow partial updates
         $rules = [
-            'title' => 'required|string|max:255',
+            'title' => 'sometimes|required|string|max:255',
             'description' => 'nullable|string',
             'category' => 'nullable|string',
-            'priority' => 'required|in:Low,Medium,High',
-           'due_date' => 'nullable|date|after_or_equal:today',
-            'assigned_type' => 'required|in:individual,team',
+            'priority' => 'sometimes|required|in:Low,Medium,High',
+            'status' => 'sometimes|required|in:Pending,In Progress,Completed',
+            'due_date' => 'nullable|date|after_or_equal:today',
+            'assigned_type' => 'sometimes|required|in:individual,team',
             'attachments.*' => 'file|mimes:pdf,jpg,png,doc|max:10240',
+            'remove_attachments' => 'sometimes|array',
+            'remove_attachments.*' => 'string',
         ];
 
-        $assignedType = $request->input('assigned_type');
+        $assignedType = $request->input('assigned_type', $task->assigned_to_team ? 'team' : 'individual');
         if ($assignedType === 'individual') {
-            $rules['assigned_users'] = 'required|array|min:1';
+            $rules['assigned_users'] = 'sometimes|required|array|min:1';
             $rules['assigned_users.*'] = 'exists:users,id';
         } elseif ($assignedType === 'team') {
-            $rules['assigned_role'] = 'required|exists:roles,id';
+            $rules['assigned_role'] = 'sometimes|required|exists:roles,id';
         }
 
         $validator = Validator::make($request->all(), $rules);
@@ -90,147 +183,66 @@ class TaskController extends Controller
 
         $validated = $validator->validated();
 
-        $task = Task::create([
-            'title' => $validated['title'],
-            'description' => $validated['description'] ?? null,
-            'category' => $validated['category'] ?? null,
-            'priority' => $validated['priority'],
-            'status' => 'Pending',
-            'due_date' => $validated['due_date'] ?? null,
-            'assigned_by' => Auth::id(),
-        ]);
+        // Handle removals first (if provided)
+        $removedAttachments = $request->input('remove_attachments', []);
+        $existingAttachments = $task->attachments ?? [];
+        if (!empty($removedAttachments)) {
+            $filteredAttachments = array_filter($existingAttachments, function ($path) use ($removedAttachments) {
+                return !in_array($path, $removedAttachments);
+            });
+            // Delete files from storage
+            foreach ($removedAttachments as $path) {
+                if (Storage::disk('public')->exists($path)) {
+                    Storage::disk('public')->delete($path);
+                }
+            }
+            $task->update(['attachments' => array_values($filteredAttachments)]);
+            $existingAttachments = array_values($filteredAttachments);
+        }
 
-        // Handle attachments
-        $attachments = [];
+        // Update core fields
+        $task->update(array_filter([
+            'title' => $validated['title'] ?? $task->title,
+            'description' => $validated['description'] ?? $task->description,
+            'category' => $validated['category'] ?? $task->category,
+            'priority' => $validated['priority'] ?? $task->priority,
+            'status' => $validated['status'] ?? $task->status,
+            'due_date' => $validated['due_date'] ?? $task->due_date,
+        ]));
+
+        // Append new attachments
         if ($request->hasFile('attachments')) {
             foreach ($request->file('attachments') as $file) {
                 $path = $file->store('task_attachments', 'public');
-                $attachments[] = $path;
+                $existingAttachments[] = $path;
             }
-            $task->update(['attachments' => $attachments]);
+            $task->update(['attachments' => $existingAttachments]);
         }
 
-        // Handle assignment
-        if ($assignedType === 'individual') {
-            $userIds = $validated['assigned_users'];
-            $task->assignToUsers($userIds);
-        } else {
-            $roleId = $validated['assigned_role'];
-            $task->assignToTeam($roleId);
+        // Re-handle assignment if type provided
+        if (isset($validated['assigned_type'])) {
+            // Clear existing assignments (assume methods handle this)
+            $task->users()->detach();
+            $task->role()->dissociate();
+            $task->update(['assigned_to_team' => $assignedType === 'team']);
+
+            if ($assignedType === 'individual') {
+                $userIds = $validated['assigned_users'];
+                $task->assignToUsers($userIds);
+            } else {
+                $roleId = $validated['assigned_role'];
+                $task->assignToTeam($roleId);
+            }
         }
-
-        notifyCompany(auth()->user()->company_id, [
-    'title' => 'Task Assigned',
-    'message' => 'A new task was assigned',
-    'module' => 'task',
-    'url' => route('tasks.index'),
-    'icon' => 'task',
-]);
-
 
         return response()->json([
             'success' => true,
             'task' => $task->load('users', 'role', 'assigner.roles')->toArray()
         ]);
     }
-
-   public function update(Request $request, Task $task)
-{
-    $this->authorize('manage', $task);
-    // Similar validation to store, but allow partial updates
-    $rules = [
-        'title' => 'sometimes|required|string|max:255',
-        'description' => 'nullable|string',
-        'category' => 'nullable|string',
-        'priority' => 'sometimes|required|in:Low,Medium,High',
-        'status' => 'sometimes|required|in:Pending,In Progress,Completed',
-        'due_date' => 'nullable|date|after_or_equal:today',
-        'assigned_type' => 'sometimes|required|in:individual,team',
-        'attachments.*' => 'file|mimes:pdf,jpg,png,doc|max:10240',
-        'remove_attachments' => 'sometimes|array',
-        'remove_attachments.*' => 'string',
-    ];
-
-    $assignedType = $request->input('assigned_type', $task->assigned_to_team ? 'team' : 'individual');
-    if ($assignedType === 'individual') {
-        $rules['assigned_users'] = 'sometimes|required|array|min:1';
-        $rules['assigned_users.*'] = 'exists:users,id';
-    } elseif ($assignedType === 'team') {
-        $rules['assigned_role'] = 'sometimes|required|exists:roles,id';
-    }
-
-    $validator = Validator::make($request->all(), $rules);
-
-    if ($validator->fails()) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Validation failed.',
-            'errors' => $validator->errors()
-        ], 422);
-    }
-
-    $validated = $validator->validated();
-
-    // Handle removals first (if provided)
-    $removedAttachments = $request->input('remove_attachments', []);
-    $existingAttachments = $task->attachments ?? [];
-    if (!empty($removedAttachments)) {
-        $filteredAttachments = array_filter($existingAttachments, function($path) use ($removedAttachments) {
-            return !in_array($path, $removedAttachments);
-        });
-        // Delete files from storage
-        foreach ($removedAttachments as $path) {
-            if (Storage::disk('public')->exists($path)) {
-                Storage::disk('public')->delete($path);
-            }
-        }
-        $task->update(['attachments' => array_values($filteredAttachments)]);
-        $existingAttachments = array_values($filteredAttachments);
-    }
-
-    // Update core fields
-    $task->update(array_filter([
-        'title' => $validated['title'] ?? $task->title,
-        'description' => $validated['description'] ?? $task->description,
-        'category' => $validated['category'] ?? $task->category,
-        'priority' => $validated['priority'] ?? $task->priority,
-        'status' => $validated['status'] ?? $task->status,
-        'due_date' => $validated['due_date'] ?? $task->due_date,
-    ]));
-
-    // Append new attachments
-    if ($request->hasFile('attachments')) {
-        foreach ($request->file('attachments') as $file) {
-            $path = $file->store('task_attachments', 'public');
-            $existingAttachments[] = $path;
-        }
-        $task->update(['attachments' => $existingAttachments]);
-    }
-
-    // Re-handle assignment if type provided
-    if (isset($validated['assigned_type'])) {
-        // Clear existing assignments (assume methods handle this)
-        $task->users()->detach();
-        $task->role()->dissociate();
-        $task->update(['assigned_to_team' => $assignedType === 'team']);
-
-        if ($assignedType === 'individual') {
-            $userIds = $validated['assigned_users'];
-            $task->assignToUsers($userIds);
-        } else {
-            $roleId = $validated['assigned_role'];
-            $task->assignToTeam($roleId);
-        }
-    }
-
-    return response()->json([
-        'success' => true,
-        'task' => $task->load('users', 'role', 'assigner.roles')->toArray()
-    ]);
-}
     public function destroy(Task $task)
     {
-         $this->authorize('manage', $task);
+        $this->authorize('manage', $task);
         // Clean up attachments
         if ($task->attachments) {
             foreach ($task->attachments as $attachment) {

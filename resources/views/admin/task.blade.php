@@ -861,8 +861,8 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 w-full lg:w-auto">
 
                             <select id="statusFilter" class="w-full px-4 py-2 border border-gray-300 rounded-lg 
-                               focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 
-                               text-sm bg-white">
+                                       focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 
+                                       text-sm bg-white">
                                 <option>All Status</option>
                                 <option>Pending</option>
                                 <option>In Progress</option>
@@ -870,8 +870,8 @@
                             </select>
 
                             <select id="priorityFilter" class="w-full px-4 py-2 border border-gray-300 rounded-lg 
-                               focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 
-                               text-sm bg-white">
+                                       focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 
+                                       text-sm bg-white">
                                 <option>All Priority</option>
                                 <option>Low</option>
                                 <option>Medium</option>
@@ -879,8 +879,8 @@
                             </select>
 
                             <select id="assigneeFilter" class="w-full px-4 py-2 border border-gray-300 rounded-lg 
-                               focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 
-                               text-sm bg-white">
+                                       focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 
+                                       text-sm bg-white">
                                 <option value="">All Assignees</option>
 
                                 <optgroup label="Users">
@@ -1092,8 +1092,8 @@
                 }
 
                 /* =======================
-                   Task Title
-                ======================= */
+                           Task Title
+                        ======================= */
                 td[data-label="Task Title"] {
                     grid-template-columns: 1fr;
                     padding-bottom: 12px;
@@ -1111,32 +1111,32 @@
                 }
 
                 /* =======================
-                   Right column alignment (GLOBAL)
-                ======================= */
+                           Right column alignment (GLOBAL)
+                        ======================= */
                 td>div {
                     justify-self: end;
                     text-align: right;
                 }
 
                 /* =======================
-                   Assigned To
-                ======================= */
+                           Assigned To
+                        ======================= */
                 td[data-label="Assigned To"]>div {
                     display: flex;
                     justify-content: flex-end;
                 }
 
                 /* =======================
-                   Priority & Status badges
-                ======================= */
+                           Priority & Status badges
+                        ======================= */
                 .priority-badge {
                     justify-self: end;
                     white-space: nowrap;
                 }
 
                 /* =======================
-                   Due Date FIX (ICON + TEXT)
-                ======================= */
+                           Due Date FIX (ICON + TEXT)
+                        ======================= */
                 td[data-label="Due Date"]>div {
                     display: inline-flex;
                     align-items: center;
@@ -1151,8 +1151,8 @@
                 }
 
                 /* =======================
-                   Assigned By
-                ======================= */
+                           Assigned By
+                        ======================= */
                 td[data-label="Assigned By"]>div {
                     display: flex;
                     justify-content: flex-end;
@@ -1162,8 +1162,8 @@
                 }
 
                 /* =======================
-                   Actions
-                ======================= */
+                           Actions
+                        ======================= */
                 td[data-label="Actions"] {
                     grid-template-columns: 1fr;
                     padding-top: 12px;
@@ -1713,14 +1713,14 @@
                         const badge = document.createElement('div');
                         badge.className = 'selected-users-badge';
                         badge.innerHTML = `
-                                <div class="w-6 h-6 rounded-full bg-gradient-to-r from-blue-100 to-indigo-100 flex items-center justify-center text-indigo-600 text-xs font-semibold mr-2">
-                                    ${userInitial}
-                                </div>
-                                <span class="font-medium">${userName}</span>
-                                <button type="button" class="ml-2 text-indigo-400 hover:text-indigo-600" data-user-id="${checkbox.value}">
-                                    <i class="fas fa-times text-xs"></i>
-                                </button>
-                            `;
+                                        <div class="w-6 h-6 rounded-full bg-gradient-to-r from-blue-100 to-indigo-100 flex items-center justify-center text-indigo-600 text-xs font-semibold mr-2">
+                                            ${userInitial}
+                                        </div>
+                                        <span class="font-medium">${userName}</span>
+                                        <button type="button" class="ml-2 text-indigo-400 hover:text-indigo-600" data-user-id="${checkbox.value}">
+                                            <i class="fas fa-times text-xs"></i>
+                                        </button>
+                                    `;
                         badge.querySelector('button').addEventListener('click', e => {
                             e.stopPropagation();
                             const userId = badge.querySelector('button').getAttribute('data-user-id');
@@ -1790,21 +1790,21 @@
                     const fileItem = document.createElement('div');
                     fileItem.className = 'file-item';
                     fileItem.innerHTML = `
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center flex-1 min-w-0">
-                                    <div class="w-12 h-12 rounded-lg bg-gradient-to-r from-indigo-100 to-purple-100 flex items-center justify-center text-indigo-600 mr-4">
-                                        <i class="fas fa-file"></i>
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center flex-1 min-w-0">
+                                            <div class="w-12 h-12 rounded-lg bg-gradient-to-r from-indigo-100 to-purple-100 flex items-center justify-center text-indigo-600 mr-4">
+                                                <i class="fas fa-file"></i>
+                                            </div>
+                                            <div class="min-w-0">
+                                                <div class="font-semibold text-gray-800 truncate">${file.name}</div>
+                                                <div class="text-sm text-gray-500">${Math.round(file.size / 1024)} KB</div>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="text-red-500 hover:text-red-700 ml-4 remove-file" data-index="${index}" title="Remove file">
+                                            <i class="fas fa-times text-lg"></i>
+                                        </button>
                                     </div>
-                                    <div class="min-w-0">
-                                        <div class="font-semibold text-gray-800 truncate">${file.name}</div>
-                                        <div class="text-sm text-gray-500">${Math.round(file.size / 1024)} KB</div>
-                                    </div>
-                                </div>
-                                <button type="button" class="text-red-500 hover:text-red-700 ml-4 remove-file" data-index="${index}" title="Remove file">
-                                    <i class="fas fa-times text-lg"></i>
-                                </button>
-                            </div>
-                        `;
+                                `;
                     fileItem.querySelector('.remove-file').addEventListener('click', () => {
                         selectedFiles.splice(index, 1);
                         updateFileList();
@@ -1893,12 +1893,12 @@
                 const toast = document.createElement('div');
                 toast.className = `fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-xl z-50 fade-in flex items-center text-white max-w-md ${type === 'error' ? 'bg-gradient-to-r from-red-500 to-rose-600' : type === 'warning' ? 'bg-gradient-to-r from-yellow-500 to-amber-600' : 'bg-gradient-to-r from-green-500 to-emerald-600'}`;
                 toast.innerHTML = `
-                        <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center mr-3">
-                            <i class="${type === 'error' ? 'fas fa-exclamation-circle' : type === 'warning' ? 'fas fa-exclamation-triangle' : 'fas fa-check-circle'}"></i>
-                        </div>
-                        <div class="flex-1"><span class="font-medium">${message}</span></div>
-                        <button class="ml-4 text-white/80 hover:text-white" onclick="this.parentElement.remove()"> <i class="fas fa-times"></i> </button>
-                    `;
+                                <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center mr-3">
+                                    <i class="${type === 'error' ? 'fas fa-exclamation-circle' : type === 'warning' ? 'fas fa-exclamation-triangle' : 'fas fa-check-circle'}"></i>
+                                </div>
+                                <div class="flex-1"><span class="font-medium">${message}</span></div>
+                                <button class="ml-4 text-white/80 hover:text-white" onclick="this.parentElement.remove()"> <i class="fas fa-times"></i> </button>
+                            `;
                 document.body.appendChild(toast);
                 setTimeout(() => toast.remove(), 5000);
             }
@@ -1951,18 +1951,18 @@
                     if (!emptyRow) {
                         emptyRow = document.createElement('tr');
                         emptyRow.innerHTML = `
-                                <td colspan="7" class="py-16 text-center">
-                                    <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-r from-gray-100 to-gray-200 flex items-center justify-center text-gray-400">
-                                        <i class="fas fa-tasks text-3xl"></i>
-                                    </div>
-                                    <h3 class="text-lg font-semibold text-gray-600">No tasks match the selected filters</h3>
-                                    <p class="text-gray-400 mt-2">Adjust your filters to see tasks</p>
-                                    <button id="clearFiltersBtn" class="mt-4 btn-secondary">
-                                        <i class="fas fa-filter mr-2"></i>
-                                        Clear All Filters
-                                    </button>
-                                </td>
-                            `;
+                                        <td colspan="7" class="py-16 text-center">
+                                            <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-r from-gray-100 to-gray-200 flex items-center justify-center text-gray-400">
+                                                <i class="fas fa-tasks text-3xl"></i>
+                                            </div>
+                                            <h3 class="text-lg font-semibold text-gray-600">No tasks match the selected filters</h3>
+                                            <p class="text-gray-400 mt-2">Adjust your filters to see tasks</p>
+                                            <button id="clearFiltersBtn" class="mt-4 btn-secondary">
+                                                <i class="fas fa-filter mr-2"></i>
+                                                Clear All Filters
+                                            </button>
+                                        </td>
+                                    `;
                         tbody.appendChild(emptyRow);
                         document.getElementById('clearFiltersBtn').addEventListener('click', function () {
                             statusFilter.value = 'All Status';
@@ -2017,26 +2017,42 @@
             });
             filterTable();
 
-            // Category functionality (you had this in original but it was missing from script – adding basic version)
-            document.getElementById('taskCategory')?.addEventListener('change', function () {
-                if (this.value === 'Custom') {
-                    document.getElementById('customCategoryContainer').classList.remove('hidden');
-                } else {
+            function initializeCategoryFunctionality() {
+                const categorySelect = document.getElementById('taskCategory');
+                if (!categorySelect) return;
+
+                categorySelect.addEventListener('change', function () {
+                    if (this.value === 'Custom') {
+                        document.getElementById('customCategoryContainer').classList.remove('hidden');
+                    } else {
+                        document.getElementById('customCategoryContainer').classList.add('hidden');
+                    }
+                });
+
+                document.getElementById('saveCustomCategory')?.addEventListener('click', function () {
+                    const customValue = document.getElementById('customCategoryInput').value.trim();
+                    if (customValue) {
+                        document.getElementById('taskCategory').value = customValue;
+                        document.getElementById('customCategoryContainer').classList.add('hidden');
+                    }
+                });
+
+                document.getElementById('cancelCustomCategory')?.addEventListener('click', function () {
+                    document.getElementById('taskCategory').value = '';
                     document.getElementById('customCategoryContainer').classList.add('hidden');
-                }
-            });
-            document.getElementById('saveCustomCategory')?.addEventListener('click', function () {
-                const customValue = document.getElementById('customCategoryInput').value.trim();
-                if (customValue) {
-                    document.getElementById('taskCategory').value = customValue;
-                    document.getElementById('customCategoryContainer').classList.add('hidden');
-                }
-            });
-            document.getElementById('cancelCustomCategory')?.addEventListener('click', function () {
-                document.getElementById('taskCategory').value = '';
-                document.getElementById('customCategoryContainer').classList.add('hidden');
-                document.getElementById('customCategoryInput').value = '';
-            });
+                    document.getElementById('customCategoryInput').value = '';
+                });
+            }
+
+            function addRequiredFieldIndicators() {
+                const requiredInputs = document.querySelectorAll('input[required], select[required], textarea[required]');
+                requiredInputs.forEach(input => {
+                    const label = document.querySelector(`label[for="${input.id}"]`);
+                    if (label && !label.classList.contains('required-field')) {
+                        label.classList.add('required-field');
+                    }
+                });
+            }
         </script>
 
 @endsection
