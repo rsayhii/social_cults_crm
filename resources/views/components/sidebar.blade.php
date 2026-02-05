@@ -75,8 +75,8 @@
 
                     <ul class="flex w-full min-w-0 flex-col gap-1">
                         <!-- Dashboard -->
+                        @if($crmAccessible)
                         @can('dashboard')
-                          @if($crmAccessible)
                         <li class="relative">
                             <a href="{{ route('dashboard') }}"
                                class="flex w-full items-center gap-2 overflow-hidden p-2 text-left h-8 text-sm rounded-xl mb-1 flex items-center gap-3 px-4 py-3 
@@ -612,7 +612,7 @@
 
 
 
-                           @can('ticket records')
+                           {{-- @can('ticket records')
                              <li class="relative">
                             <a href="{{ route('ticket.record.index') }}" class="flex w-full items-center gap-2 overflow-hidden p-2 text-left h-8 text-sm rounded-xl mb-1 flex items-center gap-3 px-4 py-3 
                                                                         {{ request()->routeIs('ticket.record.*')
@@ -622,7 +622,7 @@
                                 <span class="font-medium">Support Desk</span>
                             </a>
                         </li>
-                         @endcan
+                         @endcan --}}
 
 
                              @can('ticket raise')
@@ -1083,22 +1083,22 @@ if ($crmAccessible) {
     } 
 
 
-     if(auth()->user()->can('ticket records')) {
-        $navItems[] = [
-            'name' => 'Support Desk',
-            'route' => route('ticket.record.index'),
-            'icon' => ' <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
-        <path d="M8 3h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/>
-                  <path d="M10 7h4"/>
-                  <path d="M10 11h4"/>
-                  <path d="M10 15h2"/>
-                  <path d="M16 3v4"/>
-                    <path d="M8 3v2"/>
-                   </svg>',
-            'active' => request()->routeIs('ticket.record.index'),
-            'index' => $index++
-        ];
-    } 
+    //  if(auth()->user()->can('ticket records')) {
+    //     $navItems[] = [
+    //         'name' => 'Support Desk',
+    //         'route' => route('ticket.record.index'),
+    //         'icon' => ' <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+    //     <path d="M8 3h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/>
+    //               <path d="M10 7h4"/>
+    //               <path d="M10 11h4"/>
+    //               <path d="M10 15h2"/>
+    //               <path d="M16 3v4"/>
+    //                 <path d="M8 3v2"/>
+    //                </svg>',
+    //         'active' => request()->routeIs('ticket.record.index'),
+    //         'index' => $index++
+    //     ];
+    // } 
 
 
        if(auth()->user()->can('ticket raise')) {

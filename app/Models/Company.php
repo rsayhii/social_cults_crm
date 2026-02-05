@@ -28,6 +28,7 @@ class Company extends Model
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'trial_ends_at'=> 'datetime',
     ];
 
     public function user(): BelongsTo

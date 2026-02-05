@@ -118,18 +118,7 @@
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Category</label>
-                            <select name="category" required
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
-                                <option value="website">Website Issue</option>
-                                <option value="social-media">Social Media</option>
-                                <option value="ads-manager">Ads Manager</option>
-                                <option value="billing">Billing</option>
-                                <option value="others">Other</option>
-                            </select>
-                        </div>
-                        <div>
+                        <div class="md:col-span-2">
                             <label class="block text-sm font-medium text-gray-700">Priority</label>
                             <select name="priority" required
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
@@ -138,6 +127,18 @@
                                 <option value="high">High</option>
                                 <option value="urgent">Urgent</option>
                             </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Permissions Related <span class="text-xs text-gray-500 mt-1">( Select the exact permissions where you face issues. )</span></label>
+                        <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                            @foreach(($permissions ?? []) as $perm)
+                                <label class="flex items-center gap-2 text-sm text-gray-700 border rounded-lg px-3 py-2">
+                                    <input type="checkbox" name="permissions[]" value="{{ $perm }}" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+                                    <span>{{ ucwords(str_replace(['-', '_'], ' ', $perm)) }}</span>
+                                </label>
+                            @endforeach
                         </div>
                     </div>
 

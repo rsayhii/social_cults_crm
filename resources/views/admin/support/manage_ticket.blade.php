@@ -1,4 +1,6 @@
-@extends('components.layout')
+@extends('superadmin.layout.app')
+
+@section('title', 'Dashboard')
 
 @section('content')
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -189,6 +191,20 @@
                                 {{ ucfirst($ticket->category) }}
                             </dd>
                         </div>
+                        @if(is_array($ticket->issue_permissions) && count($ticket->issue_permissions) > 0)
+                        <div class="border-b border-gray-50 pb-2">
+                            <dt class="text-gray-500">Issue-Facing Items</dt>
+                            <dd class="mt-2">
+                                <div class="flex flex-wrap gap-2">
+                                    @foreach($ticket->issue_permissions as $perm)
+                                        <span class="px-2 py-1 text-xs rounded-lg bg-gray-100 text-gray-700">
+                                            {{ ucwords(str_replace(['-', '_'], ' ', $perm)) }}
+                                        </span>
+                                    @endforeach
+                                </div>
+                            </dd>
+                        </div>
+                        @endif
                         <div class="flex justify-between border-b border-gray-50 pb-2">
                             <dt class="text-gray-500">Company</dt>
                             <dd class="font-medium text-gray-900 text-right truncate pl-4">
