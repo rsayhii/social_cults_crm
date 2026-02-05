@@ -110,7 +110,7 @@ Route::middleware(['auth', CheckCompanyAccess::class])->group(function () {
     });
 
     // Remove ALL other role routes and keep only this:
-// Route::middleware('permission:roles')->group(function () {
+Route::middleware('permission:roles')->group(function () {
     Route::get('/roles', [RolesController::class, 'index'])->name('roles');
     Route::get('/roles/create', [RolesController::class, 'create'])->name('roles.create');
     Route::post('/roles', [RolesController::class, 'store'])->name('roles.store');
@@ -118,11 +118,11 @@ Route::middleware(['auth', CheckCompanyAccess::class])->group(function () {
     Route::get('/roles/{id}/edit', [RolesController::class, 'edit'])->name('roles.edit');
     Route::put('/roles/{id}', [RolesController::class, 'update'])->name('roles.update');
     Route::delete('/roles/{id}', [RolesController::class, 'destroy'])->name('roles.destroy');
-    // });
+    });
 
 
     // Users
-// Route::middleware('permission:users')->group(function () {
+Route::middleware('permission:users')->group(function () {
     Route::get('/users', [UserController::class, 'index'])->name('users');
     Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
     Route::post('/users', [UserController::class, 'store'])->name('users.store');  // Simplified path
@@ -130,7 +130,7 @@ Route::middleware(['auth', CheckCompanyAccess::class])->group(function () {
     Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');  // Fixed path
     Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');  // Fixed path
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');  // Fixed to DELETE
-// });
+});
 
 
 
