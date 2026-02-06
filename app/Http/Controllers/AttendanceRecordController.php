@@ -17,7 +17,7 @@ class AttendanceRecordController extends Controller
     {
         $now = Carbon::now();
         $currentMonth = $now->month;
-        $currentYear  = $now->year;
+        $currentYear = $now->year;
         $currentMonthYear = $now->format('Y-m');
 
         // 1️⃣ Fetch attendance for current company & month
@@ -30,9 +30,9 @@ class AttendanceRecordController extends Controller
         $totalRecords = $monthlyAttendances->count();
 
         // 2️⃣ Summary cards
-        $totalPresent  = $monthlyAttendances->where('status', 'Present')->count();
-        $totalAbsent   = $monthlyAttendances->where('status', 'Absent')->count();
-        $totalHalfDay  = $monthlyAttendances->where('status', 'Half Day')->count();
+        $totalPresent = $monthlyAttendances->where('status', 'Present')->count();
+        $totalAbsent = $monthlyAttendances->where('status', 'Absent')->count();
+        $totalHalfDay = $monthlyAttendances->where('status', 'Half Day')->count();
 
         $totalEmployees = $monthlyAttendances->unique('employee_id')->count();
 
@@ -45,14 +45,23 @@ class AttendanceRecordController extends Controller
             ->distinct('employee_id')
             ->count('employee_id');
 
+        // Count total clients for this company
+        $totalClients = \App\Models\Client::where('company_id', auth()->user()->company_id)->count();
+
+        // Count total contacts for this company
+        $totalContacts = \App\Models\Contact::where('company_id', auth()->user()->company_id)->count();
+
+
         $totalSummary = [
             'total_employees' => $totalEmployees,
-            'total_records'   => $totalRecords,
-            'present_today'   => $presentToday,
-            'present_count'   => $totalPresent,
-            'absent_count'    => $totalAbsent,
-            'half_day_count'  => $totalHalfDay,
-            
+            'total_records' => $totalRecords,
+            'present_today' => $presentToday,
+            'total_clients' => $totalClients,
+            'total_contacts' => $totalContacts,
+            'present_count' => $totalPresent,
+            'absent_count' => $totalAbsent,
+            'half_day_count' => $totalHalfDay,
+
             'present_percent' => $totalRecords > 0
                 ? round(($totalPresent / $totalRecords) * 100, 1)
                 : 0,
@@ -73,10 +82,10 @@ class AttendanceRecordController extends Controller
                 $employee = $records->first()->employee;
 
                 return [
-                    'employee_id'    => $employee->id ?? null,
-                    'employee_name'  => $employee->name ?? 'N/A',
-                    'present_count'  => $records->where('status', 'Present')->count(),
-                    'absent_count'   => $records->where('status', 'Absent')->count(),
+                    'employee_id' => $employee->id ?? null,
+                    'employee_name' => $employee->name ?? 'N/A',
+                    'present_count' => $records->where('status', 'Present')->count(),
+                    'absent_count' => $records->where('status', 'Absent')->count(),
                     'half_day_count' => $records->where('status', 'Half Day')->count(),
                 ];
             })
@@ -85,8 +94,8 @@ class AttendanceRecordController extends Controller
 
         // 4️⃣ Employees dropdown
         $employees = $employeeSummaries
-            ->map(fn ($e) => [
-                'id'   => $e['employee_id'],
+            ->map(fn($e) => [
+                'id' => $e['employee_id'],
                 'name' => $e['employee_name'],
             ])
             ->unique('id')
@@ -107,7 +116,7 @@ class AttendanceRecordController extends Controller
     {
         $request->validate([
             'employee_id' => 'required|integer',
-            'month'       => 'required|date_format:Y-m',
+            'month' => 'required|date_format:Y-m',
         ]);
 
         return $this->baseQuery()
