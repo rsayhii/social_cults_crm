@@ -13,8 +13,16 @@ class CompanyController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $companies = Company::where('user_id', $user->id)->get();
-        
+
+        if (!$user->company_id) {
+            return response()->json([
+                'success' => true,
+                'companies' => []
+            ]);
+        }
+
+        $companies = Company::where('id', $user->company_id)->get();
+
         return response()->json([
             'success' => true,
             'companies' => $companies
@@ -31,9 +39,9 @@ class CompanyController extends Controller
             'bank_details' => 'nullable|string',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048'
         ]);
-        
+
         $user = Auth::user();
-        
+
         $logoPath = null;
         if ($request->hasFile('logo')) {
             $logoPath = $request->file('logo')->store('company-logos', 'public');
@@ -43,14 +51,14 @@ class CompanyController extends Controller
             if (preg_match('/^data:image\/(\w+);base64,/', $imageData, $type)) {
                 $data = substr($imageData, strpos($imageData, ',') + 1);
                 $type = strtolower($type[1]); // jpg, png, gif
-                
+
                 if (!in_array($type, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
                     return response()->json([
                         'success' => false,
                         'message' => 'Invalid image type'
                     ], 422);
                 }
-                
+
                 $data = base64_decode($data);
                 if ($data === false) {
                     return response()->json([
@@ -58,43 +66,50 @@ class CompanyController extends Controller
                         'message' => 'Failed to decode base64 image'
                     ], 422);
                 }
-                
+
                 $imageName = 'company-logos/' . Str::random(20) . '.' . $type;
                 Storage::disk('public')->put($imageName, $data);
                 $logoPath = $imageName;
             }
         }
-        
+
         $companyData = [
             'name' => $request->name,
             'address' => $request->address,
             'contact' => $request->contact,
             'gstin' => $request->gstin,
             'bank_details' => $request->bank_details,
-            'user_id' => $user->id
         ];
-        
+
         if ($logoPath) {
             $companyData['logo'] = $logoPath;
         }
-        
+
         if ($request->company_id) {
-            $company = Company::where('id', $request->company_id)
-                ->where('user_id', $user->id)
-                ->firstOrFail();
-                
+            // Verify ownership
+            if ($user->company_id != $request->company_id) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+            }
+
+            $company = Company::findOrFail($request->company_id);
+
             // Delete old logo if new one uploaded
             if ($logoPath && $company->logo) {
                 Storage::disk('public')->delete($company->logo);
             }
-            
+
             $company->update($companyData);
             $message = 'Company updated successfully!';
         } else {
             $company = Company::create($companyData);
+
+            // Assign company to user
+            $user->company_id = $company->id;
+            $user->save();
+
             $message = 'Company created successfully!';
         }
-        
+
         return response()->json([
             'success' => true,
             'message' => $message,
@@ -105,16 +120,19 @@ class CompanyController extends Controller
     public function destroy($id)
     {
         $user = Auth::user();
-        $company = Company::where('id', $id)
-            ->where('user_id', $user->id)
-            ->firstOrFail();
-            
+
+        if ($user->company_id != $id) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        $company = Company::findOrFail($id);
+
         if ($company->logo) {
             Storage::disk('public')->delete($company->logo);
         }
-        
+
         $company->delete();
-        
+
         return response()->json([
             'success' => true,
             'message' => 'Company deleted successfully!'
@@ -124,19 +142,27 @@ class CompanyController extends Controller
     public function getSignature()
     {
         $user = Auth::user();
-        $company = Company::where('user_id', $user->id)->first();
-        
+
+        if (!$user->company_id) {
+            return response()->json([
+                'success' => false,
+                'signature' => null
+            ]);
+        }
+
+        $company = Company::find($user->company_id);
+
         if (!$company) {
             return response()->json([
                 'success' => false,
                 'signature' => null
             ]);
         }
-        
+
         // In a real app, you might store signature separately
-        // For now, we'll return null
+        // For now, we'll return null or fetch from somewhere else if needed
         $signature = null;
-        
+
         return response()->json([
             'success' => true,
             'signature' => $signature
@@ -148,20 +174,28 @@ class CompanyController extends Controller
         $request->validate([
             'signature' => 'required|string'
         ]);
-        
+
         $user = Auth::user();
-        $company = Company::where('user_id', $user->id)->first();
-        
+
+        if (!$user->company_id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No company associated with user'
+            ], 404);
+        }
+
+        $company = Company::find($user->company_id);
+
         if (!$company) {
             return response()->json([
                 'success' => false,
                 'message' => 'No company found'
             ], 404);
         }
-        
+
         // Store signature in user settings or separate table
         // For now, we'll just return success
-        
+
         return response()->json([
             'success' => true,
             'message' => 'Signature saved successfully!'

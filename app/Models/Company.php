@@ -5,30 +5,31 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class Company extends Model
 {
-   protected $fillable = [
-    'name',
-    'slug',
-    'address',
-    'email',
-    'phone',
-    'gstin',
-    'bank_name',
-    'account_number',
-    'ifsc_code',
-    'trial_ends_at',
-    'is_paid',
-    'status',
-];
+    protected $fillable = [
+        'name',
+        'slug',
+        'address',
+        'email',
+        'phone',
+        'gstin',
+        'bank_name',
+        'account_number',
+        'ifsc_code',
+        'trial_ends_at',
+        'is_paid',
+        'status',
+    ];
 
 
 
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'trial_ends_at'=> 'datetime',
+        'trial_ends_at' => 'datetime',
     ];
 
     public function user(): BelongsTo
@@ -50,12 +51,16 @@ class Company extends Model
     }
 
     protected static function booted()
-{
-    static::creating(function ($company) {
-        if (!$company->trial_ends_at) {
-            $company->trial_ends_at = now()->addDays(30);
-        }
-    });
-}
+    {
+        static::creating(function ($company) {
+            if (empty($company->slug)) {
+                $company->slug = Str::slug($company->name) . '-' . uniqid();
+            }
+
+            if (!$company->trial_ends_at) {
+                $company->trial_ends_at = now()->addDays(30);
+            }
+        });
+    }
 
 }
