@@ -36,14 +36,23 @@ class AttendanceRecordController extends Controller
 
         $totalEmployees = $monthlyAttendances->unique('employee_id')->count();
 
+
+        // Count employees present TODAY
+        $today = Carbon::today();
+        $presentToday = $this->baseQuery()
+            ->whereDate('date', $today)
+            ->where('status', 'Present')
+            ->distinct('employee_id')
+            ->count('employee_id');
+
         $totalSummary = [
             'total_employees' => $totalEmployees,
             'total_records'   => $totalRecords,
-
+            'present_today'   => $presentToday,
             'present_count'   => $totalPresent,
             'absent_count'    => $totalAbsent,
             'half_day_count'  => $totalHalfDay,
-
+            
             'present_percent' => $totalRecords > 0
                 ? round(($totalPresent / $totalRecords) * 100, 1)
                 : 0,
