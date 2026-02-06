@@ -29,25 +29,25 @@ class NoteController extends Controller
     {
         $user = Auth::user();
 
-      $query = Note::with('user')
-    ->where('company_id', auth()->user()->company_id)
-    ->where(function ($q) use ($user) {
+        $query = Note::with('user')
+            ->where('company_id', auth()->user()->company_id)
+            ->where(function ($q) use ($user) {
 
-        if ($user->hasRole('admin')) {
-            return;
-        }
+                if ($user->hasRole('admin')) {
+                    return;
+                }
 
-        $q->whereIn('visibility', ['public', 'team'])
+                $q->whereIn('visibility', ['public', 'team'])
 
-          ->orWhere(function ($q) use ($user) {
-              $q->where('visibility', 'private')
-                ->where('user_id', $user->id);
-          })
-          ->orWhere(function ($q) use ($user) {
-              $q->where('visibility', 'team')
-                ->whereJsonContains('teams', $user->teams ?? []);
-          });
-    });
+                    ->orWhere(function ($q) use ($user) {
+                        $q->where('visibility', 'private')
+                            ->where('user_id', $user->id);
+                    })
+                    ->orWhere(function ($q) use ($user) {
+                        $q->where('visibility', 'team')
+                            ->whereJsonContains('teams', $user->teams ?? []);
+                    });
+            });
 
 
         // -------- FILTERS --------
@@ -59,7 +59,7 @@ class NoteController extends Controller
 
                 case 'team':
                     $query->where('visibility', 'team')
-                          ->whereJsonContains('teams', $user->teams ?? []);
+                        ->whereJsonContains('teams', $user->teams ?? []);
                     break;
 
                 case 'pinned':
@@ -87,7 +87,7 @@ class NoteController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('content', 'like', "%{$search}%");
+                    ->orWhere('content', 'like', "%{$search}%");
             });
         }
 
@@ -129,31 +129,33 @@ class NoteController extends Controller
     {
         $user = Auth::user();
 
-       $baseQuery = Note::where('company_id', auth()->user()->company_id)
-    ->where(function ($q) use ($user) {
-        if ($user->hasRole('admin')) return;
+        $baseQuery = Note::where('company_id', auth()->user()->company_id)
+            ->where(function ($q) use ($user) {
+                if ($user->hasRole('admin'))
+                    return;
 
-        $q->whereIn('visibility', ['public', 'team'])
+                $q->whereIn('visibility', ['public', 'team'])
 
-          ->orWhere('user_id', $user->id)
-          ->orWhere(function ($q) use ($user) {
-              $q->where('visibility', 'team')
-                ->whereJsonContains('teams', $user->teams ?? []);
-          });
-    });
+                    ->orWhere('user_id', $user->id)
+                    ->orWhere(function ($q) use ($user) {
+                        $q->where('visibility', 'team')
+                            ->whereJsonContains('teams', $user->teams ?? []);
+                    });
+            });
 
 
         return response()->json([
-            'total' => $baseQuery->count(),
-           'my_notes' => Note::where('company_id', $user->company_id)
-                  ->where('user_id', $user->id)
-                  ->count(),
+            'total' => (clone $baseQuery)->count(),
+            'my_notes' => Note::where('company_id', $user->company_id)
+                ->where('user_id', $user->id)
+                ->count(),
 
-            'team_notes' => $baseQuery->where('visibility', 'team')->count(),
-            'pinned' => $baseQuery->where('pinned', true)->count(),
-            'recent' => $baseQuery->where('updated_at', '>=', now()->subDays(7))->count(),
+            'team_notes' => (clone $baseQuery)->where('visibility', 'team')->count(),
+            'pinned' => (clone $baseQuery)->where('pinned', true)->count(),
+            'recent' => (clone $baseQuery)->where('updated_at', '>=', now()->subDays(7))->count(),
         ]);
     }
+
 
     // =========================
     // SHOW SINGLE NOTE
@@ -164,7 +166,7 @@ class NoteController extends Controller
             ->with('user')
             ->findOrFail($id);
 
-$this->authorize('manage', $note);
+        $this->authorize('manage', $note);
 
 
         if (!$this->canViewNote($note)) {
@@ -218,10 +220,10 @@ $this->authorize('manage', $note);
         $note = Note::where('company_id', auth()->user()->company_id)
             ->findOrFail($id);
 
-$this->authorize('manage', $note);
+        $this->authorize('manage', $note);
 
 
-      
+
 
         $note->update($request->only([
             'title',
@@ -247,10 +249,10 @@ $this->authorize('manage', $note);
         $note = Note::where('company_id', auth()->user()->company_id)
             ->findOrFail($id);
 
-$this->authorize('manage', $note);
+        $this->authorize('manage', $note);
 
 
-      
+
 
         $note->delete();
 
@@ -265,9 +267,9 @@ $this->authorize('manage', $note);
         $note = Note::where('company_id', auth()->user()->company_id)
             ->findOrFail($id);
 
-$this->authorize('manage', $note);
+        $this->authorize('manage', $note);
 
-        
+
 
         $note->update(['pinned' => !$note->pinned]);
 
@@ -280,26 +282,28 @@ $this->authorize('manage', $note);
     // =========================
     // PERMISSION CHECK
     // =========================
-   private function canViewNote(Note $note)
-{
-    $user = Auth::user();
+    private function canViewNote(Note $note)
+    {
+        $user = Auth::user();
 
-    if ($user->hasRole('admin')) return true;
+        if ($user->hasRole('admin'))
+            return true;
 
-    if ($note->visibility === 'public') return true;
+        if ($note->visibility === 'public')
+            return true;
 
-    if ($note->visibility === 'private' && $note->user_id === $user->id) {
-        return true;
+        if ($note->visibility === 'private' && $note->user_id === $user->id) {
+            return true;
+        }
+
+        if ($note->visibility === 'team') {
+            return count(array_intersect(
+                $user->teams ?? [],
+                $note->teams ?? []
+            )) > 0;
+        }
+
+        return false;
     }
-
-    if ($note->visibility === 'team') {
-        return count(array_intersect(
-            $user->teams ?? [],
-            $note->teams ?? []
-        )) > 0;
-    }
-
-    return false;
-}
 
 }
