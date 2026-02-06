@@ -1,8 +1,7 @@
 {{-- resources/views/reports/index.blade.php --}}
 @extends('components.layout')
 @section('content')
-<!-- CSRF Token for AJAX -->
-<meta name="csrf-token" content="{{ csrf_token() }}">
+
 <!-- Page Content -->
 <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Report List Page -->
@@ -699,7 +698,7 @@
     };
     let searchTimeout;
     // CSRF Token for AJAX requests
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    const reportCsrfToken = document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').getAttribute('content') : '';
     // Delete modal variables
     let reportIdToDelete = null;
     // Initialize the application
@@ -873,7 +872,7 @@
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken,
+                    'X-CSRF-TOKEN': reportCsrfToken,
                     'X-Requested-With': 'XMLHttpRequest'
                 },
                 body: JSON.stringify(reportData)
@@ -897,7 +896,7 @@
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken,
+                    'X-CSRF-TOKEN': reportCsrfToken,
                     'X-Requested-With': 'XMLHttpRequest'
                 },
                 body: JSON.stringify(reportData)
@@ -920,7 +919,7 @@
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken,
+                    'X-CSRF-TOKEN': reportCsrfToken,
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             });
