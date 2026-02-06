@@ -196,6 +196,135 @@
                         overflow: auto;
                     }
                 }
+
+                /* Toast Notification Styles */
+                #toast-container {
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    z-index: 9999;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                    max-width: 400px;
+                }
+
+                .toast {
+                    background: white;
+                    border-radius: 12px;
+                    padding: 16px 20px;
+                    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    animation: slideInRight 0.3s ease-out;
+                    min-width: 300px;
+                    border-left: 4px solid;
+                }
+
+                .toast.success {
+                    border-left-color: #10b981;
+                }
+
+                .toast.error {
+                    border-left-color: #ef4444;
+                }
+
+                .toast.info {
+                    border-left-color: #3b82f6;
+                }
+
+                .toast-icon {
+                    width: 24px;
+                    height: 24px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    flex-shrink: 0;
+                }
+
+                .toast.success .toast-icon {
+                    background-color: #d1fae5;
+                    color: #10b981;
+                }
+
+                .toast.error .toast-icon {
+                    background-color: #fee2e2;
+                    color: #ef4444;
+                }
+
+                .toast.info .toast-icon {
+                    background-color: #dbeafe;
+                    color: #3b82f6;
+                }
+
+                .toast-content {
+                    flex: 1;
+                }
+
+                .toast-message {
+                    font-weight: 500;
+                    color: #1f2937;
+                    font-size: 14px;
+                }
+
+                .toast-close {
+                    cursor: pointer;
+                    color: #9ca3af;
+                    background: none;
+                    border: none;
+                    padding: 4px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: color 0.2s;
+                }
+
+                .toast-close:hover {
+                    color: #4b5563;
+                }
+
+                @keyframes slideInRight {
+                    from {
+                        transform: translateX(400px);
+                        opacity: 0;
+                    }
+
+                    to {
+                        transform: translateX(0);
+                        opacity: 1;
+                    }
+                }
+
+                @keyframes slideOutRight {
+                    from {
+                        transform: translateX(0);
+                        opacity: 1;
+                    }
+
+                    to {
+                        transform: translateX(400px);
+                        opacity: 0;
+                    }
+                }
+
+                .toast.removing {
+                    animation: slideOutRight 0.3s ease-out forwards;
+                }
+
+                /* Mobile responsive toast */
+                @media (max-width: 640px) {
+                    #toast-container {
+                        left: 10px;
+                        right: 10px;
+                        max-width: none;
+                    }
+
+                    .toast {
+                        min-width: auto;
+                    }
+                }
             </style>
 
             <div class="bg-gray-50">
@@ -722,6 +851,9 @@
                 </div>
             </div>
 
+            <!-- Toast Notification Container -->
+            <div id="toast-container"></div>
+
             <!-- JavaScript -->
             <script>
                 // Notes Management System with Database Integration
@@ -731,6 +863,59 @@
                 let noteToDelete = null;
                 let noteDetailId = null;
                 let notepadCsrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+                // Toast Notification Function
+                function showToast(message, type = 'success') {
+                    const container = document.getElementById('toast-container');
+
+                    // Create toast element
+                    const toast = document.createElement('div');
+                    toast.className = `toast ${type}`;
+
+                    // Determine icon based on type
+                    let icon = '';
+                    if (type === 'success') {
+                        icon = 'fa-check';
+                    } else if (type === 'error') {
+                        icon = 'fa-times';
+                    } else if (type === 'info') {
+                        icon = 'fa-info';
+                    }
+
+                    toast.innerHTML = `
+                                <div class="toast-icon">
+                                    <i class="fas ${icon}"></i>
+                                </div>
+                                <div class="toast-content">
+                                    <div class="toast-message">${message}</div>
+                                </div>
+                                <button class="toast-close">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            `;
+
+                    // Add to container
+                    container.appendChild(toast);
+
+                    // Close button functionality
+                    const closeBtn = toast.querySelector('.toast-close');
+                    closeBtn.addEventListener('click', () => {
+                        removeToast(toast);
+                    });
+
+                    // Auto remove after 3 seconds
+                    setTimeout(() => {
+                        removeToast(toast);
+                    }, 3000);
+                }
+
+                // Remove toast with animation
+                function removeToast(toast) {
+                    toast.classList.add('removing');
+                    setTimeout(() => {
+                        toast.remove();
+                    }, 300);
+                }
 
                 // Initialize the application
                 document.addEventListener('DOMContentLoaded', function () {
@@ -1079,57 +1264,57 @@
                         : contentPreview;
 
                     noteDiv.innerHTML = `
-                                            <div class="${currentView === 'list' ? 'flex-1' : ''}">
-                                                <!-- Note Header -->
-                                                <div class="flex justify-between items-start mb-3">
-                                                    <div class="flex-1">
-                                                        <h3 class="font-bold text-gray-800 ${currentView === 'list' ? 'text-lg' : ''}">${note.title}</h3>
-                                                        <div class="flex flex-wrap items-center mt-1 gap-1">
-                                                            <span class="${categoryColor} category-badge">${getCategoryName(note.category)}</span>
-                                                            <span class="${visibilityInfo.color} tag-badge">
-                                                                <i class="fas ${visibilityInfo.icon} mr-1"></i>${note.visibility}
-                                                            </span>
-                                                            ${note.pinned ? '<span class="bg-yellow-100 text-yellow-800 tag-badge"><i class="fas fa-thumbtack mr-1"></i>Pinned</span>' : ''}
-                                                        </div>
-                                                    </div>
-                                                    <div class="flex gap-1 ml-2">
-                                                        <button class="note-pin-btn p-1.5 text-gray-400 hover:text-yellow-500 rounded-lg hover:bg-yellow-50" title="${note.pinned ? 'Unpin' : 'Pin'}">
-                                                            <i class="fas fa-thumbtack ${note.pinned ? 'text-yellow-500' : ''}"></i>
-                                                        </button>
-                                                        <button class="note-edit-btn p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50" title="Edit">
-                                                            <i class="fas fa-edit"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
+                                                                <div class="${currentView === 'list' ? 'flex-1' : ''}">
+                                                                    <!-- Note Header -->
+                                                                    <div class="flex justify-between items-start mb-3">
+                                                                        <div class="flex-1">
+                                                                            <h3 class="font-bold text-gray-800 ${currentView === 'list' ? 'text-lg' : ''}">${note.title}</h3>
+                                                                            <div class="flex flex-wrap items-center mt-1 gap-1">
+                                                                                <span class="${categoryColor} category-badge">${getCategoryName(note.category)}</span>
+                                                                                <span class="${visibilityInfo.color} tag-badge">
+                                                                                    <i class="fas ${visibilityInfo.icon} mr-1"></i>${note.visibility}
+                                                                                </span>
+                                                                                ${note.pinned ? '<span class="bg-yellow-100 text-yellow-800 tag-badge"><i class="fas fa-thumbtack mr-1"></i>Pinned</span>' : ''}
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="flex gap-1 ml-2">
+                                                                            <button class="note-pin-btn p-1.5 text-gray-400 hover:text-yellow-500 rounded-lg hover:bg-yellow-50" title="${note.pinned ? 'Unpin' : 'Pin'}">
+                                                                                <i class="fas fa-thumbtack ${note.pinned ? 'text-yellow-500' : ''}"></i>
+                                                                            </button>
+                                                                            <button class="note-edit-btn p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50" title="Edit">
+                                                                                <i class="fas fa-edit"></i>
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
 
-                                                <!-- Note Content Preview -->
-                                                <p class="text-gray-600 mb-4 whitespace-pre-line ${currentView === 'list' ? '' : 'h-16 sm:h-20 overflow-hidden'}">${contentPreview}</p>
+                                                                    <!-- Note Content Preview -->
+                                                                    <p class="text-gray-600 mb-4 whitespace-pre-line ${currentView === 'list' ? '' : 'h-16 sm:h-20 overflow-hidden'}">${contentPreview}</p>
 
-                                                <!-- Tags -->
-                                                <div class="mb-4">
-                                                    <div class="flex flex-wrap gap-1">
-                                                        ${tags && tags.length > 0 ? tags.map(tag => `
-                                                            <span class="bg-gray-100 text-gray-700 tag-badge">${tag}</span>
-                                                        `).join('') : ''}
-                                                    </div>
-                                                </div>
+                                                                    <!-- Tags -->
+                                                                    <div class="mb-4">
+                                                                        <div class="flex flex-wrap gap-1">
+                                                                            ${tags && tags.length > 0 ? tags.map(tag => `
+                                                                                <span class="bg-gray-100 text-gray-700 tag-badge">${tag}</span>
+                                                                            `).join('') : ''}
+                                                                        </div>
+                                                                    </div>
 
-                                                <!-- Note Footer -->
-                                                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pt-3 border-t border-gray-100">
-                                                    <div class="flex items-center">
-                                                        <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mr-2">
-                                                            <span class="text-blue-700 text-xs font-medium">${(note.user?.name?.charAt(0) || note.created_by?.charAt(0) || 'U')}</span>
-                                                        </div>
-                                                        <span class="text-sm text-gray-700">${note.user?.name || note.created_by || 'User'}</span>
-                                                        <span class="text-xs text-gray-500 mx-2">•</span>
-                                                        <span class="text-xs text-gray-500">${formatDate(note.created_at)}</span>
-                                                    </div>
-                                                    <button class="note-view-btn px-3 py-1 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700">
-                                                        View
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        `;
+                                                                    <!-- Note Footer -->
+                                                                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pt-3 border-t border-gray-100">
+                                                                        <div class="flex items-center">
+                                                                            <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mr-2">
+                                                                                <span class="text-blue-700 text-xs font-medium">${(note.user?.name?.charAt(0) || note.created_by?.charAt(0) || 'U')}</span>
+                                                                            </div>
+                                                                            <span class="text-sm text-gray-700">${note.user?.name || note.created_by || 'User'}</span>
+                                                                            <span class="text-xs text-gray-500 mx-2">•</span>
+                                                                            <span class="text-xs text-gray-500">${formatDate(note.created_at)}</span>
+                                                                        </div>
+                                                                        <button class="note-view-btn px-3 py-1 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700">
+                                                                            View
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            `;
 
                     // Add event listeners
                     const viewBtn = noteDiv.querySelector('.note-view-btn');
@@ -1213,128 +1398,128 @@
                     }
 
                     detailContent.innerHTML = `
-                                            <!-- Note Header -->
-                                            <div class="bg-white rounded-xl shadow p-4 sm:p-6 mb-6">
-                                                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                                                    <div>
-                                                        <h2 class="text-xl sm:text-2xl font-bold text-gray-800 mb-2">${note.title}</h2>
-                                                        <div class="flex flex-wrap items-center gap-2">
-                                                            <span class="${categoryColor} category-badge">${getCategoryName(note.category)}</span>
-                                                            <span class="${visibilityInfo.color} tag-badge">
-                                                                <i class="fas ${visibilityInfo.icon} mr-1"></i>${note.visibility}
-                                                            </span>
-                                                            ${note.pinned ? '<span class="bg-yellow-100 text-yellow-800 tag-badge"><i class="fas fa-thumbtack mr-1"></i>Pinned</span>' : ''}
-                                                            <span class="text-gray-600 text-sm sm:text-base"><i class="far fa-clock mr-1"></i> ${formatDate(note.created_at)}</span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="mt-4 lg:mt-0 flex flex-wrap gap-2">
-                                                        <button id="detail-pin-btn" class="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium flex-1 sm:flex-none">
-                                                            <i class="fas fa-thumbtack mr-2"></i> <span id="pin-text">${note.pinned ? 'Unpin' : 'Pin'}</span>
-                                                        </button>
-                                                        <button id="detail-edit-btn" class="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium flex-1 sm:flex-none">
-                                                            <i class="fas fa-edit mr-2"></i> Edit
-                                                        </button>
-                                                        <button id="detail-delete-btn" class="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium flex-1 sm:flex-none">
-                                                            <i class="fas fa-trash-alt mr-2"></i> Delete
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-- Main Content Grid -->
-                                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-                                                <!-- Left Column -->
-                                                <div class="lg:col-span-2 space-y-4 sm:space-y-6">
-                                                    <!-- Note Content -->
-                                                    <div class="bg-white rounded-xl shadow p-4 sm:p-6">
-                                                        <h3 class="text-lg font-bold text-gray-800 mb-4">Note Content</h3>
-                                                        <div class="prose max-w-none">
-                                                            ${note.content || 'No content available'}
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Tags -->
-                                                    ${tags && tags.length > 0 ? `
-                                                        <div class="bg-white rounded-xl shadow p-4 sm:p-6">
-                                                            <h3 class="text-lg font-bold text-gray-800 mb-4">Tags</h3>
-                                                            <div class="flex flex-wrap gap-2">
-                                                                ${tags.map(tag => `
-                                                                    <span class="bg-gray-100 text-gray-700 tag-badge">${tag}</span>
-                                                                `).join('')}
-                                                            </div>
-                                                        </div>
-                                                    ` : ''}
-                                                </div>
-
-                                                <!-- Right Column -->
-                                                <div class="space-y-4 sm:space-y-6">
-                                                    <!-- Note Metadata -->
-                                                    <div class="bg-white rounded-xl shadow p-4 sm:p-6">
-                                                        <h3 class="text-lg font-bold text-gray-800 mb-4">Note Details</h3>
-                                                        <div class="space-y-4">
-                                                            <div>
-                                                                <p class="text-gray-500 text-sm">Created By</p>
-                                                                <div class="flex items-center mt-1">
-                                                                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                                                                        <span class="text-blue-700 text-sm font-medium">${(note.user?.name?.charAt(0) || note.created_by?.charAt(0) || 'U')}</span>
-                                                                    </div>
-                                                                    <p class="font-medium">${note.user?.name || note.created_by || 'User'}</p>
-                                                                </div>
-                                                            </div>
-                                                            <div>
-                                                                <p class="text-gray-500 text-sm">Created</p>
-                                                                <p class="font-medium">${formatDate(note.created_at)}</p>
-                                                            </div>
-                                                            <div>
-                                                                <p class="text-gray-500 text-sm">Last Updated</p>
-                                                                <p class="font-medium">${formatDate(note.updated_at)}</p>
-                                                            </div>
-                                                            <div>
-                                                                <p class="text-gray-500 text-sm">Visibility</p>
-                                                                <p class="font-medium"><span class="${visibilityInfo.color} tag-badge"><i class="fas ${visibilityInfo.icon} mr-1"></i>${note.visibility.charAt(0).toUpperCase() + note.visibility.slice(1)}</span></p>
-                                                            </div>
-                                                            ${teams && teams.length > 0 ? `
-                                                                <div>
-                                                                    <p class="text-gray-500 text-sm">Shared with Teams</p>
-                                                                    <div class="flex flex-wrap gap-1 mt-1">
-                                                                        ${teams.map(team => `
-                                                                            <span class="bg-blue-100 text-blue-800 tag-badge">${team.charAt(0).toUpperCase() + team.slice(1)}</span>
-                                                                        `).join('')}
+                                                                <!-- Note Header -->
+                                                                <div class="bg-white rounded-xl shadow p-4 sm:p-6 mb-6">
+                                                                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                                                                        <div>
+                                                                            <h2 class="text-xl sm:text-2xl font-bold text-gray-800 mb-2">${note.title}</h2>
+                                                                            <div class="flex flex-wrap items-center gap-2">
+                                                                                <span class="${categoryColor} category-badge">${getCategoryName(note.category)}</span>
+                                                                                <span class="${visibilityInfo.color} tag-badge">
+                                                                                    <i class="fas ${visibilityInfo.icon} mr-1"></i>${note.visibility}
+                                                                                </span>
+                                                                                ${note.pinned ? '<span class="bg-yellow-100 text-yellow-800 tag-badge"><i class="fas fa-thumbtack mr-1"></i>Pinned</span>' : ''}
+                                                                                <span class="text-gray-600 text-sm sm:text-base"><i class="far fa-clock mr-1"></i> ${formatDate(note.created_at)}</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="mt-4 lg:mt-0 flex flex-wrap gap-2">
+                                                                            <button id="detail-pin-btn" class="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium flex-1 sm:flex-none">
+                                                                                <i class="fas fa-thumbtack mr-2"></i> <span id="pin-text">${note.pinned ? 'Unpin' : 'Pin'}</span>
+                                                                            </button>
+                                                                            <button id="detail-edit-btn" class="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium flex-1 sm:flex-none">
+                                                                                <i class="fas fa-edit mr-2"></i> Edit
+                                                                            </button>
+                                                                            <button id="detail-delete-btn" class="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium flex-1 sm:flex-none">
+                                                                                <i class="fas fa-trash-alt mr-2"></i> Delete
+                                                                            </button>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
-                                                            ` : ''}
-                                                        </div>
-                                                    </div>
 
-                                                    <!-- Related Items -->
-                                                    ${note.related_client || note.related_project || note.related_task ? `
-                                                        <div class="bg-white rounded-xl shadow p-4 sm:p-6">
-                                                            <h3 class="text-lg font-bold text-gray-800 mb-4">Related Items</h3>
-                                                            <div class="space-y-3">
-                                                                ${note.related_client ? `
-                                                                    <div>
-                                                                        <p class="text-gray-500 text-sm">Client</p>
-                                                                        <p class="font-medium">${note.related_client}</p>
+                                                                <!-- Main Content Grid -->
+                                                                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+                                                                    <!-- Left Column -->
+                                                                    <div class="lg:col-span-2 space-y-4 sm:space-y-6">
+                                                                        <!-- Note Content -->
+                                                                        <div class="bg-white rounded-xl shadow p-4 sm:p-6">
+                                                                            <h3 class="text-lg font-bold text-gray-800 mb-4">Note Content</h3>
+                                                                            <div class="prose max-w-none">
+                                                                                ${note.content || 'No content available'}
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <!-- Tags -->
+                                                                        ${tags && tags.length > 0 ? `
+                                                                            <div class="bg-white rounded-xl shadow p-4 sm:p-6">
+                                                                                <h3 class="text-lg font-bold text-gray-800 mb-4">Tags</h3>
+                                                                                <div class="flex flex-wrap gap-2">
+                                                                                    ${tags.map(tag => `
+                                                                                        <span class="bg-gray-100 text-gray-700 tag-badge">${tag}</span>
+                                                                                    `).join('')}
+                                                                                </div>
+                                                                            </div>
+                                                                        ` : ''}
                                                                     </div>
-                                                                ` : ''}
-                                                                ${note.related_project ? `
-                                                                    <div>
-                                                                        <p class="text-gray-500 text-sm">Project</p>
-                                                                        <p class="font-medium">${note.related_project}</p>
+
+                                                                    <!-- Right Column -->
+                                                                    <div class="space-y-4 sm:space-y-6">
+                                                                        <!-- Note Metadata -->
+                                                                        <div class="bg-white rounded-xl shadow p-4 sm:p-6">
+                                                                            <h3 class="text-lg font-bold text-gray-800 mb-4">Note Details</h3>
+                                                                            <div class="space-y-4">
+                                                                                <div>
+                                                                                    <p class="text-gray-500 text-sm">Created By</p>
+                                                                                    <div class="flex items-center mt-1">
+                                                                                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                                                                            <span class="text-blue-700 text-sm font-medium">${(note.user?.name?.charAt(0) || note.created_by?.charAt(0) || 'U')}</span>
+                                                                                        </div>
+                                                                                        <p class="font-medium">${note.user?.name || note.created_by || 'User'}</p>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div>
+                                                                                    <p class="text-gray-500 text-sm">Created</p>
+                                                                                    <p class="font-medium">${formatDate(note.created_at)}</p>
+                                                                                </div>
+                                                                                <div>
+                                                                                    <p class="text-gray-500 text-sm">Last Updated</p>
+                                                                                    <p class="font-medium">${formatDate(note.updated_at)}</p>
+                                                                                </div>
+                                                                                <div>
+                                                                                    <p class="text-gray-500 text-sm">Visibility</p>
+                                                                                    <p class="font-medium"><span class="${visibilityInfo.color} tag-badge"><i class="fas ${visibilityInfo.icon} mr-1"></i>${note.visibility.charAt(0).toUpperCase() + note.visibility.slice(1)}</span></p>
+                                                                                </div>
+                                                                                ${teams && teams.length > 0 ? `
+                                                                                    <div>
+                                                                                        <p class="text-gray-500 text-sm">Shared with Teams</p>
+                                                                                        <div class="flex flex-wrap gap-1 mt-1">
+                                                                                            ${teams.map(team => `
+                                                                                                <span class="bg-blue-100 text-blue-800 tag-badge">${team.charAt(0).toUpperCase() + team.slice(1)}</span>
+                                                                                            `).join('')}
+                                                                                        </div>
+                                                                                    </div>
+                                                                                ` : ''}
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <!-- Related Items -->
+                                                                        ${note.related_client || note.related_project || note.related_task ? `
+                                                                            <div class="bg-white rounded-xl shadow p-4 sm:p-6">
+                                                                                <h3 class="text-lg font-bold text-gray-800 mb-4">Related Items</h3>
+                                                                                <div class="space-y-3">
+                                                                                    ${note.related_client ? `
+                                                                                        <div>
+                                                                                            <p class="text-gray-500 text-sm">Client</p>
+                                                                                            <p class="font-medium">${note.related_client}</p>
+                                                                                        </div>
+                                                                                    ` : ''}
+                                                                                    ${note.related_project ? `
+                                                                                        <div>
+                                                                                            <p class="text-gray-500 text-sm">Project</p>
+                                                                                            <p class="font-medium">${note.related_project}</p>
+                                                                                        </div>
+                                                                                    ` : ''}
+                                                                                    ${note.related_task ? `
+                                                                                        <div>
+                                                                                            <p class="text-gray-500 text-sm">Task</p>
+                                                                                            <p class="font-medium">${note.related_task}</p>
+                                                                                        </div>
+                                                                                    ` : ''}
+                                                                                </div>
+                                                                            </div>
+                                                                        ` : ''}
                                                                     </div>
-                                                                ` : ''}
-                                                                ${note.related_task ? `
-                                                                    <div>
-                                                                        <p class="text-gray-500 text-sm">Task</p>
-                                                                        <p class="font-medium">${note.related_task}</p>
-                                                                    </div>
-                                                                ` : ''}
-                                                            </div>
-                                                        </div>
-                                                    ` : ''}
-                                                </div>
-                                            </div>
-                                        `;
+                                                                </div>
+                                                            `;
 
                     // Add event listeners to detail page buttons
                     const pinBtn = document.getElementById('detail-pin-btn');
@@ -1543,11 +1728,11 @@
                         const tagElement = document.createElement('span');
                         tagElement.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800';
                         tagElement.innerHTML = `
-                                                ${tag}
-                                                <button type="button" class="ml-1 text-blue-600 hover:text-blue-800 remove-tag" data-tag="${tag}">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
-                                            `;
+                                                                    ${tag}
+                                                                    <button type="button" class="ml-1 text-blue-600 hover:text-blue-800 remove-tag" data-tag="${tag}">
+                                                                        <i class="fas fa-times"></i>
+                                                                    </button>
+                                                                `;
                         container.appendChild(tagElement);
                     });
                 }
@@ -1654,8 +1839,7 @@
                         .then(data => {
                             if (data.success) {
                                 // Show success message
-                                // alert(data.message);
-                                alert("Note saved successfully");
+                                showToast('Note saved successfully', 'success');
 
                                 // Go to detail view of the note
                                 if (noteId) {
@@ -1728,7 +1912,7 @@
                         })
                         .then(data => {
                             if (data.success) {
-                                alert(data.message);
+                                showToast('Note deleted successfully', 'success');
                                 closeDeleteModal();
                                 showNotesList();
                             }
