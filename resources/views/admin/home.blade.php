@@ -842,7 +842,7 @@
                             <!-- Dashboard Image -->
                             <div class="relative w-full overflow-hidden bg-gray-100">
                                 <img 
-                                    src="{{ asset('assests/view.png') }}" 
+                                    src="{{ asset('assets/view.png') }}" 
                                     alt="Social Cults CRM Dashboard - Tablet View"
                                     class="w-full h-auto object-contain"
                                     loading="lazy"
@@ -989,7 +989,7 @@
                 <div class="lg:w-1/2">
                 <!-- Replace this div with your image -->
                     <img 
-                        src="{{ asset('assests/C3.png') }}" 
+                        src="{{ asset('assets/C3.png') }}" 
                         alt="Mobile App Dashboard Preview"
                         class="w-1/2 max-w-md mx-auto rounded-3xl "
                     >
@@ -1125,7 +1125,12 @@
                     <svg width="24" height="24" fill="white" viewBox="0 0 24 24">
                         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                     </svg>
-                    <img src="{{ asset('assests/crm25-removebg-preview.png') }}" alt="CRM Dashboard" class="mt-4 rounded-lg">
+                    <img 
+                        src="{{ asset('assets/crm25-removebg-preview.png') }}" 
+                        alt="CRM Dashboard"
+                        class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[6.25rem] md:w-[12.5rem] sm:w-[10rem]"
+                    />
+
                 </div>
             </div>
         </div>
@@ -1673,10 +1678,7 @@
     </div>
 </div>
             
-            <div class="mt-12 text-center">
-                <p class="text-gray-600">All plans include a 30-day free trial. No credit card required.</p>
-            </div>
-        </div>
+
     </section>
     
     <!-- FAQ Section -->
