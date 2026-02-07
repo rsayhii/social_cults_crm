@@ -1566,77 +1566,112 @@
                 <p class="text-xl text-gray-600 max-w-3xl mx-auto">Start for free, upgrade as you grow. No hidden fees, no long-term contracts.</p>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 mx-4 md:mx-96">
-                <!-- Pro Plan -->
-                <div class="bg-white rounded-xl shadow-lg border-2 border-primary p-6 pricing-card relative">
-                    <div class="absolute top-0 right-0 bg-primary text-white px-4 py-1 rounded-bl-lg rounded-tr-lg text-sm font-medium">Most Popular</div>
-                    <div class="text-center mb-6">
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">Pro</h3>
-                        <div class="flex justify-center items-baseline mb-4">
-                            <span class="text-3xl font-bold text-gray-800">₹4,999</span>
-                            <span class="text-gray-600 ml-1">/user/month</span>
-                        </div>
-                        <p class="text-gray-600">Advanced features for growing teams</p>
-                    </div>
-                    <ul class="text-gray-600 space-y-3 mb-6">
-                        <li class="flex items-start">
-                            <i class="fas fa-check text-accent mt-1 mr-2"></i>
-                            <span>Up to 50 users</span>
-                        </li>
-                        <li class="flex items-start">
-                            <i class="fas fa-check text-accent mt-1 mr-2"></i>
-                            <span>Advanced analytics</span>
-                        </li>
-                        <li class="flex items-start">
-                            <i class="fas fa-check text-accent mt-1 mr-2"></i>
-                            <span>Sales automation</span>
-                        </li>
-                        <li class="flex items-start">
-                            <i class="fas fa-check text-accent mt-1 mr-2"></i>
-                            <span>Priority support</span>
-                        </li>
-                        <li class="flex items-start">
-                            <i class="fas fa-check text-accent mt-1 mr-2"></i>
-                            <span>Custom reporting</span>
-                        </li>
-                    </ul>
-                    <a href="#" class="start-now-btn block w-full bg-primary hover:bg-secondary text-white text-center py-3 rounded-lg font-medium transition duration-300">Start Now</a>
+            <div class="max-w-6xl mx-auto px-4">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        
+        <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 pricing-card flex flex-col">
+            <div class="text-center mb-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Starter</h3>
+                <div class="flex justify-center items-baseline mb-4">
+                    <span class="text-3xl font-bold text-gray-800">Free</span>
+                    <span class="text-gray-600 ml-1">/ 30 days</span>
                 </div>
-                
-                <!-- Enterprise Plan -->
-                <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 pricing-card">
-                    <div class="text-center mb-6">
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">Enterprise</h3>
-                        <div class="flex justify-center items-baseline mb-4">
-                            <span class="text-3xl font-bold text-gray-800">Custom</span>
-                        </div>
-                        <p class="text-gray-600">Tailored solutions for large organizations</p>
-                    </div>
-                    <ul class="text-gray-600 space-y-3 mb-6">
-                        <li class="flex items-start">
-                            <i class="fas fa-check text-accent mt-1 mr-2"></i>
-                            <span>All Business features</span>
-                        </li>
-                        <li class="flex items-start">
-                            <i class="fas fa-check text-accent mt-1 mr-2"></i>
-                            <span>Enterprise-grade security</span>
-                        </li>
-                        <li class="flex items-start">
-                            <i class="fas fa-check text-accent mt-1 mr-2"></i>
-                            <span>Custom development</span>
-                        </li>
-                        <li class="flex items-start">
-                            <i class="fas fa-check text-accent mt-1 mr-2"></i>
-                            <span>24/7 premium support</span>
-                        </li>
-                        <li class="flex items-start">
-                            <i class="fas fa-check text-accent mt-1 mr-2"></i>
-                            <span>On-premise deployment</span>
-                        </li>
-                    </ul>
-                    <a href="#" class="block w-full bg-gray-100 hover:bg-gray-200 text-gray-800 text-center py-3 rounded-lg font-medium transition duration-300">Contact Sales</a>
-                </div>
+                <p class="text-gray-600">Perfect to explore the platform</p>
             </div>
+            <ul class="text-gray-600 space-y-3 mb-6 flex-grow">
+                <li class="flex items-start">
+                    <i class="fas fa-check text-accent mt-1 mr-2"></i>
+                    <span>Single user access</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-check text-accent mt-1 mr-2"></i>
+                    <span>Basic analytics dashboard</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-check text-accent mt-1 mr-2"></i>
+                    <span>Community support</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-check text-accent mt-1 mr-2"></i>
+                    <span>Standard export limits</span>
+                </li>
+            </ul>
+            <a href="/start-trial" class="block w-full bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white text-center py-3 rounded-lg font-medium transition duration-300">Start Free Trial</a>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-lg border-2 border-primary p-6 pricing-card relative flex flex-col">
+            <div class="absolute top-0 right-0 bg-primary text-white px-4 py-1 rounded-bl-lg rounded-tr-lg text-sm font-medium">Most Popular</div>
+            <div class="text-center mb-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Pro</h3>
+                <div class="flex justify-center items-baseline mb-4">
+                    <span class="text-3xl font-bold text-gray-800">₹4,999</span>
+                    <span class="text-gray-600 ml-1">/user/month</span>
+                </div>
+                <p class="text-gray-600">Advanced features for growing teams</p>
+            </div>
+            <ul class="text-gray-600 space-y-3 mb-6 flex-grow">
+                <li class="flex items-start">
+                    <i class="fas fa-check text-accent mt-1 mr-2"></i>
+                    <span>Up to 50 users</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-check text-accent mt-1 mr-2"></i>
+                    <span>Advanced analytics</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-check text-accent mt-1 mr-2"></i>
+                    <span>Sales automation</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-check text-accent mt-1 mr-2"></i>
+                    <span>Priority support</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-check text-accent mt-1 mr-2"></i>
+                    <span>Custom reporting</span>
+                </li>
+            </ul>
+            <a href="#" class="start-now-btn block w-full bg-primary hover:bg-secondary text-white text-center py-3 rounded-lg font-medium transition duration-300">Start Now</a>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 pricing-card flex flex-col">
+            <div class="text-center mb-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Enterprise</h3>
+                <div class="flex justify-center items-baseline mb-4">
+                    <span class="text-3xl font-bold text-gray-800">Custom</span>
+                </div>
+                <p class="text-gray-600">Tailored solutions for large organizations</p>
+            </div>
+            <ul class="text-gray-600 space-y-3 mb-6 flex-grow">
+                <li class="flex items-start">
+                    <i class="fas fa-check text-accent mt-1 mr-2"></i>
+                    <span>All Business features</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-check text-accent mt-1 mr-2"></i>
+                    <span>Enterprise-grade security</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-check text-accent mt-1 mr-2"></i>
+                    <span>Custom development</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-check text-accent mt-1 mr-2"></i>
+                    <span>24/7 premium support</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-check text-accent mt-1 mr-2"></i>
+                    <span>On-premise deployment</span>
+                </li>
+            </ul>
+            <a href="#" class="block w-full bg-gray-100 hover:bg-gray-200 text-gray-800 text-center py-3 rounded-lg font-medium transition duration-300">Contact Sales</a>
+        </div>
+    </div>
+    
+    <div class="mt-12 text-center">
+        <p class="text-gray-600">All plans include a 30-day free trial. No credit card required.</p>
+    </div>
+</div>
             
             <div class="mt-12 text-center">
                 <p class="text-gray-600">All plans include a 30-day free trial. No credit card required.</p>
