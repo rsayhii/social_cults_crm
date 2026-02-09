@@ -22,3 +22,5 @@ yarn-error.log
 /.vscode
 /.zed
 composer.log
+temp_log_2.txt
+temp_log.txt

@@ -200,6 +200,7 @@ Route::middleware(['auth', CheckCompanyAccess::class])->group(function () {
         // Route::get('/proposals', [ProposalController::class, 'index'])->name('proposals.index');
         Route::get('/proposals/create', [ProposalController::class, 'create'])->name('proposals.create');
         Route::post('/proposals', [ProposalController::class, 'store'])->name('proposals.store');
+        Route::post('/proposals/background-save', [ProposalController::class, 'backgroundSave'])->name('proposals.background-save');
         Route::get('/proposals/{proposal}/edit', [ProposalController::class, 'edit'])->name('proposals.edit');
         Route::put('/proposals/{proposal}', [ProposalController::class, 'update'])->name('proposals.update');
         Route::delete('/proposals/{proposal}', [ProposalController::class, 'destroy'])->name('proposals.destroy');

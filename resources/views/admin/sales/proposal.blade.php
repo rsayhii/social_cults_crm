@@ -161,6 +161,14 @@
 
                     <!-- Right: Main Area -->
                     <div class="lg:col-span-3">
+                        <!-- Saved Proposals Section -->
+                        <div id="savedProposalsSection" class="mb-8 hidden">
+                            <h2 class="text-2xl font-bold text-gray-800 mb-6">Saved Proposals</h2>
+                            <div id="savedProposalsGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                                <!-- Saved proposals will be rendered here -->
+                            </div>
+                        </div>
+
                         <div id="proposalCardsView">
                             <h2 class="text-2xl font-bold text-gray-800 mb-6">Choose or Create Proposal</h2>
                             <div id="proposalCardsGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
@@ -482,400 +490,400 @@
                 // Professional proposal templates with PDF-friendly styling
                 const proposalTemplates = {
                     social: `
-                                                                                                <div class="pdf-export-container">
-                                                                                                    <div class="pdf-section">
-                                                                                                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px;">
-                                                                                                            <div>
-                                                                                                                <h1 id="proposalTitle" style="font-size: 28px; font-weight: bold; color: #1f2937; margin-bottom: 10px;" contenteditable="true">Social Media Marketing Proposal</h1>
-                                                                                                                <p style="color: #6b7280;" contenteditable="true">Prepared for <span id="clientName" style="font-weight: 500;">Client Name</span> at <span id="clientCompany" style="font-weight: 500;">Company Name</span></p>
+                                                                                                        <div class="pdf-export-container">
+                                                                                                            <div class="pdf-section">
+                                                                                                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px;">
+                                                                                                                    <div>
+                                                                                                                        <h1 id="proposalTitle" style="font-size: 28px; font-weight: bold; color: #1f2937; margin-bottom: 10px;" contenteditable="true">Social Media Marketing Proposal</h1>
+                                                                                                                        <p style="color: #6b7280;" contenteditable="true">Prepared for <span id="clientName" style="font-weight: 500;">Client Name</span> at <span id="clientCompany" style="font-weight: 500;">Company Name</span></p>
+                                                                                                                    </div>
+                                                                                                                    <div style="text-align: right;">
+                                                                                                                        <p style="color: #6b7280;">Date: <span id="proposalDate" style="font-weight: 500;">${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span></p>
+                                                                                                                        <p style="color: #6b7280;">Proposal ID: <span style="font-weight: 500;">#SMM-2025-001</span></p>
+                                                                                                                    </div>
+                                                                                                                </div>
                                                                                                             </div>
-                                                                                                            <div style="text-align: right;">
-                                                                                                                <p style="color: #6b7280;">Date: <span id="proposalDate" style="font-weight: 500;">${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span></p>
-                                                                                                                <p style="color: #6b7280;">Proposal ID: <span style="font-weight: 500;">#SMM-2025-001</span></p>
+
+                                                                                                            <div class="pdf-section">
+                                                                                                                <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Service Overview</h2>
+                                                                                                                <div style="color: #374151;" contenteditable="true">
+                                                                                                                    <p>This proposal outlines our comprehensive social media marketing services designed to increase your brand visibility, engage your target audience, and drive measurable results for your business.</p>
+                                                                                                                    <p style="margin-top: 15px;">Our approach combines strategic planning, creative content development, and data-driven optimization to ensure your social media presence aligns with your business objectives.</p>
+                                                                                                                </div>
+                                                                                                            </div>
+
+                                                                                                            <div class="pdf-section">
+                                                                                                                <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Scope of Work</h2>
+                                                                                                                <ul style="list-style-type: disc; padding-left: 20px; color: #374151; line-height: 1.6;" contenteditable="true">
+                                                                                                                    <li>Social media strategy development</li>
+                                                                                                                    <li>Content calendar creation and management</li>
+                                                                                                                    <li>Platform setup and optimization (Facebook, Instagram, LinkedIn, Twitter)</li>
+                                                                                                                    <li>Monthly content creation (30 posts per platform)</li>
+                                                                                                                    <li>Community management and engagement</li>
+                                                                                                                    <li>Performance tracking and monthly reporting</li>
+                                                                                                                </ul>
+                                                                                                            </div>
+
+                                                                                                            <div class="pdf-section">
+                                                                                                                <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Deliverables</h2>
+                                                                                                                <ul style="list-style-type: disc; padding-left: 20px; color: #374151; line-height: 1.6;" contenteditable="true">
+                                                                                                                    <li>Comprehensive social media strategy document</li>
+                                                                                                                    <li>3-month content calendar</li>
+                                                                                                                    <li>Branded graphics and video content</li>
+                                                                                                                    <li>Monthly performance reports with insights</li>
+                                                                                                                    <li>Competitor analysis and hashtag research</li>
+                                                                                                                </ul>
+                                                                                                            </div>
+
+                                                                                                            <div class="pdf-section">
+                                                                                                                <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Timeline</h2>
+                                                                                                                <div style="color: #374151; line-height: 1.6;" contenteditable="true">
+                                                                                                                    <p><strong>Week 1-2:</strong> Strategy development and platform setup</p>
+                                                                                                                    <p><strong>Week 3-4:</strong> Content creation and calendar implementation</p>
+                                                                                                                    <p><strong>Month 2-3:</strong> Ongoing management, optimization, and reporting</p>
+                                                                                                                </div>
+                                                                                                            </div>
+
+                                                                                                            <div class="pdf-section">
+                                                                                                                <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Investment</h2>
+                                                                                                                <table class="pdf-table">
+                                                                                                                    <thead>
+                                                                                                                        <tr>
+                                                                                                                            <th style="padding: 10px; background-color: #f3f4f6; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Service</th>
+                                                                                                                            <th style="padding: 10px; background-color: #f3f4f6; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Description</th>
+                                                                                                                            <th style="padding: 10px; background-color: #f3f4f6; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Price</th>
+                                                                                                                        </tr>
+                                                                                                                    </thead>
+                                                                                                                    <tbody>
+                                                                                                                        <tr>
+                                                                                                                            <td style="padding: 10px; font-weight: 500;" contenteditable="true">Monthly Management</td>
+                                                                                                                            <td style="padding: 10px; font-size: 14px; color: #6b7280;" contenteditable="true">Full social media handling</td>
+                                                                                                                            <td style="padding: 10px; font-weight: 500;" contenteditable="true">$2,499 / month</td>
+                                                                                                                        </tr>
+                                                                                                                        <tr style="background-color: #f9fafb;">
+                                                                                                                            <td style="padding: 10px; font-weight: 500;">Total (3 months)</td>
+                                                                                                                            <td style="padding: 10px; font-size: 14px; color: #6b7280;">Minimum commitment</td>
+                                                                                                                            <td style="padding: 10px; font-weight: bold; font-size: 18px;">$7,497</td>
+                                                                                                                        </tr>
+                                                                                                                    </tbody>
+                                                                                                                </table>
+                                                                                                            </div>
+
+                                                                                                            <div class="pdf-section">
+                                                                                                                <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Terms & Conditions</h2>
+                                                                                                                <div style="color: #374151; line-height: 1.6;" contenteditable="true">
+                                                                                                                    <p>Payment: 50% upfront, 50% after first month.</p>
+                                                                                                                    <p style="margin-top: 10px;">Valid for 30 days. Minimum 3-month engagement.</p>
+                                                                                                                </div>
+                                                                                                            </div>
+
+                                                                                                            <div class="pdf-section">
+                                                                                                                <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Contact Us</h2>
+                                                                                                                <div style="color: #374151; line-height: 1.6;" contenteditable="true">
+                                                                                                                    <p><strong>Your Digital Agency</strong> | hello@agency.com | +91 98765 43210</p>
+                                                                                                                </div>
                                                                                                             </div>
                                                                                                         </div>
-                                                                                                    </div>
-
-                                                                                                    <div class="pdf-section">
-                                                                                                        <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Service Overview</h2>
-                                                                                                        <div style="color: #374151;" contenteditable="true">
-                                                                                                            <p>This proposal outlines our comprehensive social media marketing services designed to increase your brand visibility, engage your target audience, and drive measurable results for your business.</p>
-                                                                                                            <p style="margin-top: 15px;">Our approach combines strategic planning, creative content development, and data-driven optimization to ensure your social media presence aligns with your business objectives.</p>
-                                                                                                        </div>
-                                                                                                    </div>
-
-                                                                                                    <div class="pdf-section">
-                                                                                                        <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Scope of Work</h2>
-                                                                                                        <ul style="list-style-type: disc; padding-left: 20px; color: #374151; line-height: 1.6;" contenteditable="true">
-                                                                                                            <li>Social media strategy development</li>
-                                                                                                            <li>Content calendar creation and management</li>
-                                                                                                            <li>Platform setup and optimization (Facebook, Instagram, LinkedIn, Twitter)</li>
-                                                                                                            <li>Monthly content creation (30 posts per platform)</li>
-                                                                                                            <li>Community management and engagement</li>
-                                                                                                            <li>Performance tracking and monthly reporting</li>
-                                                                                                        </ul>
-                                                                                                    </div>
-
-                                                                                                    <div class="pdf-section">
-                                                                                                        <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Deliverables</h2>
-                                                                                                        <ul style="list-style-type: disc; padding-left: 20px; color: #374151; line-height: 1.6;" contenteditable="true">
-                                                                                                            <li>Comprehensive social media strategy document</li>
-                                                                                                            <li>3-month content calendar</li>
-                                                                                                            <li>Branded graphics and video content</li>
-                                                                                                            <li>Monthly performance reports with insights</li>
-                                                                                                            <li>Competitor analysis and hashtag research</li>
-                                                                                                        </ul>
-                                                                                                    </div>
-
-                                                                                                    <div class="pdf-section">
-                                                                                                        <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Timeline</h2>
-                                                                                                        <div style="color: #374151; line-height: 1.6;" contenteditable="true">
-                                                                                                            <p><strong>Week 1-2:</strong> Strategy development and platform setup</p>
-                                                                                                            <p><strong>Week 3-4:</strong> Content creation and calendar implementation</p>
-                                                                                                            <p><strong>Month 2-3:</strong> Ongoing management, optimization, and reporting</p>
-                                                                                                        </div>
-                                                                                                    </div>
-
-                                                                                                    <div class="pdf-section">
-                                                                                                        <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Investment</h2>
-                                                                                                        <table class="pdf-table">
-                                                                                                            <thead>
-                                                                                                                <tr>
-                                                                                                                    <th style="padding: 10px; background-color: #f3f4f6; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Service</th>
-                                                                                                                    <th style="padding: 10px; background-color: #f3f4f6; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Description</th>
-                                                                                                                    <th style="padding: 10px; background-color: #f3f4f6; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Price</th>
-                                                                                                                </tr>
-                                                                                                            </thead>
-                                                                                                            <tbody>
-                                                                                                                <tr>
-                                                                                                                    <td style="padding: 10px; font-weight: 500;" contenteditable="true">Monthly Management</td>
-                                                                                                                    <td style="padding: 10px; font-size: 14px; color: #6b7280;" contenteditable="true">Full social media handling</td>
-                                                                                                                    <td style="padding: 10px; font-weight: 500;" contenteditable="true">$2,499 / month</td>
-                                                                                                                </tr>
-                                                                                                                <tr style="background-color: #f9fafb;">
-                                                                                                                    <td style="padding: 10px; font-weight: 500;">Total (3 months)</td>
-                                                                                                                    <td style="padding: 10px; font-size: 14px; color: #6b7280;">Minimum commitment</td>
-                                                                                                                    <td style="padding: 10px; font-weight: bold; font-size: 18px;">$7,497</td>
-                                                                                                                </tr>
-                                                                                                            </tbody>
-                                                                                                        </table>
-                                                                                                    </div>
-
-                                                                                                    <div class="pdf-section">
-                                                                                                        <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Terms & Conditions</h2>
-                                                                                                        <div style="color: #374151; line-height: 1.6;" contenteditable="true">
-                                                                                                            <p>Payment: 50% upfront, 50% after first month.</p>
-                                                                                                            <p style="margin-top: 10px;">Valid for 30 days. Minimum 3-month engagement.</p>
-                                                                                                        </div>
-                                                                                                    </div>
-
-                                                                                                    <div class="pdf-section">
-                                                                                                        <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Contact Us</h2>
-                                                                                                        <div style="color: #374151; line-height: 1.6;" contenteditable="true">
-                                                                                                            <p><strong>Your Digital Agency</strong> | hello@agency.com | +91 98765 43210</p>
-                                                                                                        </div>
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                            `,
+                                                                                                    `,
 
                     website: `
-                                                                                                <div class="pdf-export-container">
-                                                                                                    <div class="pdf-section">
-                                                                                                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px;">
-                                                                                                            <div>
-                                                                                                                <h1 id="proposalTitle" style="font-size: 28px; font-weight: bold; color: #1f2937; margin-bottom: 10px;" contenteditable="true">Website Design & Development Proposal</h1>
-                                                                                                                <p style="color: #6b7280;" contenteditable="true">Prepared for <span id="clientName" style="font-weight: 500;">Client Name</span> at <span id="clientCompany" style="font-weight: 500;">Company Name</span></p>
+                                                                                                        <div class="pdf-export-container">
+                                                                                                            <div class="pdf-section">
+                                                                                                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px;">
+                                                                                                                    <div>
+                                                                                                                        <h1 id="proposalTitle" style="font-size: 28px; font-weight: bold; color: #1f2937; margin-bottom: 10px;" contenteditable="true">Website Design & Development Proposal</h1>
+                                                                                                                        <p style="color: #6b7280;" contenteditable="true">Prepared for <span id="clientName" style="font-weight: 500;">Client Name</span> at <span id="clientCompany" style="font-weight: 500;">Company Name</span></p>
+                                                                                                                    </div>
+                                                                                                                    <div style="text-align: right;">
+                                                                                                                        <p style="color: #6b7280;">Date: <span id="proposalDate" style="font-weight: 500;">${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span></p>
+                                                                                                                        <p style="color: #6b7280;">Proposal ID: <span style="font-weight: 500;">#WEB-2025-001</span></p>
+                                                                                                                    </div>
+                                                                                                                </div>
                                                                                                             </div>
-                                                                                                            <div style="text-align: right;">
-                                                                                                                <p style="color: #6b7280;">Date: <span id="proposalDate" style="font-weight: 500;">${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span></p>
-                                                                                                                <p style="color: #6b7280;">Proposal ID: <span style="font-weight: 500;">#WEB-2025-001</span></p>
+
+                                                                                                            <div class="pdf-section">
+                                                                                                                <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Project Overview</h2>
+                                                                                                                <div style="color: #374151;" contenteditable="true">
+                                                                                                                    <p>We will design and develop a modern, fast, mobile-responsive website that represents your brand professionally and converts visitors into customers.</p>
+                                                                                                                    <p style="margin-top: 15px;">Built with latest technologies, SEO-ready structure, and focused on user experience.</p>
+                                                                                                                </div>
+                                                                                                            </div>
+
+                                                                                                            <div class="pdf-section">
+                                                                                                                <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Scope of Work</h2>
+                                                                                                                <ul style="list-style-type: disc; padding-left: 20px; color: #374151; line-height: 1.6;" contenteditable="true">
+                                                                                                                    <li>Custom responsive website design (up to 10 pages)</li>
+                                                                                                                    <li>WordPress / Webflow / Custom development</li>
+                                                                                                                    <li>Mobile & tablet optimization</li>
+                                                                                                                    <li>Contact forms, WhatsApp chat, Google Maps</li>
+                                                                                                                    <li>Basic on-page SEO implementation</li>
+                                                                                                                    <li>Speed optimization & security setup</li>
+                                                                                                                </ul>
+                                                                                                            </div>
+
+                                                                                                            <div class="pdf-section">
+                                                                                                                <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Deliverables</h2>
+                                                                                                                <ul style="list-style-type: disc; padding-left: 20px; color: #374151; line-height: 1.6;" contenteditable="true">
+                                                                                                                    <li>Complete website with admin panel</li>
+                                                                                                                    <li>2 rounds of design revisions</li>
+                                                                                                                    <li>Google Analytics & Search Console setup</li>
+                                                                                                                    <li>Training session for content updates</li>
+                                                                                                                    <li>30 days post-launch support</li>
+                                                                                                                </ul>
+                                                                                                            </div>
+
+                                                                                                            <div class="pdf-section">
+                                                                                                                <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Timeline</h2>
+                                                                                                                <div style="color: #374151; line-height: 1.6;" contenteditable="true">
+                                                                                                                    <p><strong>Week 1:</strong> Discovery & wireframing</p>
+                                                                                                                    <p><strong>Week 2-3:</strong> Design mockups & approval</p>
+                                                                                                                    <p><strong>Week 4-6:</strong> Development & testing</p>
+                                                                                                                    <p><strong>Week 7:</strong> Launch & training</p>
+                                                                                                                </div>
+                                                                                                            </div>
+
+                                                                                                            <div class="pdf-section">
+                                                                                                                <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Investment</h2>
+                                                                                                                <table class="pdf-table">
+                                                                                                                    <thead>
+                                                                                                                        <tr>
+                                                                                                                            <th style="padding: 10px; background-color: #f3f4f6; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Package</th>
+                                                                                                                            <th style="padding: 10px; background-color: #f3f4f6; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Includes</th>
+                                                                                                                            <th style="padding: 10px; background-color: #f3f4f6; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Price</th>
+                                                                                                                        </tr>
+                                                                                                                    </thead>
+                                                                                                                    <tbody>
+                                                                                                                        <tr>
+                                                                                                                            <td style="padding: 10px; font-weight: 500;" contenteditable="true">Professional Website</td>
+                                                                                                                            <td style="padding: 10px; font-size: 14px; color: #6b7280;" contenteditable="true">Up to 10 pages, responsive, SEO-ready</td>
+                                                                                                                            <td style="padding: 10px; font-weight: 500;" contenteditable="true">$18,000 - $25,000</td>
+                                                                                                                        </tr>
+                                                                                                                        <tr style="background-color: #f9fafb;">
+                                                                                                                            <td style="padding: 10px; font-weight: 500;">Payment Terms</td>
+                                                                                                                            <td style="padding: 10px; font-size: 14px; color: #6b7280;">50% advance, 30% on design, 20% on launch</td>
+                                                                                                                            <td style="padding: 10px; font-weight: bold; font-size: 18px;">One-time</td>
+                                                                                                                        </tr>
+                                                                                                                    </tbody>
+                                                                                                                </table>
+                                                                                                            </div>
+
+                                                                                                            <div class="pdf-section">
+                                                                                                                <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Terms & Conditions</h2>
+                                                                                                                <div style="color: #374151; line-height: 1.6;" contenteditable="true">
+                                                                                                                    <p>Content and images to be provided by client.</p>
+                                                                                                                    <p style="margin-top: 10px;">Additional pages: $800 each. Hosting & domain extra.</p>
+                                                                                                                </div>
+                                                                                                            </div>
+
+                                                                                                            <div class="pdf-section">
+                                                                                                                <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Contact Us</h2>
+                                                                                                                <div style="color: #374151; line-height: 1.6;" contenteditable="true">
+                                                                                                                    <p><strong>Your Digital Agency</strong> | hello@agency.com | +91 98765 43210</p>
+                                                                                                                </div>
                                                                                                             </div>
                                                                                                         </div>
-                                                                                                    </div>
-
-                                                                                                    <div class="pdf-section">
-                                                                                                        <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Project Overview</h2>
-                                                                                                        <div style="color: #374151;" contenteditable="true">
-                                                                                                            <p>We will design and develop a modern, fast, mobile-responsive website that represents your brand professionally and converts visitors into customers.</p>
-                                                                                                            <p style="margin-top: 15px;">Built with latest technologies, SEO-ready structure, and focused on user experience.</p>
-                                                                                                        </div>
-                                                                                                    </div>
-
-                                                                                                    <div class="pdf-section">
-                                                                                                        <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Scope of Work</h2>
-                                                                                                        <ul style="list-style-type: disc; padding-left: 20px; color: #374151; line-height: 1.6;" contenteditable="true">
-                                                                                                            <li>Custom responsive website design (up to 10 pages)</li>
-                                                                                                            <li>WordPress / Webflow / Custom development</li>
-                                                                                                            <li>Mobile & tablet optimization</li>
-                                                                                                            <li>Contact forms, WhatsApp chat, Google Maps</li>
-                                                                                                            <li>Basic on-page SEO implementation</li>
-                                                                                                            <li>Speed optimization & security setup</li>
-                                                                                                        </ul>
-                                                                                                    </div>
-
-                                                                                                    <div class="pdf-section">
-                                                                                                        <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Deliverables</h2>
-                                                                                                        <ul style="list-style-type: disc; padding-left: 20px; color: #374151; line-height: 1.6;" contenteditable="true">
-                                                                                                            <li>Complete website with admin panel</li>
-                                                                                                            <li>2 rounds of design revisions</li>
-                                                                                                            <li>Google Analytics & Search Console setup</li>
-                                                                                                            <li>Training session for content updates</li>
-                                                                                                            <li>30 days post-launch support</li>
-                                                                                                        </ul>
-                                                                                                    </div>
-
-                                                                                                    <div class="pdf-section">
-                                                                                                        <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Timeline</h2>
-                                                                                                        <div style="color: #374151; line-height: 1.6;" contenteditable="true">
-                                                                                                            <p><strong>Week 1:</strong> Discovery & wireframing</p>
-                                                                                                            <p><strong>Week 2-3:</strong> Design mockups & approval</p>
-                                                                                                            <p><strong>Week 4-6:</strong> Development & testing</p>
-                                                                                                            <p><strong>Week 7:</strong> Launch & training</p>
-                                                                                                        </div>
-                                                                                                    </div>
-
-                                                                                                    <div class="pdf-section">
-                                                                                                        <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Investment</h2>
-                                                                                                        <table class="pdf-table">
-                                                                                                            <thead>
-                                                                                                                <tr>
-                                                                                                                    <th style="padding: 10px; background-color: #f3f4f6; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Package</th>
-                                                                                                                    <th style="padding: 10px; background-color: #f3f4f6; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Includes</th>
-                                                                                                                    <th style="padding: 10px; background-color: #f3f4f6; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Price</th>
-                                                                                                                </tr>
-                                                                                                            </thead>
-                                                                                                            <tbody>
-                                                                                                                <tr>
-                                                                                                                    <td style="padding: 10px; font-weight: 500;" contenteditable="true">Professional Website</td>
-                                                                                                                    <td style="padding: 10px; font-size: 14px; color: #6b7280;" contenteditable="true">Up to 10 pages, responsive, SEO-ready</td>
-                                                                                                                    <td style="padding: 10px; font-weight: 500;" contenteditable="true">$18,000 - $25,000</td>
-                                                                                                                </tr>
-                                                                                                                <tr style="background-color: #f9fafb;">
-                                                                                                                    <td style="padding: 10px; font-weight: 500;">Payment Terms</td>
-                                                                                                                    <td style="padding: 10px; font-size: 14px; color: #6b7280;">50% advance, 30% on design, 20% on launch</td>
-                                                                                                                    <td style="padding: 10px; font-weight: bold; font-size: 18px;">One-time</td>
-                                                                                                                </tr>
-                                                                                                            </tbody>
-                                                                                                        </table>
-                                                                                                    </div>
-
-                                                                                                    <div class="pdf-section">
-                                                                                                        <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Terms & Conditions</h2>
-                                                                                                        <div style="color: #374151; line-height: 1.6;" contenteditable="true">
-                                                                                                            <p>Content and images to be provided by client.</p>
-                                                                                                            <p style="margin-top: 10px;">Additional pages: $800 each. Hosting & domain extra.</p>
-                                                                                                        </div>
-                                                                                                    </div>
-
-                                                                                                    <div class="pdf-section">
-                                                                                                        <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Contact Us</h2>
-                                                                                                        <div style="color: #374151; line-height: 1.6;" contenteditable="true">
-                                                                                                            <p><strong>Your Digital Agency</strong> | hello@agency.com | +91 98765 43210</p>
-                                                                                                        </div>
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                            `,
+                                                                                                    `,
 
                     ads: `
-                                                                                                <div class="pdf-export-container">
-                                                                                                    <div class="pdf-section">
-                                                                                                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px;">
-                                                                                                            <div>
-                                                                                                                <h1 id="proposalTitle" style="font-size: 28px; font-weight: bold; color: #1f2937; margin-bottom: 10px;" contenteditable="true">Google Ads Management Proposal</h1>
-                                                                                                                <p style="color: #6b7280;" contenteditable="true">Prepared for <span id="clientName" style="font-weight: 500;">Client Name</span> at <span id="clientCompany" style="font-weight: 500;">Company Name</span></p>
+                                                                                                        <div class="pdf-export-container">
+                                                                                                            <div class="pdf-section">
+                                                                                                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px;">
+                                                                                                                    <div>
+                                                                                                                        <h1 id="proposalTitle" style="font-size: 28px; font-weight: bold; color: #1f2937; margin-bottom: 10px;" contenteditable="true">Google Ads Management Proposal</h1>
+                                                                                                                        <p style="color: #6b7280;" contenteditable="true">Prepared for <span id="clientName" style="font-weight: 500;">Client Name</span> at <span id="clientCompany" style="font-weight: 500;">Company Name</span></p>
+                                                                                                                    </div>
+                                                                                                                    <div style="text-align: right;">
+                                                                                                                        <p style="color: #6b7280;">Date: <span id="proposalDate" style="font-weight: 500;">${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span></p>
+                                                                                                                        <p style="color: #6b7280;">Proposal ID: <span style="font-weight: 500;">#GADS-2025-001</span></p>
+                                                                                                                    </div>
+                                                                                                                </div>
                                                                                                             </div>
-                                                                                                            <div style="text-align: right;">
-                                                                                                                <p style="color: #6b7280;">Date: <span id="proposalDate" style="font-weight: 500;">${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span></p>
-                                                                                                                <p style="color: #6b7280;">Proposal ID: <span style="font-weight: 500;">#GADS-2025-001</span></p>
+
+                                                                                                            <div class="pdf-section">
+                                                                                                                <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Campaign Overview</h2>
+                                                                                                                <div style="color: #374151;" contenteditable="true">
+                                                                                                                    <p>We will run high-ROI Google Ads campaigns (Search, Display, YouTube, Remarketing) to generate qualified leads and sales with full transparency and weekly optimization.</p>
+                                                                                                                    <p style="margin-top: 15px;">No long-term contracts. You own all accounts.</p>
+                                                                                                                </div>
+                                                                                                            </div>
+
+                                                                                                            <div class="pdf-section">
+                                                                                                                <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">What We Do</h2>
+                                                                                                                <ul style="list-style-type: disc; padding-left: 20px; color: #374151; line-height: 1.6;" contenteditable="true">
+                                                                                                                    <li>Keyword research & competitor analysis</li>
+                                                                                                                    <li>High-converting ad copy & landing page suggestions</li>
+                                                                                                                    <li>Full campaign setup with conversion tracking</li>
+                                                                                                                    <li>Daily monitoring & bid optimization</li>
+                                                                                                                    <li>Negative keyword management</li>
+                                                                                                                    <li>Weekly performance reports + monthly call</li>
+                                                                                                                </ul>
+                                                                                                            </div>
+
+                                                                                                            <div class="pdf-section">
+                                                                                                                <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Deliverables</h2>
+                                                                                                                <ul style="list-style-type: disc; padding-left: 20px; color: #374151; line-height: 1.6;" contenteditable="true">
+                                                                                                                    <li>Detailed campaign strategy document</li>
+                                                                                                                    <li>Google Ads account fully owned by you</li>
+                                                                                                                    <li>Weekly optimization reports</li>
+                                                                                                                    <li>Monthly performance review call</li>
+                                                                                                                    <li>A/B testing of ads & landing pages</li>
+                                                                                                                </ul>
+                                                                                                            </div>
+
+                                                                                                            <div class="pdf-section">
+                                                                                                                <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Timeline</h2>
+                                                                                                                <div style="color: #374151; line-height: 1.6;" contenteditable="true">
+                                                                                                                    <p><strong>Week 1:</strong> Research, strategy & setup</p>
+                                                                                                                    <p><strong>Week 2:</strong> Launch campaigns & initial optimization</p>
+                                                                                                                    <p><strong>Ongoing:</strong> Daily management & scaling</p>
+                                                                                                                </div>
+                                                                                                            </div>
+
+                                                                                                            <div class="pdf-section">
+                                                                                                                <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Investment</h2>
+                                                                                                                <table class="pdf-table">
+                                                                                                                    <thead>
+                                                                                                                        <tr>
+                                                                                                                            <th style="padding: 10px; background-color: #f3f4f6; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Fee</th>
+                                                                                                                            <th style="padding: 10px; background-color: #f3f4f6; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Details</th>
+                                                                                                                            <th style="padding: 10px; background-color: #f3f4f6; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Price</th>
+                                                                                                                        </tr>
+                                                                                                                    </thead>
+                                                                                                                    <tbody>
+                                                                                                                        <tr>
+                                                                                                                            <td style="padding: 10px; font-weight: 500;" contenteditable="true">One-time Setup</td>
+                                                                                                                            <td style="padding: 10px; font-size: 14px; color: #6b7280;" contenteditable="true">Research, strategy, account setup</td>
+                                                                                                                            <td style="padding: 10px; font-weight: 500;" contenteditable="true">$1,999</td>
+                                                                                                                        </tr>
+                                                                                                                        <tr>
+                                                                                                                            <td style="padding: 10px; font-weight: 500;" contenteditable="true">Monthly Management</td>
+                                                                                                                            <td style="padding: 10px; font-size: 14px; color: #6b7280;" contenteditable="true">Full optimization & reporting</td>
+                                                                                                                            <td style="padding: 10px; font-weight: 500;" contenteditable="true">$999 / month</td>
+                                                                                                                        </tr>
+                                                                                                                        <tr style="background-color: #f9fafb;">
+                                                                                                                            <td style="padding: 10px; font-weight: 500;">Ad Spend</td>
+                                                                                                                            <td style="padding: 10px; font-size: 14px; color: #6b7280;">Direct to Google</td>
+                                                                                                                            <td style="padding: 10px; font-weight: bold; font-size: 18px;">As per budget</td>
+                                                                                                                        </tr>
+                                                                                                                    </tbody>
+                                                                                                                </table>
+                                                                                                            </div>
+
+                                                                                                            <div class="pdf-section">
+                                                                                                                <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Terms & Conditions</h2>
+                                                                                                                <div style="color: #374151; line-height: 1.6;" contenteditable="true">
+                                                                                                                    <p>No lock-in. Cancel anytime with 15 days notice.</p>
+                                                                                                                    <p style="margin-top: 10px;">You own all accounts and data.</p>
+                                                                                                                </div>
+                                                                                                            </div>
+
+                                                                                                            <div class="pdf-section">
+                                                                                                                <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Contact Us</h2>
+                                                                                                                <div style="color: #374151; line-height: 1.6;" contenteditable="true">
+                                                                                                                    <p><strong>Your Digital Agency</strong> | hello@agency.com | +91 98765 43210</p>
+                                                                                                                </div>
                                                                                                             </div>
                                                                                                         </div>
-                                                                                                    </div>
-
-                                                                                                    <div class="pdf-section">
-                                                                                                        <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Campaign Overview</h2>
-                                                                                                        <div style="color: #374151;" contenteditable="true">
-                                                                                                            <p>We will run high-ROI Google Ads campaigns (Search, Display, YouTube, Remarketing) to generate qualified leads and sales with full transparency and weekly optimization.</p>
-                                                                                                            <p style="margin-top: 15px;">No long-term contracts. You own all accounts.</p>
-                                                                                                        </div>
-                                                                                                    </div>
-
-                                                                                                    <div class="pdf-section">
-                                                                                                        <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">What We Do</h2>
-                                                                                                        <ul style="list-style-type: disc; padding-left: 20px; color: #374151; line-height: 1.6;" contenteditable="true">
-                                                                                                            <li>Keyword research & competitor analysis</li>
-                                                                                                            <li>High-converting ad copy & landing page suggestions</li>
-                                                                                                            <li>Full campaign setup with conversion tracking</li>
-                                                                                                            <li>Daily monitoring & bid optimization</li>
-                                                                                                            <li>Negative keyword management</li>
-                                                                                                            <li>Weekly performance reports + monthly call</li>
-                                                                                                        </ul>
-                                                                                                    </div>
-
-                                                                                                    <div class="pdf-section">
-                                                                                                        <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Deliverables</h2>
-                                                                                                        <ul style="list-style-type: disc; padding-left: 20px; color: #374151; line-height: 1.6;" contenteditable="true">
-                                                                                                            <li>Detailed campaign strategy document</li>
-                                                                                                            <li>Google Ads account fully owned by you</li>
-                                                                                                            <li>Weekly optimization reports</li>
-                                                                                                            <li>Monthly performance review call</li>
-                                                                                                            <li>A/B testing of ads & landing pages</li>
-                                                                                                        </ul>
-                                                                                                    </div>
-
-                                                                                                    <div class="pdf-section">
-                                                                                                        <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Timeline</h2>
-                                                                                                        <div style="color: #374151; line-height: 1.6;" contenteditable="true">
-                                                                                                            <p><strong>Week 1:</strong> Research, strategy & setup</p>
-                                                                                                            <p><strong>Week 2:</strong> Launch campaigns & initial optimization</p>
-                                                                                                            <p><strong>Ongoing:</strong> Daily management & scaling</p>
-                                                                                                        </div>
-                                                                                                    </div>
-
-                                                                                                    <div class="pdf-section">
-                                                                                                        <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Investment</h2>
-                                                                                                        <table class="pdf-table">
-                                                                                                            <thead>
-                                                                                                                <tr>
-                                                                                                                    <th style="padding: 10px; background-color: #f3f4f6; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Fee</th>
-                                                                                                                    <th style="padding: 10px; background-color: #f3f4f6; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Details</th>
-                                                                                                                    <th style="padding: 10px; background-color: #f3f4f6; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Price</th>
-                                                                                                                </tr>
-                                                                                                            </thead>
-                                                                                                            <tbody>
-                                                                                                                <tr>
-                                                                                                                    <td style="padding: 10px; font-weight: 500;" contenteditable="true">One-time Setup</td>
-                                                                                                                    <td style="padding: 10px; font-size: 14px; color: #6b7280;" contenteditable="true">Research, strategy, account setup</td>
-                                                                                                                    <td style="padding: 10px; font-weight: 500;" contenteditable="true">$1,999</td>
-                                                                                                                </tr>
-                                                                                                                <tr>
-                                                                                                                    <td style="padding: 10px; font-weight: 500;" contenteditable="true">Monthly Management</td>
-                                                                                                                    <td style="padding: 10px; font-size: 14px; color: #6b7280;" contenteditable="true">Full optimization & reporting</td>
-                                                                                                                    <td style="padding: 10px; font-weight: 500;" contenteditable="true">$999 / month</td>
-                                                                                                                </tr>
-                                                                                                                <tr style="background-color: #f9fafb;">
-                                                                                                                    <td style="padding: 10px; font-weight: 500;">Ad Spend</td>
-                                                                                                                    <td style="padding: 10px; font-size: 14px; color: #6b7280;">Direct to Google</td>
-                                                                                                                    <td style="padding: 10px; font-weight: bold; font-size: 18px;">As per budget</td>
-                                                                                                                </tr>
-                                                                                                            </tbody>
-                                                                                                        </table>
-                                                                                                    </div>
-
-                                                                                                    <div class="pdf-section">
-                                                                                                        <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Terms & Conditions</h2>
-                                                                                                        <div style="color: #374151; line-height: 1.6;" contenteditable="true">
-                                                                                                            <p>No lock-in. Cancel anytime with 15 days notice.</p>
-                                                                                                            <p style="margin-top: 10px;">You own all accounts and data.</p>
-                                                                                                        </div>
-                                                                                                    </div>
-
-                                                                                                    <div class="pdf-section">
-                                                                                                        <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Contact Us</h2>
-                                                                                                        <div style="color: #374151; line-height: 1.6;" contenteditable="true">
-                                                                                                            <p><strong>Your Digital Agency</strong> | hello@agency.com | +91 98765 43210</p>
-                                                                                                        </div>
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                            `,
+                                                                                                    `,
 
                     seo: `
-                                                                                                <div class="pdf-export-container">
-                                                                                                    <div class="pdf-section">
-                                                                                                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px;">
-                                                                                                            <div>
-                                                                                                                <h1 id="proposalTitle" style="font-size: 28px; font-weight: bold; color: #1f2937; margin-bottom: 10px;" contenteditable="true">SEO Proposal</h1>
-                                                                                                                <p style="color: #6b7280;" contenteditable="true">Prepared for <span id="clientName" style="font-weight: 500;">Client Name</span> at <span id="clientCompany" style="font-weight: 500;">Company Name</span></p>
+                                                                                                        <div class="pdf-export-container">
+                                                                                                            <div class="pdf-section">
+                                                                                                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px;">
+                                                                                                                    <div>
+                                                                                                                        <h1 id="proposalTitle" style="font-size: 28px; font-weight: bold; color: #1f2937; margin-bottom: 10px;" contenteditable="true">SEO Proposal</h1>
+                                                                                                                        <p style="color: #6b7280;" contenteditable="true">Prepared for <span id="clientName" style="font-weight: 500;">Client Name</span> at <span id="clientCompany" style="font-weight: 500;">Company Name</span></p>
+                                                                                                                    </div>
+                                                                                                                    <div style="text-align: right;">
+                                                                                                                        <p style="color: #6b7280;">Date: <span id="proposalDate" style="font-weight: 500;">${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span></p>
+                                                                                                                        <p style="color: #6b7280;">Proposal ID: <span style="font-weight: 500;">#SEO-2025-001</span></p>
+                                                                                                                    </div>
+                                                                                                                </div>
                                                                                                             </div>
-                                                                                                            <div style="text-align: right;">
-                                                                                                                <p style="color: #6b7280;">Date: <span id="proposalDate" style="font-weight: 500;">${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span></p>
-                                                                                                                <p style="color: #6b7280;">Proposal ID: <span style="font-weight: 500;">#SEO-2025-001</span></p>
+
+                                                                                                            <div class="pdf-section">
+                                                                                                                <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">SEO Strategy Overview</h2>
+                                                                                                                <div style="color: #374151;" contenteditable="true">
+                                                                                                                    <p>This proposal outlines our comprehensive search engine optimization strategy to improve your organic rankings, drive qualified traffic, and increase conversions.</p>
+                                                                                                                    <p style="margin-top: 15px;">Our data-driven approach focuses on technical SEO, content optimization, and authoritative link building.</p>
+                                                                                                                </div>
+                                                                                                            </div>
+
+                                                                                                            <div class="pdf-section">
+                                                                                                                <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Scope of Work</h2>
+                                                                                                                <ul style="list-style-type: disc; padding-left: 20px; color: #374151; line-height: 1.6;" contenteditable="true">
+                                                                                                                    <li>Comprehensive website SEO audit</li>
+                                                                                                                    <li>Technical SEO optimization</li>
+                                                                                                                    <li>Keyword research and strategy</li>
+                                                                                                                    <li>On-page optimization (meta tags, content)</li>
+                                                                                                                    <li>Content strategy and creation</li>
+                                                                                                                    <li>Link building and outreach</li>
+                                                                                                                    <li>Monthly performance tracking and reporting</li>
+                                                                                                                </ul>
+                                                                                                            </div>
+
+                                                                                                            <div class="pdf-section">
+                                                                                                                <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Deliverables</h2>
+                                                                                                                <ul style="list-style-type: disc; padding-left: 20px; color: #374151; line-height: 1.6;" contenteditable="true">
+                                                                                                                    <li>Detailed SEO audit report</li>
+                                                                                                                    <li>Keyword strategy document</li>
+                                                                                                                    <li>Monthly optimization reports</li>
+                                                                                                                    <li>Competitor analysis</li>
+                                                                                                                    <li>Content calendar</li>
+                                                                                                                    <li>Ranking tracking dashboard</li>
+                                                                                                                </ul>
+                                                                                                            </div>
+
+                                                                                                            <div class="pdf-section">
+                                                                                                                <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Timeline</h2>
+                                                                                                                <div style="color: #374151; line-height: 1.6;" contenteditable="true">
+                                                                                                                    <p><strong>Month 1:</strong> Audit, technical fixes, keyword strategy</p>
+                                                                                                                    <p><strong>Month 2-3:</strong> On-page optimization, content creation</p>
+                                                                                                                    <p><strong>Month 4-6:</strong> Link building, ongoing optimization</p>
+                                                                                                                </div>
+                                                                                                            </div>
+
+                                                                                                            <div class="pdf-section">
+                                                                                                                <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Investment</h2>
+                                                                                                                <table class="pdf-table">
+                                                                                                                    <thead>
+                                                                                                                        <tr>
+                                                                                                                            <th style="padding: 10px; background-color: #f3f4f6; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Service</th>
+                                                                                                                            <th style="padding: 10px; background-color: #f3f4f6; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Description</th>
+                                                                                                                            <th style="padding: 10px; background-color: #f3f4f6; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Price</th>
+                                                                                                                        </tr>
+                                                                                                                    </thead>
+                                                                                                                    <tbody>
+                                                                                                                        <tr>
+                                                                                                                            <td style="padding: 10px; font-weight: 500;" contenteditable="true">Monthly SEO Management</td>
+                                                                                                                            <td style="padding: 10px; font-size: 14px; color: #6b7280;" contenteditable="true">Comprehensive SEO services</td>
+                                                                                                                            <td style="padding: 10px; font-weight: 500;" contenteditable="true">$1,500 / month</td>
+                                                                                                                        </tr>
+                                                                                                                        <tr style="background-color: #f9fafb;">
+                                                                                                                            <td style="padding: 10px; font-weight: 500;">Minimum Commitment</td>
+                                                                                                                            <td style="padding: 10px; font-size: 14px; color: #6b7280;">6 months for best results</td>
+                                                                                                                            <td style="padding: 10px; font-weight: bold; font-size: 18px;">$9,000</td>
+                                                                                                                        </tr>
+                                                                                                                    </tbody>
+                                                                                                                </table>
+                                                                                                            </div>
+
+                                                                                                            <div class="pdf-section">
+                                                                                                                <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Terms & Conditions</h2>
+                                                                                                                <div style="color: #374151; line-height: 1.6;" contenteditable="true">
+                                                                                                                    <p>Minimum 6-month commitment required for optimal results.</p>
+                                                                                                                    <p style="margin-top: 10px;">Results may vary based on industry competition and website history.</p>
+                                                                                                                </div>
+                                                                                                            </div>
+
+                                                                                                            <div class="pdf-section">
+                                                                                                                <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Contact Us</h2>
+                                                                                                                <div style="color: #374151; line-height: 1.6;" contenteditable="true">
+                                                                                                                    <p><strong>Your Digital Agency</strong> | hello@agency.com | +91 98765 43210</p>
+                                                                                                                </div>
                                                                                                             </div>
                                                                                                         </div>
-                                                                                                    </div>
-
-                                                                                                    <div class="pdf-section">
-                                                                                                        <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">SEO Strategy Overview</h2>
-                                                                                                        <div style="color: #374151;" contenteditable="true">
-                                                                                                            <p>This proposal outlines our comprehensive search engine optimization strategy to improve your organic rankings, drive qualified traffic, and increase conversions.</p>
-                                                                                                            <p style="margin-top: 15px;">Our data-driven approach focuses on technical SEO, content optimization, and authoritative link building.</p>
-                                                                                                        </div>
-                                                                                                    </div>
-
-                                                                                                    <div class="pdf-section">
-                                                                                                        <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Scope of Work</h2>
-                                                                                                        <ul style="list-style-type: disc; padding-left: 20px; color: #374151; line-height: 1.6;" contenteditable="true">
-                                                                                                            <li>Comprehensive website SEO audit</li>
-                                                                                                            <li>Technical SEO optimization</li>
-                                                                                                            <li>Keyword research and strategy</li>
-                                                                                                            <li>On-page optimization (meta tags, content)</li>
-                                                                                                            <li>Content strategy and creation</li>
-                                                                                                            <li>Link building and outreach</li>
-                                                                                                            <li>Monthly performance tracking and reporting</li>
-                                                                                                        </ul>
-                                                                                                    </div>
-
-                                                                                                    <div class="pdf-section">
-                                                                                                        <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Deliverables</h2>
-                                                                                                        <ul style="list-style-type: disc; padding-left: 20px; color: #374151; line-height: 1.6;" contenteditable="true">
-                                                                                                            <li>Detailed SEO audit report</li>
-                                                                                                            <li>Keyword strategy document</li>
-                                                                                                            <li>Monthly optimization reports</li>
-                                                                                                            <li>Competitor analysis</li>
-                                                                                                            <li>Content calendar</li>
-                                                                                                            <li>Ranking tracking dashboard</li>
-                                                                                                        </ul>
-                                                                                                    </div>
-
-                                                                                                    <div class="pdf-section">
-                                                                                                        <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Timeline</h2>
-                                                                                                        <div style="color: #374151; line-height: 1.6;" contenteditable="true">
-                                                                                                            <p><strong>Month 1:</strong> Audit, technical fixes, keyword strategy</p>
-                                                                                                            <p><strong>Month 2-3:</strong> On-page optimization, content creation</p>
-                                                                                                            <p><strong>Month 4-6:</strong> Link building, ongoing optimization</p>
-                                                                                                        </div>
-                                                                                                    </div>
-
-                                                                                                    <div class="pdf-section">
-                                                                                                        <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Investment</h2>
-                                                                                                        <table class="pdf-table">
-                                                                                                            <thead>
-                                                                                                                <tr>
-                                                                                                                    <th style="padding: 10px; background-color: #f3f4f6; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Service</th>
-                                                                                                                    <th style="padding: 10px; background-color: #f3f4f6; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Description</th>
-                                                                                                                    <th style="padding: 10px; background-color: #f3f4f6; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Price</th>
-                                                                                                                </tr>
-                                                                                                            </thead>
-                                                                                                            <tbody>
-                                                                                                                <tr>
-                                                                                                                    <td style="padding: 10px; font-weight: 500;" contenteditable="true">Monthly SEO Management</td>
-                                                                                                                    <td style="padding: 10px; font-size: 14px; color: #6b7280;" contenteditable="true">Comprehensive SEO services</td>
-                                                                                                                    <td style="padding: 10px; font-weight: 500;" contenteditable="true">$1,500 / month</td>
-                                                                                                                </tr>
-                                                                                                                <tr style="background-color: #f9fafb;">
-                                                                                                                    <td style="padding: 10px; font-weight: 500;">Minimum Commitment</td>
-                                                                                                                    <td style="padding: 10px; font-size: 14px; color: #6b7280;">6 months for best results</td>
-                                                                                                                    <td style="padding: 10px; font-weight: bold; font-size: 18px;">$9,000</td>
-                                                                                                                </tr>
-                                                                                                            </tbody>
-                                                                                                        </table>
-                                                                                                    </div>
-
-                                                                                                    <div class="pdf-section">
-                                                                                                        <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Terms & Conditions</h2>
-                                                                                                        <div style="color: #374151; line-height: 1.6;" contenteditable="true">
-                                                                                                            <p>Minimum 6-month commitment required for optimal results.</p>
-                                                                                                            <p style="margin-top: 10px;">Results may vary based on industry competition and website history.</p>
-                                                                                                        </div>
-                                                                                                    </div>
-
-                                                                                                    <div class="pdf-section">
-                                                                                                        <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Contact Us</h2>
-                                                                                                        <div style="color: #374151; line-height: 1.6;" contenteditable="true">
-                                                                                                            <p><strong>Your Digital Agency</strong> | hello@agency.com | +91 98765 43210</p>
-                                                                                                        </div>
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                            `
+                                                                                                    `
                 };
 
                 // Default templates (cannot be deleted)
@@ -954,25 +962,25 @@
 
                         // Add delete button for custom templates only
                         const deleteBtn = t.isDefault ? '' : `
-                                                                                        <button class="delete-template text-xs text-red-600 hover:text-red-800 font-medium">
-                                                                                            <i class="fas fa-trash mr-1"></i>
-                                                                                        </button>
-                                                                                    `;
+                                                                                                <button class="delete-template text-xs text-red-600 hover:text-red-800 font-medium">
+                                                                                                    <i class="fas fa-trash mr-1"></i>
+                                                                                                </button>
+                                                                                            `;
 
                         templateItem.innerHTML = `
-                                                                                                    <h3 class="text-lg font-bold text-gray-800 mb-2">${t.name} </h3>
-                                                                                                    <p class="text-sm text-gray-600 mb-4">${t.description} </p>
+                                                                                                            <h3 class="text-lg font-bold text-gray-800 mb-2">${t.name} </h3>
+                                                                                                            <p class="text-sm text-gray-600 mb-4">${t.description} </p>
 
-                                                                                                    <div class="flex space-x-2">
-                                                                                                        <button class="preview-template text-xs text-indigo-600 hover:text-indigo-800 font-medium">
-                                                                                                            <i class="fas fa-eye mr-1"></i> Preview
-                                                                                                        </button>
-                                                                                                        <button class="use-template text-xs bg-indigo-600 text-white py-1 px-3 rounded font-medium hover:bg-indigo-700">
-                                                                                                            <i class="fas fa-plus mr-1"></i> Use Template
-                                                                                                        </button>
-                                                                                                        ${deleteBtn}
-                                                                                                    </div>
-                                                                                                `;
+                                                                                                            <div class="flex space-x-2">
+                                                                                                                <button class="preview-template text-xs text-indigo-600 hover:text-indigo-800 font-medium">
+                                                                                                                    <i class="fas fa-eye mr-1"></i> Preview
+                                                                                                                </button>
+                                                                                                                <button class="use-template text-xs bg-indigo-600 text-white py-1 px-3 rounded font-medium hover:bg-indigo-700">
+                                                                                                                    <i class="fas fa-plus mr-1"></i> Use Template
+                                                                                                                </button>
+                                                                                                                ${deleteBtn}
+                                                                                                            </div>
+                                                                                                        `;
 
                         templateItem.querySelector('.use-template').onclick = () => {
                             currentTemplate = t;
@@ -1013,17 +1021,17 @@
                         const card = document.createElement('div');
                         card.className = "proposal-card bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-gray-200";
                         card.innerHTML = `
-                                                                                                    <div class="p-8">
-                                                                                                        <h3 class="text-2xl font-bold text-gray-800 mb-4">${template.name}</h3>
-                                                                                                        <p class="text-sm text-gray-500 mb-1">Client</p>
-                                                                                                        <p class="text-lg font-semibold text-gray-800 mb-3">${client.name}</p>
-                                                                                                        <p class="text-sm text-gray-500 mb-1">Company</p>
-                                                                                                        <p class="font-medium text-gray-800 mb-6">${client.company}</p>
-                                                                                                        <button class="open-editor w-full bg-indigo-600 text-white py-3 rounded-xl font-semibold hover:bg-indigo-700">
-                                                                                                            Open & Edit
-                                                                                                        </button>
-                                                                                                    </div>
-                                                                                                `;
+                                                                                                            <div class="p-8">
+                                                                                                                <h3 class="text-2xl font-bold text-gray-800 mb-4">${template.name}</h3>
+                                                                                                                <p class="text-sm text-gray-500 mb-1">Client</p>
+                                                                                                                <p class="text-lg font-semibold text-gray-800 mb-3">${client.name}</p>
+                                                                                                                <p class="text-sm text-gray-500 mb-1">Company</p>
+                                                                                                                <p class="font-medium text-gray-800 mb-6">${client.company}</p>
+                                                                                                                <button class="open-editor w-full bg-indigo-600 text-white py-3 rounded-xl font-semibold hover:bg-indigo-700">
+                                                                                                                    Open & Edit
+                                                                                                                </button>
+                                                                                                            </div>
+                                                                                                        `;
                         card.querySelector('.open-editor').onclick = () => openFullEditor(template, client);
                         proposalCardsGrid.appendChild(card);
                     });
@@ -1526,17 +1534,17 @@
                     // Wrap extracted content in editable blocks
                     const wrappedContent = wrapContentInEditableBlocks(extractedHTML);
                     proposalContent.innerHTML = `
-                                                                                                <div class="pdf-export-container">
-                                                                                                    <div style="text-align: center; padding: 40px 0;">
-                                                                                                        <h1 contenteditable="true" style="font-size: 36px; font-weight: bold; color: #1f2937; margin-bottom: 20px;">Custom Proposal - ${file.name.split('.').slice(0, -1).join('.')}</h1>
-                                                                                                        <p style="font-size: 20px; color: #374151; margin-bottom: 15px;">Prepared for <span id="clientName" class="editable-client-name" contenteditable="true" style="font-weight: bold; color: #6366f1;">Client Name</span></p>
-                                                                                                        <p style="font-size: 18px; color: #6b7280;">Date: <span style="font-weight: bold;">${today}</span></p>
-                                                                                                        <div contenteditable="true" style="margin-top: 40px; text-align: left;">
-                                                                                                            ${wrappedContent}
+                                                                                                        <div class="pdf-export-container">
+                                                                                                            <div style="text-align: center; padding: 40px 0;">
+                                                                                                                <h1 contenteditable="true" style="font-size: 36px; font-weight: bold; color: #1f2937; margin-bottom: 20px;">Custom Proposal - ${file.name.split('.').slice(0, -1).join('.')}</h1>
+                                                                                                                <p style="font-size: 20px; color: #374151; margin-bottom: 15px;">Prepared for <span id="clientName" class="editable-client-name" contenteditable="true" style="font-weight: bold; color: #6366f1;">Client Name</span></p>
+                                                                                                                <p style="font-size: 18px; color: #6b7280;">Date: <span style="font-weight: bold;">${today}</span></p>
+                                                                                                                <div contenteditable="true" style="margin-top: 40px; text-align: left;">
+                                                                                                                    ${wrappedContent}
+                                                                                                                </div>
+                                                                                                            </div>
                                                                                                         </div>
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                            `;
+                                                                                                    `;
 
                     currentProposal = {
                         template: { name: "Custom Proposal", key: "custom" },
@@ -1619,36 +1627,58 @@
                 };
 
                 // Save Proposal Function
-                document.getElementById('saveProposal').onclick = () => {
-                    if (!currentProposal) return;
+                // Save Proposal Function
+                document.getElementById('saveProposal').onclick = () => saveProposalToServer();
 
-                    // Update current proposal content
-                    currentProposal.content = proposalContent.innerHTML;
-                    currentProposal.lastSaved = new Date();
+                async function saveProposalToServer() {
+                    const saveBtn = document.getElementById('saveProposal');
+                    const originalText = saveBtn.innerHTML;
+                    saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Saving...';
 
-                    // Save to savedProposals array
-                    const existingIndex = savedProposals.findIndex(p =>
-                        p.client.name === currentProposal.client.name &&
-                        p.client.company === currentProposal.client.company &&
-                        p.template.key === currentProposal.template.key
-                    );
+                    const content = proposalContent.innerHTML;
+                    const title = currentProposal.template ? currentProposal.template.name : 'Custom Proposal';
+                    const clientName = document.getElementById('editClientName').value || "Client Name";
+                    const companyName = document.getElementById('editClientCompany').value || "Company Name";
 
-                    if (existingIndex !== -1) {
-                        savedProposals[existingIndex] = currentProposal;
-                    } else {
-                        savedProposals.push(currentProposal);
+                    try {
+                        const response = await fetch("{{ route('proposals.background-save') }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                proposal_id: currentProposal.id,
+                                content: content,
+                                title: title,
+                                client_name: clientName,
+                                client_company: companyName,
+                                template_key: currentProposal.template ? currentProposal.template.key : null,
+                                settings: { key: currentProposal.template ? currentProposal.template.key : null }
+                            })
+                        });
+
+                        const data = await response.json();
+                        if (data.success) {
+                            currentProposal.id = data.proposal_id;
+                            // Show toast
+                            const saveToast = document.getElementById('saveToast');
+                            saveToast.classList.remove('hidden', 'translate-y-full');
+                            setTimeout(() => {
+                                saveToast.classList.add('translate-y-full');
+                                setTimeout(() => {
+                                    saveToast.classList.add('hidden');
+                                }, 300); // Wait for transition to complete
+                            }, 1000);
+                        }
+                    } catch (e) {
+                        console.error(e);
+                        alert('Failed to save proposal');
+                    } finally {
+                        saveBtn.innerHTML = originalText;
                     }
-
-                    // Show save confirmation
-                    const saveToast = document.getElementById('saveToast');
-                    saveToast.classList.remove('hidden', 'translate-y-full');
-                    setTimeout(() => {
-                        saveToast.classList.add('translate-y-full');
-                        setTimeout(() => {
-                            saveToast.classList.add('hidden');
-                        }, 300); // Wait for transition to complete
-                    }, 1000);
-                };
+                }
 
                 // Improved DOC Export Function
                 document.getElementById('exportDOC').onclick = () => {
@@ -1673,67 +1703,67 @@
 
                     // Create properly formatted HTML document for Word
                     const htmlContent = `
-                                                                                                <!DOCTYPE html>
-                                                                                                <html>
-                                                                                                <head>
-                                                                                                    <meta charset="UTF-8">
-                                                                                                    <style>
-                                                                                                        body {
-                                                                                                            font-family: Arial, sans-serif;
-                                                                                                            line-height: 1.6;
-                                                                                                            margin: 40px;
-                                                                                                            color: #333;
-                                                                                                        }
-                                                                                                        h1 {
-                                                                                                            font-size: 28px;
-                                                                                                            color: #1f2937;
-                                                                                                            margin-bottom: 10px;
-                                                                                                        }
-                                                                                                        h2 {
-                                                                                                            font-size: 20px;
-                                                                                                            color: #1f2937;
-                                                                                                            margin-bottom: 15px;
-                                                                                                            margin-top: 25px;
-                                                                                                        }
-                                                                                                        p {
-                                                                                                            margin-bottom: 15px;
-                                                                                                        }
-                                                                                                        ul {
-                                                                                                            margin-left: 20px;
-                                                                                                            margin-bottom: 15px;
-                                                                                                        }
-                                                                                                        li {
-                                                                                                            margin-bottom: 8px;
-                                                                                                        }
-                                                                                                        table {
-                                                                                                            width: 100%;
-                                                                                                            border-collapse: collapse;
-                                                                                                            margin: 15px 0;
-                                                                                                        }
-                                                                                                        th, td {
-                                                                                                            border: 1px solid #ddd;
-                                                                                                            padding: 8px;
-                                                                                                            text-align: left;
-                                                                                                        }
-                                                                                                        th {
-                                                                                                            background-color: #f2f2f2;
-                                                                                                            font-weight: bold;
-                                                                                                        }
-                                                                                                        .header-section {
-                                                                                                            display: flex;
-                                                                                                            justify-content: space-between;
-                                                                                                            margin-bottom: 30px;
-                                                                                                        }
-                                                                                                        .contact-info {
-                                                                                                            text-align: right;
-                                                                                                        }
-                                                                                                    </style>
-                                                                                                </head>
-                                                                                                <body>
-                                                                                                    ${content}
-                                                                                                </body>
-                                                                                                </html>
-                                                                                            `;
+                                                                                                        <!DOCTYPE html>
+                                                                                                        <html>
+                                                                                                        <head>
+                                                                                                            <meta charset="UTF-8">
+                                                                                                            <style>
+                                                                                                                body {
+                                                                                                                    font-family: Arial, sans-serif;
+                                                                                                                    line-height: 1.6;
+                                                                                                                    margin: 40px;
+                                                                                                                    color: #333;
+                                                                                                                }
+                                                                                                                h1 {
+                                                                                                                    font-size: 28px;
+                                                                                                                    color: #1f2937;
+                                                                                                                    margin-bottom: 10px;
+                                                                                                                }
+                                                                                                                h2 {
+                                                                                                                    font-size: 20px;
+                                                                                                                    color: #1f2937;
+                                                                                                                    margin-bottom: 15px;
+                                                                                                                    margin-top: 25px;
+                                                                                                                }
+                                                                                                                p {
+                                                                                                                    margin-bottom: 15px;
+                                                                                                                }
+                                                                                                                ul {
+                                                                                                                    margin-left: 20px;
+                                                                                                                    margin-bottom: 15px;
+                                                                                                                }
+                                                                                                                li {
+                                                                                                                    margin-bottom: 8px;
+                                                                                                                }
+                                                                                                                table {
+                                                                                                                    width: 100%;
+                                                                                                                    border-collapse: collapse;
+                                                                                                                    margin: 15px 0;
+                                                                                                                }
+                                                                                                                th, td {
+                                                                                                                    border: 1px solid #ddd;
+                                                                                                                    padding: 8px;
+                                                                                                                    text-align: left;
+                                                                                                                }
+                                                                                                                th {
+                                                                                                                    background-color: #f2f2f2;
+                                                                                                                    font-weight: bold;
+                                                                                                                }
+                                                                                                                .header-section {
+                                                                                                                    display: flex;
+                                                                                                                    justify-content: space-between;
+                                                                                                                    margin-bottom: 30px;
+                                                                                                                }
+                                                                                                                .contact-info {
+                                                                                                                    text-align: right;
+                                                                                                                }
+                                                                                                            </style>
+                                                                                                        </head>
+                                                                                                        <body>
+                                                                                                            ${content}
+                                                                                                        </body>
+                                                                                                        </html>
+                                                                                                    `;
 
                     // Create a Blob with the HTML content
                     const blob = new Blob([htmlContent], { type: 'application/msword' });
@@ -1796,6 +1826,101 @@
                 // Initialize the app
                 loadTemplates();
                 renderTemplates();
+
+                // Initialize Saved Proposals from Server
+                const serverProposals = @json($proposals);
+                renderSavedProposals();
+
+                function renderSavedProposals() {
+                    const grid = document.getElementById('savedProposalsGrid');
+                    const section = document.getElementById('savedProposalsSection');
+
+                    if (serverProposals.length === 0) {
+                        section.classList.add('hidden');
+                        return;
+                    }
+
+                    section.classList.remove('hidden');
+                    grid.innerHTML = '';
+
+                    serverProposals.forEach(p => {
+                        const date = new Date(p.updated_at).toLocaleDateString();
+                        const card = document.createElement('div');
+                        card.className = "bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-indigo-100 hover:border-indigo-300 transition-all";
+                        card.innerHTML = `
+                                <div class="p-6">
+                                    <div class="flex justify-between items-start mb-4">
+                                        <span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-0.5 rounded">Saved</span>
+                                        <button class="delete-proposal text-gray-400 hover:text-red-500 transition-colors" data-id="${p.id}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                    <h3 class="text-xl font-bold text-gray-800 mb-2 truncate" title="${p.title}">${p.title}</h3>
+                                    <div class="space-y-2 mb-6">
+                                        <p class="text-sm text-gray-600 flex items-center">
+                                            <i class="fas fa-user-tie w-5 text-indigo-500"></i>
+                                            ${p.client ? p.client.contact_person : 'Unknown Client'}
+                                        </p>
+                                        <p class="text-sm text-gray-600 flex items-center">
+                                            <i class="fas fa-building w-5 text-indigo-500"></i>
+                                             ${p.client ? p.client.company_name : 'Unknown Company'}
+                                        </p>
+                                        <p class="text-sm text-gray-500 flex items-center">
+                                            <i class="fas fa-clock w-5 text-gray-400"></i>
+                                            ${date}
+                                        </p>
+                                    </div>
+                                    <button class="open-saved-proposal w-full bg-indigo-600 text-white py-2.5 rounded-xl font-semibold hover:bg-indigo-700 transition-colors flex items-center justify-center">
+                                        <i class="fas fa-edit mr-2"></i> Continue Editing
+                                    </button>
+                                </div>
+                            `;
+
+                        card.querySelector('.open-saved-proposal').onclick = () => loadSavedProposal(p);
+                        card.querySelector('.delete-proposal').onclick = (e) => deleteSavedProposal(e, p.id);
+
+                        grid.appendChild(card);
+                    });
+                }
+
+                function loadSavedProposal(proposal) {
+                    proposalContent.innerHTML = proposal.content;
+                    currentProposal = {
+                        id: proposal.id,
+                        template: { key: proposal.settings?.key || 'custom', name: proposal.title },
+                        client: {
+                            name: proposal.client ? proposal.client.contact_person : '',
+                            company: proposal.client ? proposal.client.company_name : ''
+                        },
+                        content: proposal.content,
+                        lastSaved: new Date(proposal.updated_at)
+                    };
+
+                    // Update toolbar
+                    document.getElementById('editClientName').value = currentProposal.client.name;
+                    document.getElementById('editClientCompany').value = currentProposal.client.company;
+
+                    // Show editor
+                    document.getElementById('proposalCardsView').classList.add('hidden');
+                    document.getElementById('savedProposalsSection').classList.add('hidden');
+                    fullEditorView.classList.remove('hidden');
+                    document.getElementById('formattingToolbar').classList.remove('hidden');
+                }
+
+                function deleteSavedProposal(e, id) {
+                    e.stopPropagation();
+                    if (!confirm('Are you sure you want to delete this proposal?')) return;
+
+                    fetch(`/proposals/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'Accept': 'application/json'
+                        }
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                }
             </script>
 
 
