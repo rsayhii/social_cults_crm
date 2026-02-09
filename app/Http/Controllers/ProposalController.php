@@ -40,6 +40,7 @@ class ProposalController extends Controller
         }
 
         Proposal::create([
+            'company_id' => Auth::user()->company_id,
             'user_id' => Auth::id(),
             'client_id' => $request->client_id,
             'title' => $request->title,
@@ -54,14 +55,26 @@ class ProposalController extends Controller
 
     public function edit(Proposal $proposal)
     {
-        $clients = Client::all();
+        if ($proposal->company_id !== Auth::user()->company_id) {
+            abort(403);
+        }
+        $clients = Client::where('company_id', Auth::user()->company_id)->get();
         return view('admin.proposals.edit', compact('proposal', 'clients'));
     }
 
     public function update(Request $request, Proposal $proposal)
     {
+        if ($proposal->company_id !== Auth::user()->company_id) {
+            abort(403);
+        }
+
         $request->validate([
-            'client_id' => 'required|exists:clients,id',
+            'client_id' => [
+                'required',
+                \Illuminate\Validation\Rule::exists('clients', 'id')->where(function ($query) {
+                    return $query->where('company_id', Auth::user()->company_id);
+                }),
+            ],
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'amount' => 'nullable|numeric',
@@ -88,6 +101,9 @@ class ProposalController extends Controller
 
     public function destroy(Proposal $proposal)
     {
+        if ($proposal->company_id !== Auth::user()->company_id) {
+            abort(403);
+        }
         $proposal->delete();
         return back()->with('success', 'Proposal deleted successfully!');
     }
@@ -105,7 +121,8 @@ class ProposalController extends Controller
         $user = Auth::user();
 
         // Find or create client
-        $client = Client::where('contact_person', $request->client_name)
+        $client = Client::where('company_id', $user->company_id)
+            ->where('contact_person', $request->client_name)
             ->where('company_name', $request->client_company)
             ->first();
 
@@ -123,7 +140,9 @@ class ProposalController extends Controller
         }
 
         if ($request->proposal_id) {
-            $proposal = Proposal::find($request->proposal_id);
+            $proposal = Proposal::where('id', $request->proposal_id)
+                ->where('company_id', $user->company_id)
+                ->first();
             if ($proposal) {
                 $proposal->update([
                     'content' => $request->content,
