@@ -193,7 +193,7 @@
                         @endcan
 
                        <!-- Proposal -->
-                        {{-- @can('proposal')
+                         @can('proposal')
                         <li class="relative">
                             <a href="{{ route('proposal') }}"
                                class="flex w-full items-center gap-2 overflow-hidden p-2 text-left h-8 text-sm rounded-xl mb-1 flex items-center gap-3 px-4 py-3 
@@ -209,7 +209,7 @@
                                 <span class="font-medium">Proposal</span>
                             </a>
                         </li>
-                        @endcan --}}
+                        @endcan
 
                         <!-- My Attendance -->
                         @can('my attendance')
