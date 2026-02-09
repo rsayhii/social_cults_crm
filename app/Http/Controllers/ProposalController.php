@@ -11,7 +11,10 @@ class ProposalController extends Controller
 {
     public function index()
     {
-        $proposals = Proposal::with('client', 'user')->latest()->get();
+        $proposals = Proposal::with('client', 'user')
+            ->where('company_id', Auth::user()->company_id)
+            ->latest()
+            ->get();
         return view('admin.sales.proposal', compact('proposals'));
     }
 
