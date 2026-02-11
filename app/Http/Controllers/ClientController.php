@@ -86,11 +86,13 @@ public function update(Request $request, Client $client)
 
     $client->update($validated);
 
-    return response()->json([
-        'success' => true,
-        'message' => 'Client updated successfully!',
-        'client' => $client
-    ]);
+    return redirect()->route('clients.index')->with('success', 'Client updated successfully!');
+
+    // return response()->json([
+    //     'success' => true,
+    //     'message' => 'Client updated successfully!',
+    //     'client' => $client
+    // ]);
 }
 
 

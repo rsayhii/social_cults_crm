@@ -61,39 +61,68 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200">
-                @foreach($activeSubscriptions as $customer)
-                @php
-                    $daysRemaining = \Carbon\Carbon::parse($customer->subscription_end_date)->diffInDays(now());
-                @endphp
-                <tr>
-                    <td class="py-3 px-6">
-                        <div class="flex items-center">
-                            <div class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 mr-3"></div>
-                            <div>
-                                <p class="font-medium text-gray-800">{{ $customer->name }}</p>
-                                <p class="text-sm text-gray-500">{{ $customer->business_name }}</p>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="py-3 px-6">
-                        <span class="text-gray-800">{{ $customer->subscription_start_date }}</span>
-                    </td>
-                    <td class="py-3 px-6">
-                        <span class="text-gray-800">{{ $customer->subscription_end_date }}</span>
-                    </td>
-                    <td class="py-3 px-6">
-                        <span class="font-medium {{ $daysRemaining > 30 ? 'text-green-600' : ($daysRemaining > 0 ? 'text-yellow-600' : 'text-red-600') }}">
-                            {{ $daysRemaining > 0 ? $daysRemaining . ' days' : 'Expired' }}
-                        </span>
-                    </td>
-                    <td class="py-3 px-6">
-                        <a href="{{ route('superadmin.customers.show', $customer) }}" class="p-1 text-blue-600 hover:text-blue-800" title="View Details">
-                            <i class="fas fa-eye"></i>
-                        </a>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
+@foreach($activeSubscriptions as $company)
+
+@php
+    // Assuming 1 year paid validity (change later if needed)
+    $startDate = $company->updated_at;
+    $endDate = $company->updated_at->copy()->addYear();
+    $daysRemaining = now()->diffInDays($endDate, false);
+@endphp
+
+<tr>
+    <td class="py-3 px-6">
+        <div class="flex items-center">
+            <img src="{{ $company->logo_url }}" class="w-8 h-8 rounded-full mr-3">
+            <div>
+                <p class="font-medium text-gray-800">{{ $company->name }}</p>
+                <p class="text-sm text-gray-500">{{ $company->email }}</p>
+            </div>
+        </div>
+    </td>
+
+    <td class="py-3 px-6">
+        {{ $startDate->format('d M Y') }}
+    </td>
+
+    <td class="py-3 px-6">
+        {{ $endDate->format('d M Y') }}
+    </td>
+
+   <td class="py-3 px-6">
+    @php
+        // Paid subscription end date (1 year from start – adjust if needed)
+        $subscriptionEnd = $company->updated_at->copy()->addYear();
+
+        $diff = now()->diff($subscriptionEnd, false);
+        $days = $diff->days;
+        $hours = $diff->h;
+    @endphp
+
+    @if(now()->lt($subscriptionEnd))
+        <span class="font-medium
+            {{ $days > 30 ? 'text-green-600' : ($days > 0 ? 'text-yellow-600' : 'text-red-600') }}">
+            Expires in {{ $days }} days {{ $hours }} hours
+        </span>
+    @else
+        <span class="font-medium text-red-600">
+            Expired
+        </span>
+    @endif
+</td>
+
+
+    <td class="py-3 px-6">
+        <span class="inline-flex items-center px-3 py-1 rounded-full
+            bg-green-100 text-green-700 text-sm font-semibold">
+            Active
+        </span>
+    </td>
+</tr>
+
+@endforeach
+</tbody>
+
         </table>
     </div>
     <div class="px-6 py-4 border-t border-gray-200">

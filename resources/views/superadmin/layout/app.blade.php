@@ -94,10 +94,10 @@
         </div>
         
         <div class="flex items-center space-x-4">
-            <a href="{{ route('superadmin.customers.create') }}" class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:to-indigo-700 transition duration-200 font-medium flex items-center">
+            {{-- <a href="{{ route('superadmin.customers.create') }}" class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:to-indigo-700 transition duration-200 font-medium flex items-center">
                 <i class="fas fa-plus mr-2"></i>
                 Add New Customer
-            </a>
+            </a> --}}
             
             <div class="relative">
                 <button id="profileDropdownBtn" class="flex items-center space-x-2 focus:outline-none">

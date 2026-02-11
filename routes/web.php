@@ -574,9 +574,9 @@ Route::middleware('permission:ticket raise')->prefix('user/support/ticket')
     // Subscription Routes
     Route::prefix('superadmin')->group(function () {
         Route::get('subscriptions', [SubscriptionController::class, 'index'])->name('superadmin.subscriptions.index');
-        Route::get('subscriptions/create', [SubscriptionController::class, 'create'])->name('superadmin.subscriptions.create');
-        Route::post('subscriptions', [SubscriptionController::class, 'store'])->name('superadmin.subscriptions.store');
-        Route::post('subscriptions/{id}/renew', [SubscriptionController::class, 'renew'])->name('superadmin.subscriptions.renew');
+        // Route::get('subscriptions/create', [SubscriptionController::class, 'create'])->name('superadmin.subscriptions.create');
+        // Route::post('subscriptions', [SubscriptionController::class, 'store'])->name('superadmin.subscriptions.store');
+        // Route::post('subscriptions/{id}/renew', [SubscriptionController::class, 'renew'])->name('superadmin.subscriptions.renew');
     });
 
 

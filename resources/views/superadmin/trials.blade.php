@@ -114,7 +114,7 @@
     @if(now()->lt($company->trial_ends_at))
         <span class="inline-flex items-center px-3 py-1 rounded-full
             bg-green-100 text-green-700 text-sm font-semibold">
-            Active
+            Trial Active
         </span>
     @else
         <span class="inline-flex items-center px-3 py-1 rounded-full
