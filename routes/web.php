@@ -110,27 +110,27 @@ Route::middleware(['auth', CheckCompanyAccess::class])->group(function () {
     });
 
     // Remove ALL other role routes and keep only this:
-Route::middleware('permission:roles')->group(function () {
-    Route::get('/roles', [RolesController::class, 'index'])->name('roles');
-    Route::get('/roles/create', [RolesController::class, 'create'])->name('roles.create');
-    Route::post('/roles', [RolesController::class, 'store'])->name('roles.store');
-    Route::get('/roles/{id}', [RolesController::class, 'show'])->name('roles.show');
-    Route::get('/roles/{id}/edit', [RolesController::class, 'edit'])->name('roles.edit');
-    Route::put('/roles/{id}', [RolesController::class, 'update'])->name('roles.update');
-    Route::delete('/roles/{id}', [RolesController::class, 'destroy'])->name('roles.destroy');
+    Route::middleware('permission:roles')->group(function () {
+        Route::get('/roles', [RolesController::class, 'index'])->name('roles');
+        Route::get('/roles/create', [RolesController::class, 'create'])->name('roles.create');
+        Route::post('/roles', [RolesController::class, 'store'])->name('roles.store');
+        Route::get('/roles/{id}', [RolesController::class, 'show'])->name('roles.show');
+        Route::get('/roles/{id}/edit', [RolesController::class, 'edit'])->name('roles.edit');
+        Route::put('/roles/{id}', [RolesController::class, 'update'])->name('roles.update');
+        Route::delete('/roles/{id}', [RolesController::class, 'destroy'])->name('roles.destroy');
     });
 
 
     // Users
-Route::middleware('permission:users')->group(function () {
-    Route::get('/users', [UserController::class, 'index'])->name('users');
-    Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
-    Route::post('/users', [UserController::class, 'store'])->name('users.store');  // Simplified path
-    Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');  // Fixed path and binding
-    Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');  // Fixed path
-    Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');  // Fixed path
-    Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');  // Fixed to DELETE
-});
+    Route::middleware('permission:users')->group(function () {
+        Route::get('/users', [UserController::class, 'index'])->name('users');
+        Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+        Route::post('/users', [UserController::class, 'store'])->name('users.store');  // Simplified path
+        Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');  // Fixed path and binding
+        Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');  // Fixed path
+        Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');  // Fixed path
+        Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');  // Fixed to DELETE
+    });
 
 
 
@@ -200,6 +200,10 @@ Route::middleware('permission:users')->group(function () {
         // Route::get('/proposals', [ProposalController::class, 'index'])->name('proposals.index');
         Route::get('/proposals/create', [ProposalController::class, 'create'])->name('proposals.create');
         Route::post('/proposals', [ProposalController::class, 'store'])->name('proposals.store');
+        Route::post('/proposals/background-save', [ProposalController::class, 'backgroundSave'])->name('proposals.background-save');
+        Route::get('/proposals/hidden-templates', [ProposalController::class, 'getHiddenTemplates'])->name('proposals.hidden-templates');
+        Route::post('/proposals/hide-template', [ProposalController::class, 'hideTemplate'])->name('proposals.hide-template');
+        Route::post('/proposals/unhide-template', [ProposalController::class, 'unhideTemplate'])->name('proposals.unhide-template');
         Route::get('/proposals/{proposal}/edit', [ProposalController::class, 'edit'])->name('proposals.edit');
         Route::put('/proposals/{proposal}', [ProposalController::class, 'update'])->name('proposals.update');
         Route::delete('/proposals/{proposal}', [ProposalController::class, 'destroy'])->name('proposals.destroy');
@@ -525,51 +529,52 @@ Route::middleware('permission:users')->group(function () {
 
 
 
-Route::middleware('permission:ticket raise')->prefix('user/support/ticket')
-    ->name('user.support.ticket.')
-    ->group(function () {
+    Route::middleware('permission:ticket raise')->prefix('user/support/ticket')
+        ->name('user.support.ticket.')
+        ->group(function () {
 
-        Route::get('/', [TicketController::class, 'index'])->name('index');
-        Route::get('/create', [TicketController::class, 'create'])->name('create');
-        Route::post('/', [TicketController::class, 'store'])->name('store');
-        Route::get('/{id}', [TicketController::class, 'show'])->name('show');
-        Route::post('/{id}/reply', [TicketController::class, 'reply'])->name('reply');
+            Route::get('/', [TicketController::class, 'index'])->name('index');
+            Route::get('/create', [TicketController::class, 'create'])->name('create');
+            Route::post('/', [TicketController::class, 'store'])->name('store');
+            Route::get('/{id}', [TicketController::class, 'show'])->name('show');
+            Route::post('/{id}/reply', [TicketController::class, 'reply'])->name('reply');
+        });
+
+
+
+
+
+
 });
 
 
 
 
-
-
-});
-
-
-
-
-    // ***********************************************************************
+// ***********************************************************************
 // ************************** END OF ROUTES FILE *************************
 // ***********************************************************************
 
 
-    // Dashboard
-    Route::get('/superadmin', [SuperAdminDashboardController::class, 'index'])->name('superadmin.dashboard');
+// Dashboard
+Route::get('/superadmin', [SuperAdminDashboardController::class, 'index'])->name('superadmin.dashboard');
 
-    // Customers
-    Route::prefix('superadmin')->group(function () {
-        Route::get('customers', [CustomerController::class, 'index'])->name('superadmin.customers.index');
-        Route::get('customers/create', [CustomerController::class, 'create'])->name('superadmin.customers.create');
-        Route::post('customers', [CustomerController::class, 'store'])->name('superadmin.customers.store');
-        Route::get('customers/{customer}', [CustomerController::class, 'show'])->name('superadmin.customers.show');
-        Route::get('customers/{customer}/edit', [CustomerController::class, 'edit'])->name('superadmin.customers.edit');
-        Route::put('customers/{customer}', [CustomerController::class, 'update'])->name('superadmin.customers.update');
-        Route::delete('customers/{customer}', [CustomerController::class, 'destroy'])->name('superadmin.customers.destroy');
-    });
+// Customers
+Route::prefix('superadmin')->group(function () {
+    Route::get('customers', [CustomerController::class, 'index'])->name('superadmin.customers.index');
+    Route::get('customers/create', [CustomerController::class, 'create'])->name('superadmin.customers.create');
+    Route::post('customers', [CustomerController::class, 'store'])->name('superadmin.customers.store');
+    Route::get('customers/{customer}', [CustomerController::class, 'show'])->name('superadmin.customers.show');
+    Route::get('customers/{customer}/edit', [CustomerController::class, 'edit'])->name('superadmin.customers.edit');
+    Route::put('customers/{customer}', [CustomerController::class, 'update'])->name('superadmin.customers.update');
+    Route::delete('customers/{customer}', [CustomerController::class, 'destroy'])->name('superadmin.customers.destroy');
+});
 
-    // Trials
-    Route::prefix('superadmin')->group(function () {
-        Route::get('trials', [TrialController::class, 'index'])->name('superadmin.trials.index');
-        Route::post('trials/{id}/convert', [TrialController::class, 'convertToPaid'])->name('superadmin.trials.convert');
-    });
+// Trials
+Route::prefix('superadmin')->group(function () {
+    Route::get('trials', [TrialController::class, 'index'])->name('superadmin.trials.index');
+    Route::post('trials/{id}/convert', [TrialController::class, 'convertToPaid'])->name('superadmin.trials.convert');
+});
+
 
     // Subscription Routes
     Route::prefix('superadmin')->group(function () {
@@ -580,79 +585,57 @@ Route::middleware('permission:ticket raise')->prefix('user/support/ticket')
     });
 
 
-    // Payments Routes
-    Route::prefix('superadmin')->group(function () {
-        Route::get('payments', [PaymentController::class, 'index'])->name('superadmin.payments.index');
-        Route::get('payments/create', [PaymentController::class, 'index'])->name('superadmin.payments.create');
-        Route::post('payments', [PaymentController::class, 'store'])->name('superadmin.payments.store');
-        Route::get('payments/{payment}', [PaymentController::class, 'show'])->name('superadmin.payments.show');
-        Route::get('payments/{payment}/edit', [PaymentController::class, 'edit'])->name('superadmin.payments.edit');
-        Route::put('payments/{payment}', [PaymentController::class, 'update'])->name('superadmin.payments.update');
-        Route::delete('payments/{payment}', [PaymentController::class, 'destroy'])->name('superadmin.payments.destroy');
-    });
+
+// Payments Routes
+Route::prefix('superadmin')->group(function () {
+    Route::get('payments', [PaymentController::class, 'index'])->name('superadmin.payments.index');
+    Route::get('payments/create', [PaymentController::class, 'index'])->name('superadmin.payments.create');
+    Route::post('payments', [PaymentController::class, 'store'])->name('superadmin.payments.store');
+    Route::get('payments/{payment}', [PaymentController::class, 'show'])->name('superadmin.payments.show');
+    Route::get('payments/{payment}/edit', [PaymentController::class, 'edit'])->name('superadmin.payments.edit');
+    Route::put('payments/{payment}', [PaymentController::class, 'update'])->name('superadmin.payments.update');
+    Route::delete('payments/{payment}', [PaymentController::class, 'destroy'])->name('superadmin.payments.destroy');
+});
 
 
-    // Additional routes
-    Route::prefix('superadmin')->group(function () {
-        Route::post('/payments/{payment}/process', [PaymentController::class, 'processPayment'])->name('superadmin.payments.process');
-        Route::get('/payments/trashed', [PaymentController::class, 'trashed'])->name('superadmin.payments.trashed');
-        Route::post('/payments/{id}/restore', [PaymentController::class, 'restore'])->name('superadmin.payments.restore');
-        Route::delete('/payments/{id}/force-delete', [PaymentController::class, 'forceDelete'])->name('superadmin.payments.force-delete');
-        Route::get('/payments/statistics', [PaymentController::class, 'getStatistics'])->name('superadmin.payments.statistics');
-    });
-    // Invoices
+// Additional routes
+Route::prefix('superadmin')->group(function () {
+    Route::post('/payments/{payment}/process', [PaymentController::class, 'processPayment'])->name('superadmin.payments.process');
+    Route::get('/payments/trashed', [PaymentController::class, 'trashed'])->name('superadmin.payments.trashed');
+    Route::post('/payments/{id}/restore', [PaymentController::class, 'restore'])->name('superadmin.payments.restore');
+    Route::delete('/payments/{id}/force-delete', [PaymentController::class, 'forceDelete'])->name('superadmin.payments.force-delete');
+    Route::get('/payments/statistics', [PaymentController::class, 'getStatistics'])->name('superadmin.payments.statistics');
+});
+// Invoices
 // Route::get('invoices', [InvoiceController::class, 'index'])->name('invoices.index');
 // Route::get('invoices/{id}', [InvoiceController::class, 'show'])->name('invoices.show');
 // Route::get('invoices/{id}/download', [InvoiceController::class, 'download'])->name('invoices.download');
 // Invoices Routes
 // Invoices Routes
 
-    Route::prefix('superadmin')->group(function () {
-        Route::get('invoices', [SuperAdminInvoiceController::class, 'index'])->name('superadmin.invoices.index');
-        Route::get('invoices/create', [SuperAdminInvoiceController::class, 'create'])->name('superadmin.invoices.create');
-        Route::post('invoices', [SuperAdminInvoiceController::class, 'store'])->name('superadmin.invoices.store');
-        Route::get('invoices/{id}', [SuperAdminInvoiceController::class, 'show'])->name('superadmin.invoices.show');
-        Route::get('invoices/{id}/edit', [SuperAdminInvoiceController::class, 'edit'])->name('superadmin.invoices.edit');
-        Route::put('invoices/{id}', [SuperAdminInvoiceController::class, 'update'])->name('superadmin.invoices.update');
-        Route::delete('invoices/{id}', [SuperAdminInvoiceController::class, 'destroy'])->name('superadmin.invoices.destroy');
-        Route::get('invoices/{id}/download', [SuperAdminInvoiceController::class, 'download'])->name('superadmin.invoices.download');
+Route::prefix('superadmin')->group(function () {
+    Route::get('invoices', [SuperAdminInvoiceController::class, 'index'])->name('superadmin.invoices.index');
+    Route::get('invoices/create', [SuperAdminInvoiceController::class, 'create'])->name('superadmin.invoices.create');
+    Route::post('invoices', [SuperAdminInvoiceController::class, 'store'])->name('superadmin.invoices.store');
+    Route::get('invoices/{id}', [SuperAdminInvoiceController::class, 'show'])->name('superadmin.invoices.show');
+    Route::get('invoices/{id}/edit', [SuperAdminInvoiceController::class, 'edit'])->name('superadmin.invoices.edit');
+    Route::put('invoices/{id}', [SuperAdminInvoiceController::class, 'update'])->name('superadmin.invoices.update');
+    Route::delete('invoices/{id}', [SuperAdminInvoiceController::class, 'destroy'])->name('superadmin.invoices.destroy');
+    Route::get('invoices/{id}/download', [SuperAdminInvoiceController::class, 'download'])->name('superadmin.invoices.download');
 
 
 
-        // Additional invoice routes
-        Route::post('invoices/{id}/status', [SuperAdminInvoiceController::class, 'updateStatus'])->name('superadmin.invoices.status.update');
-        Route::post('invoices/bulk-delete', [SuperAdminInvoiceController::class, 'bulkDelete'])->name('superadmin.invoices.bulk.delete');
-        Route::post('invoices/bulk-download', [SuperAdminInvoiceController::class, 'bulkDownload'])->name('superadmin.invoices.bulk.download');
-        Route::get('invoices/stats', [SuperAdminInvoiceController::class, 'getStats'])->name('superadmin.invoices.stats');
-        Route::get('invoices/export', [SuperAdminInvoiceController::class, 'export'])->name('superadmin.invoices.export');
-        Route::post('invoices/preview', [InvoiceController::class, 'preview'])->name('superadmin.invoices.preview');
-        Route::get('invoices/search', [SuperAdminInvoiceController::class, 'search'])->name('superadmin.invoices.search');
+    // Additional invoice routes
+    Route::post('invoices/{id}/status', [SuperAdminInvoiceController::class, 'updateStatus'])->name('superadmin.invoices.status.update');
+    Route::post('invoices/bulk-delete', [SuperAdminInvoiceController::class, 'bulkDelete'])->name('superadmin.invoices.bulk.delete');
+    Route::post('invoices/bulk-download', [SuperAdminInvoiceController::class, 'bulkDownload'])->name('superadmin.invoices.bulk.download');
+    Route::get('invoices/stats', [SuperAdminInvoiceController::class, 'getStats'])->name('superadmin.invoices.stats');
+    Route::get('invoices/export', [SuperAdminInvoiceController::class, 'export'])->name('superadmin.invoices.export');
+    Route::post('invoices/preview', [InvoiceController::class, 'preview'])->name('superadmin.invoices.preview');
+    Route::get('invoices/search', [SuperAdminInvoiceController::class, 'search'])->name('superadmin.invoices.search');
 
-        Route::post('/invoices/{invoice}/mark-paid', [SuperAdminInvoiceController::class, 'markAsPaid'])->name('superadmin.invoices.mark-paid');
-    });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    Route::prefix('ticket/record')->name('ticket.record.')->group(function () {
-        Route::get('/', [TicketRecordController::class, 'index'])->name('index');
-        Route::get('/{id}', [TicketRecordController::class, 'show'])->name('show');
-        Route::put('/{id}', [TicketRecordController::class, 'update'])->name('update');
-        Route::delete('/{id}', [TicketRecordController::class, 'destroy'])->name('destroy');
-        Route::post('/{id}/reply', [TicketRecordController::class, 'reply'])->name('reply');
-    });
+    Route::post('/invoices/{invoice}/mark-paid', [SuperAdminInvoiceController::class, 'markAsPaid'])->name('superadmin.invoices.mark-paid');
+});
 
 
 
@@ -668,46 +651,69 @@ Route::middleware('permission:ticket raise')->prefix('user/support/ticket')
 
 
 
-    // Revenue
-    Route::prefix('superadmin')->group(function () {
-        Route::get('revenue', [RevenueController::class, 'index'])->name('superadmin.revenue.index');
-    });
 
-    // Settings
-    Route::prefix('superadmin')->group(function () {
-        Route::get('settings', [SettingsController::class, 'index'])->name('superadmin.settings.index');
-        Route::post('settings', [SettingsController::class, 'update'])->name('superadmin.settings.update');
-    });
+Route::prefix('ticket/record')->name('ticket.record.')->group(function () {
+    Route::get('/', [TicketRecordController::class, 'index'])->name('index');
+    Route::get('/{id}', [TicketRecordController::class, 'show'])->name('show');
+    Route::put('/{id}', [TicketRecordController::class, 'update'])->name('update');
+    Route::delete('/{id}', [TicketRecordController::class, 'destroy'])->name('destroy');
+    Route::post('/{id}/reply', [TicketRecordController::class, 'reply'])->name('reply');
+});
 
-    // Profile
-    Route::get('superadmin/profile', function () {
-        return view('profile');
-    })->name('superadmin.profile');
 
-    // Notifications
-    Route::get('superadmin/notifications', function () {
-        return view('notifications');
-    })->name('superadmin.notifications');
 
-    // Export
-    Route::get('superadmin/export', function () {
-        return view('export');
-    })->name('superadmin.export');
 
-    // Reports
-    Route::get('superadmin/reports', function () {
-        return view('reports');
-    })->name('superadmin.reports');
 
-    // Analytics
-    Route::get('superadmin/analytics', function () {
-        return view('analytics');
-    })->name('superadmin.analytics');
 
-    // Help
-    Route::get('superadmin/help', function () {
-        return view('help');
-    })->name('superadmin.help');
+
+
+
+
+
+
+
+
+
+// Revenue
+Route::prefix('superadmin')->group(function () {
+    Route::get('revenue', [RevenueController::class, 'index'])->name('superadmin.revenue.index');
+});
+
+// Settings
+Route::prefix('superadmin')->group(function () {
+    Route::get('settings', [SettingsController::class, 'index'])->name('superadmin.settings.index');
+    Route::post('settings', [SettingsController::class, 'update'])->name('superadmin.settings.update');
+});
+
+// Profile
+Route::get('superadmin/profile', function () {
+    return view('profile');
+})->name('superadmin.profile');
+
+// Notifications
+Route::get('superadmin/notifications', function () {
+    return view('notifications');
+})->name('superadmin.notifications');
+
+// Export
+Route::get('superadmin/export', function () {
+    return view('export');
+})->name('superadmin.export');
+
+// Reports
+Route::get('superadmin/reports', function () {
+    return view('reports');
+})->name('superadmin.reports');
+
+// Analytics
+Route::get('superadmin/analytics', function () {
+    return view('analytics');
+})->name('superadmin.analytics');
+
+// Help
+Route::get('superadmin/help', function () {
+    return view('help');
+})->name('superadmin.help');
 
 
 
@@ -791,4 +797,28 @@ Route::get('/debug-roles', function () {
 Route::post('/notifications/read', function () {
     auth()->user()->unreadNotifications->markAsRead();
     return response()->json(['success' => true]);
+});
+
+// TEMPORARY FIX ROUTE
+Route::get('/fix-permissions', function () {
+    $missing = ['admin portal', 'employeeportal', 'project management'];
+    foreach ($missing as $p) {
+        \Spatie\Permission\Models\Permission::firstOrCreate(['name' => $p, 'guard_name' => 'web']);
+    }
+
+    $user = auth()->user();
+    if (!$user)
+        return 'Login first';
+
+    $role = \App\Models\Role::where('name', 'admin')
+        ->where('company_id', $user->company_id)
+        ->first();
+
+    if ($role) {
+        // Sync ALL permissions to this admin role
+        $role->syncPermissions(\Spatie\Permission\Models\Permission::all());
+        return 'SUCCESS: Added missing permissions and synced Admin role for company: ' . $user->company->name;
+    }
+
+    return 'ERROR: Admin role not found for this company.';
 });

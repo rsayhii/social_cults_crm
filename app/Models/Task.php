@@ -14,7 +14,7 @@ class Task extends Model
     use HasFactory;
 
     protected $fillable = [
-         'company_id',
+        'company_id',
         'title',
         'description',
         'category',
@@ -55,9 +55,9 @@ class Task extends Model
 
     // Accessor for formatted due date
     public function getFormattedDueDateAttribute()
-{
-    return $this->due_date ? \Carbon\Carbon::parse($this->due_date)->format('M d, Y') : null;
-}
+    {
+        return $this->due_date ? \Carbon\Carbon::parse($this->due_date)->format('M d, Y') : null;
+    }
 
     // Method to assign to team (role) using Spatie
     public function assignToTeam($roleId)
@@ -65,32 +65,50 @@ class Task extends Model
         $role = Role::findOrFail($roleId);
         $this->update(['assigned_to_team' => true, 'assigned_role_id' => $roleId]);
         $users = $role->users; // Spatie method to get users with this role
-        $this->users()->attach($users->pluck('id'));
+
+        // Prepare pivot data with company_id
+        $pivotData = [];
+        $companyId = auth()->check() ? auth()->user()->company_id : $this->company_id;
+
+        foreach ($users as $user) {
+            $pivotData[$user->id] = ['company_id' => $companyId];
+        }
+
+        $this->users()->sync($pivotData);
     }
 
     // Method to assign to specific users
     public function assignToUsers($userIds)
     {
         $this->update(['assigned_to_team' => false, 'assigned_role_id' => null]);
-        $this->users()->sync($userIds);
+
+        // Prepare pivot data with company_id
+        $pivotData = [];
+        $companyId = auth()->check() ? auth()->user()->company_id : $this->company_id;
+
+        foreach ($userIds as $userId) {
+            $pivotData[$userId] = ['company_id' => $companyId];
+        }
+
+        $this->users()->sync($pivotData);
     }
 
 
     protected static function booted()
-{
-    // 🔐 Auto-assign company_id on create
-    static::creating(function ($task) {
-        if (auth()->check()) {
-            $task->company_id = auth()->user()->company_id;
-        }
-    });
+    {
+        // 🔐 Auto-assign company_id on create
+        static::creating(function ($task) {
+            if (auth()->check()) {
+                $task->company_id = auth()->user()->company_id;
+            }
+        });
 
-    // 🔒 Global company scope (VERY IMPORTANT)
-    static::addGlobalScope('company', function ($query) {
-        if (auth()->check()) {
-            $query->where('company_id', auth()->user()->company_id);
-        }
-    });
-}
+        // 🔒 Global company scope (VERY IMPORTANT)
+        static::addGlobalScope('company', function ($query) {
+            if (auth()->check()) {
+                $query->where('company_id', auth()->user()->company_id);
+            }
+        });
+    }
 
 }

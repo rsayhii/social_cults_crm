@@ -8,21 +8,28 @@ use Illuminate\Database\Eloquent\Model;
 
 class Proposal extends Model
 {
-     use HasFactory;
+    use HasFactory;
 
 
-     protected $fillable = [
+    protected $fillable = [
+        'company_id',
         'user_id',
         'client_id',
         'title',
         'description',
+        'content',
+        'settings',
         'amount',
         'status',
         'file_path',
     ];
 
+    protected $casts = [
+        'settings' => 'array',
+    ];
 
-     public function client()
+
+    public function client()
     {
         return $this->belongsTo(\App\Models\Client::class, 'client_id');
     }
