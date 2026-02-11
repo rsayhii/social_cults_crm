@@ -22,6 +22,7 @@ class Company extends Model
         'trial_ends_at',
         'is_paid',
         'status',
+        'hidden_proposal_templates',
     ];
 
 
@@ -30,6 +31,7 @@ class Company extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'trial_ends_at' => 'datetime',
+        'hidden_proposal_templates' => 'array',
     ];
 
     public function user(): BelongsTo

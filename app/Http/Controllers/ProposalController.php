@@ -168,4 +168,66 @@ class ProposalController extends Controller
 
         return response()->json(['success' => true, 'proposal_id' => $proposal->id]);
     }
+
+    /**
+     * Get hidden templates for the authenticated company
+     */
+    public function getHiddenTemplates()
+    {
+        $user = Auth::user();
+        $company = \App\Models\Company::find($user->company_id);
+
+        $hiddenTemplates = $company->hidden_proposal_templates ?? [];
+
+        return response()->json(['hidden_templates' => $hiddenTemplates]);
+    }
+
+    /**
+     * Hide a default template for the authenticated company
+     */
+    public function hideTemplate(Request $request)
+    {
+        $request->validate([
+            'template_key' => 'required|string'
+        ]);
+
+        $user = Auth::user();
+        $company = \App\Models\Company::find($user->company_id);
+
+        $hiddenTemplates = $company->hidden_proposal_templates ?? [];
+
+        // Add template key if not already hidden
+        if (!in_array($request->template_key, $hiddenTemplates)) {
+            $hiddenTemplates[] = $request->template_key;
+            $company->hidden_proposal_templates = $hiddenTemplates;
+            $company->save();
+        }
+
+        return response()->json(['success' => true, 'hidden_templates' => $hiddenTemplates]);
+    }
+
+    /**
+     * Unhide a template for the authenticated company
+     */
+    public function unhideTemplate(Request $request)
+    {
+        $request->validate([
+            'template_key' => 'required|string'
+        ]);
+
+        $user = Auth::user();
+        $company = \App\Models\Company::find($user->company_id);
+
+        $hiddenTemplates = $company->hidden_proposal_templates ?? [];
+
+        // Remove template key from hidden list
+        $hiddenTemplates = array_values(array_filter($hiddenTemplates, function ($key) use ($request) {
+            return $key !== $request->template_key;
+        }));
+
+        $company->hidden_proposal_templates = $hiddenTemplates;
+        $company->save();
+
+        return response()->json(['success' => true, 'hidden_templates' => $hiddenTemplates]);
+    }
 }
