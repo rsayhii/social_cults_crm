@@ -1754,7 +1754,7 @@
                     //formatted HTML document for Word
 
                     // Create a Blob with the HTML content
-                    const blob = new Blob([htmlContent], { type: 'application/msword' });
+                    const blob = new Blob([content], { type: 'application/msword' });
 
                     // Create a download link
                     const link = document.createElement('a');
