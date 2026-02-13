@@ -149,33 +149,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!overlay) return;
 
+
     document.body.style.overflow = 'hidden';
 
-    // Play sound
-    if(sound) {
-        setTimeout(() => { sound.play().catch(() => {}); }, 400);
-    }
+            // Play sound
+            if (sound) {
+                setTimeout(() => { sound.play().catch(() => { }); }, 400);
+            }
 
-    // Keep it on screen for 3 seconds, then fade out
-    setTimeout(() => {
-        overlay.classList.add('premium-exit');
-        setTimeout(() => {
-            overlay.remove();
-            document.body.style.overflow = '';
-        }, 1200);
-    }, 3000);
-});
-</script>
-
-
-
-
-
-
-
-
-
-
+            // Keep it on screen for 3 seconds, then fade out
+            setTimeout(() => {
+                overlay.classList.add('premium-exit');
+                setTimeout(() => {
+                    overlay.remove();
+                    document.body.style.overflow = '';
+                }, 1200);
+            }, 5000);
+        });
+    </script>
     
     <div class="min-h-screen flex">
 

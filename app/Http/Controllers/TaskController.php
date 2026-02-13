@@ -16,7 +16,7 @@ class TaskController extends Controller
     public function index()
     {
         $tasks = Task::with('users', 'role', 'assigner.roles')->recent()->get();
-        $users = User::with('roles')->get();
+        $users = User::with('roles')->where('company_id',Auth::user()->company_id)->get();
         $roles = Role::forCompany(Auth::user()->company_id)->get();
 
         // Calculate stats
@@ -24,6 +24,7 @@ class TaskController extends Controller
         $pending = $tasks->where('status', 'Pending')->count();
         $inProgress = $tasks->where('status', 'In Progress')->count();
         $completed = $tasks->where('status', 'Completed')->count();
+
 
         return view('admin.task', compact(
             'tasks',

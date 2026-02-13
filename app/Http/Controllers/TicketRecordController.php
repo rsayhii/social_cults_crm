@@ -33,7 +33,17 @@ class TicketRecordController extends Controller
 
         $tickets = $query->orderBy('created_at', 'desc')->paginate(15);
 
-        return view('admin.support.support_desk', compact('tickets', 'stats'));
+        // Fetch recurring issues (Permission stats)
+        $issueStats = HelpAndSupport::whereNotNull('issue_permissions')
+            ->get()
+            ->flatMap(function ($ticket) {
+                return $ticket->issue_permissions ?? [];
+            })
+            ->countBy()
+            ->sortDesc()
+            ->take(6); // Show top 6 issues
+
+        return view('admin.support.support_desk', compact('tickets', 'stats', 'issueStats'));
     }
 
     public function show($id)
