@@ -1295,12 +1295,18 @@
             elements.locationModal?.classList.add('hidden');
         }
 
-        function updateCurrentDateTime() {
-            const now = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
-            const date = new Date(now).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: '2-digit', month: '2-digit', year: 'numeric' });
-            const parts = date.split('/');
-            elements.currentDate.textContent = `${parts[0]}-${parts[1]}-${parts[2]}`;
-        }
+       function updateCurrentDateTime() {
+    const now = new Date(
+        new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' })
+    );
+
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+
+    elements.currentDate.textContent = `${dd}-${mm}-${yyyy}`;
+}
+
 
         async function ajaxPost(route, data = {}) {
             const response = await fetch(route, {
