@@ -480,7 +480,7 @@
                             Close Preview
                         </button>
                         <button id="useTemplateFromPreview"
-                            class="px-8 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold">
+                            class="px-8 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold hidden">
                             <i class="fas fa-plus mr-2"></i> Use This Template
                         </button>
                     </div>
