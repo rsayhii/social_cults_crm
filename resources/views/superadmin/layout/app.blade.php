@@ -170,6 +170,17 @@
                             <span>Settings</span>
                         </a>
                     </li>
+                    <li>
+    <form method="GET" action="{{ route('superadmin.logout') }}">
+        @csrf
+        <button type="submit"
+            class="w-full text-left flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-red-50 hover:text-red-600 transition duration-200">
+            
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+        </button>
+    </form>
+</li>
                 </ul>
             </div>
         </aside>

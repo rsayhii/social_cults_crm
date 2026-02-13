@@ -44,5 +44,9 @@ class Kernel extends HttpKernel
 
         // ✅ Your custom middleware
         'company.access' => \App\Http\Middleware\CheckCompanyAccess::class,
+
+
+        'superadmin' => \App\Http\Middleware\SuperadminMiddleware::class,
+
     ];
 }

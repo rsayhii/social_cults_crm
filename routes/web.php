@@ -43,6 +43,7 @@ use App\Http\Controllers\SuperAdmin\SuperAdminDashboardController;
 use App\Http\Controllers\SuperAdmin\SuperAdminInvoiceController;
 use App\Http\Controllers\SuperAdmin\TrialController;
 use App\Http\Controllers\FreeTrialController;
+use App\Http\Controllers\Superadmin\AuthController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\TicketRecordController;
 use App\Http\Controllers\UpgradePlanController;
@@ -555,11 +556,63 @@ Route::middleware(['auth', CheckCompanyAccess::class])->group(function () {
 // ***********************************************************************
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ***********************************************************************
+// ******************** START SUPERADMIN OF ROUTES FILE ******************
+// ***********************************************************************
+Route::prefix('superadmin')->group(function () {
+
+
+Route::get('login', [AuthController::class, 'showLogin'])->name('superadmin.login');
+    Route::post('login', [AuthController::class, 'login'])->name('superadmin.login.submit');
+
+
+
+
+
+ Route::middleware('superadmin')->group(function () {
+
 // Dashboard
-Route::get('/superadmin', [SuperAdminDashboardController::class, 'index'])->name('superadmin.dashboard');
+Route::get('/', [SuperAdminDashboardController::class, 'index'])->name('superadmin.dashboard');
 
 // Customers
-Route::prefix('superadmin')->group(function () {
+
     Route::get('customers', [CustomerController::class, 'index'])->name('superadmin.customers.index');
     Route::get('customers/create', [CustomerController::class, 'create'])->name('superadmin.customers.create');
     Route::post('customers', [CustomerController::class, 'store'])->name('superadmin.customers.store');
@@ -567,27 +620,23 @@ Route::prefix('superadmin')->group(function () {
     Route::get('customers/{customer}/edit', [CustomerController::class, 'edit'])->name('superadmin.customers.edit');
     Route::put('customers/{customer}', [CustomerController::class, 'update'])->name('superadmin.customers.update');
     Route::delete('customers/{customer}', [CustomerController::class, 'destroy'])->name('superadmin.customers.destroy');
-});
+
+
 
 // Trials
-Route::prefix('superadmin')->group(function () {
+
     Route::get('trials', [TrialController::class, 'index'])->name('superadmin.trials.index');
     Route::post('trials/{id}/convert', [TrialController::class, 'convertToPaid'])->name('superadmin.trials.convert');
-});
+
 
 
     // Subscription Routes
-    Route::prefix('superadmin')->group(function () {
+
         Route::get('subscriptions', [SubscriptionController::class, 'index'])->name('superadmin.subscriptions.index');
-        // Route::get('subscriptions/create', [SubscriptionController::class, 'create'])->name('superadmin.subscriptions.create');
-        // Route::post('subscriptions', [SubscriptionController::class, 'store'])->name('superadmin.subscriptions.store');
-        // Route::post('subscriptions/{id}/renew', [SubscriptionController::class, 'renew'])->name('superadmin.subscriptions.renew');
-    });
-
-
+   
 
 // Payments Routes
-Route::prefix('superadmin')->group(function () {
+
     Route::get('payments', [PaymentController::class, 'index'])->name('superadmin.payments.index');
     Route::get('payments/create', [PaymentController::class, 'index'])->name('superadmin.payments.create');
     Route::post('payments', [PaymentController::class, 'store'])->name('superadmin.payments.store');
@@ -595,25 +644,20 @@ Route::prefix('superadmin')->group(function () {
     Route::get('payments/{payment}/edit', [PaymentController::class, 'edit'])->name('superadmin.payments.edit');
     Route::put('payments/{payment}', [PaymentController::class, 'update'])->name('superadmin.payments.update');
     Route::delete('payments/{payment}', [PaymentController::class, 'destroy'])->name('superadmin.payments.destroy');
-});
+
 
 
 // Additional routes
-Route::prefix('superadmin')->group(function () {
+
+
     Route::post('/payments/{payment}/process', [PaymentController::class, 'processPayment'])->name('superadmin.payments.process');
     Route::get('/payments/trashed', [PaymentController::class, 'trashed'])->name('superadmin.payments.trashed');
     Route::post('/payments/{id}/restore', [PaymentController::class, 'restore'])->name('superadmin.payments.restore');
     Route::delete('/payments/{id}/force-delete', [PaymentController::class, 'forceDelete'])->name('superadmin.payments.force-delete');
     Route::get('/payments/statistics', [PaymentController::class, 'getStatistics'])->name('superadmin.payments.statistics');
-});
-// Invoices
-// Route::get('invoices', [InvoiceController::class, 'index'])->name('invoices.index');
-// Route::get('invoices/{id}', [InvoiceController::class, 'show'])->name('invoices.show');
-// Route::get('invoices/{id}/download', [InvoiceController::class, 'download'])->name('invoices.download');
-// Invoices Routes
-// Invoices Routes
 
-Route::prefix('superadmin')->group(function () {
+
+
     Route::get('invoices', [SuperAdminInvoiceController::class, 'index'])->name('superadmin.invoices.index');
     Route::get('invoices/create', [SuperAdminInvoiceController::class, 'create'])->name('superadmin.invoices.create');
     Route::post('invoices', [SuperAdminInvoiceController::class, 'store'])->name('superadmin.invoices.store');
@@ -622,8 +666,6 @@ Route::prefix('superadmin')->group(function () {
     Route::put('invoices/{id}', [SuperAdminInvoiceController::class, 'update'])->name('superadmin.invoices.update');
     Route::delete('invoices/{id}', [SuperAdminInvoiceController::class, 'destroy'])->name('superadmin.invoices.destroy');
     Route::get('invoices/{id}/download', [SuperAdminInvoiceController::class, 'download'])->name('superadmin.invoices.download');
-
-
 
     // Additional invoice routes
     Route::post('invoices/{id}/status', [SuperAdminInvoiceController::class, 'updateStatus'])->name('superadmin.invoices.status.update');
@@ -635,85 +677,47 @@ Route::prefix('superadmin')->group(function () {
     Route::get('invoices/search', [SuperAdminInvoiceController::class, 'search'])->name('superadmin.invoices.search');
 
     Route::post('/invoices/{invoice}/mark-paid', [SuperAdminInvoiceController::class, 'markAsPaid'])->name('superadmin.invoices.mark-paid');
-});
 
 
 
 
+     Route::get('logout', [AuthController::class, 'logout'])->name('superadmin.logout');
+    
 
 
-
-
-
-
-
-
-
-
-
-
-Route::prefix('ticket/record')->name('ticket.record.')->group(function () {
-    Route::get('/', [TicketRecordController::class, 'index'])->name('index');
-    Route::get('/{id}', [TicketRecordController::class, 'show'])->name('show');
-    Route::put('/{id}', [TicketRecordController::class, 'update'])->name('update');
-    Route::delete('/{id}', [TicketRecordController::class, 'destroy'])->name('destroy');
-    Route::post('/{id}/reply', [TicketRecordController::class, 'reply'])->name('reply');
-});
-
-
-
-
-
-
-
-
-
-
-
-
-
+    Route::get('/ticket/record', [TicketRecordController::class, 'index'])->name('ticket.record.index');
+    Route::get('/ticket/record/{id}', [TicketRecordController::class, 'show'])->name('ticket.record.show');
+    Route::put('/ticket/record/{id}', [TicketRecordController::class, 'update'])->name('ticket.record.update');
+    Route::delete('/ticket/record/{id}', [TicketRecordController::class, 'destroy'])->name('ticket.record.destroy');
+    Route::post('/ticket/record/{id}/reply', [TicketRecordController::class, 'reply'])->name('ticket.record.reply');
 
 
 // Revenue
-Route::prefix('superadmin')->group(function () {
+
+
+
     Route::get('revenue', [RevenueController::class, 'index'])->name('superadmin.revenue.index');
-});
+
 
 // Settings
-Route::prefix('superadmin')->group(function () {
+
     Route::get('settings', [SettingsController::class, 'index'])->name('superadmin.settings.index');
     Route::post('settings', [SettingsController::class, 'update'])->name('superadmin.settings.update');
-});
+
+
+
 
 // Profile
-Route::get('superadmin/profile', function () {
+Route::get('/profile', function () {
     return view('profile');
 })->name('superadmin.profile');
 
-// Notifications
-Route::get('superadmin/notifications', function () {
-    return view('notifications');
-})->name('superadmin.notifications');
 
-// Export
-Route::get('superadmin/export', function () {
-    return view('export');
-})->name('superadmin.export');
-
-// Reports
-Route::get('superadmin/reports', function () {
-    return view('reports');
-})->name('superadmin.reports');
-
-// Analytics
-Route::get('superadmin/analytics', function () {
-    return view('analytics');
-})->name('superadmin.analytics');
-
-// Help
-Route::get('superadmin/help', function () {
-    return view('help');
-})->name('superadmin.help');
+  });
+});
+// ***********************************************************************
+// ******************** END SUPERADMIN OF ROUTES FILE ********************
+// ***********************************************************************
 
 
 

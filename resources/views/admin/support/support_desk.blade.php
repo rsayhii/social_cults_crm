@@ -25,6 +25,35 @@
             </div>
         </div>
 
+        <!-- Issue-Facing Items (Recurring Problems) -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-8 border-l-4 border-blue-600">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                    <i class="fas fa-exclamation-triangle text-amber-500"></i>
+                    Issue-Facing Items
+                </h3>
+                <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded">Top Recurring Issues</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                @forelse($issueStats as $issue => $count)
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100 hover:border-blue-200 transition-colors">
+                        <span class="text-sm font-medium text-gray-700 truncate pr-2" title="{{ $issue }}">
+                            {{ $issue }}
+                        </span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">
+                                {{ $count }} {{ Str::plural('ticket', $count) }}
+                            </span>
+                        </div>
+                    </div>
+                @empty
+                    <div class="col-span-full py-4 text-center text-gray-500 italic text-sm">
+                        No recurring issues tracked yet.
+                    </div>
+                @endforelse
+            </div>
+        </div>
+
         <!-- Filters & List -->
         <div class="bg-white rounded-xl shadow-sm overflow-hidden">
             <div class="p-6 border-b border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">

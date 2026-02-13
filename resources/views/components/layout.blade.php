@@ -155,7 +155,7 @@
             if (!overlay) return;
 
             document.body.style.overflow = 'hidden';
-
+            
             // Play sound
             if (sound) {
                 setTimeout(() => { sound.play().catch(() => { }); }, 400);
@@ -168,20 +168,10 @@
                     overlay.remove();
                     document.body.style.overflow = '';
                 }, 1200);
-            }, 3000);
+            }, 5000);
         });
     </script>
-
-
-
-
-
-
-
-
-
-
-
+    
     <div class="min-h-screen flex">
 
 
