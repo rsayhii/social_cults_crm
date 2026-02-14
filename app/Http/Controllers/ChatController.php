@@ -213,13 +213,14 @@ class ChatController extends Controller
             $senderIsClient = $sender ? $sender->roles->contains(fn($role) => strtolower($role->name) === 'client') : false;
             $senderIsAdmin = $sender ? $sender->roles->contains(fn($role) => strtolower($role->name) === 'admin') : false;
 
-            // Sender always sees their own messages
+            // Sender always sees their own messages, BUT filtered by subgroup context
             if ($m->sender_id == $user->id) {
-                // But if viewing a specific subgroup, only show if message matches that context
-                if ($subgroupContextInt !== null && ($isUserAdmin || $isUserClient)) {
+                // If viewing a specific subgroup/role channel, only show messages for that role
+                if ($subgroupContextInt !== null) {
                     return $messageTargetRoleId === $subgroupContextInt;
                 }
-                return true;
+                // If viewing "All Teams", only show messages sent to "All Teams" (target_role_id IS NULL)
+                return $messageTargetRoleId === null;
             }
 
             // If admin/client is viewing a specific subgroup, only show messages for that team
@@ -227,25 +228,24 @@ class ChatController extends Controller
                 return $messageTargetRoleId === $subgroupContextInt;
             }
 
-            // Admins and clients viewing "All Teams" see all messages
+            // Admins and clients viewing "All Teams" ONLY see messages sent to "All Teams" (target_role_id IS NULL)
+            // This achieves complete message isolation between "All Teams" and role-specific channels
             if ($isUserAdmin || $isUserClient) {
-                return true;
+                return $messageTargetRoleId === null;
             }
 
-            // === STANDARD USER (TEAM MEMBER) LOGIC ===
 
-            // If message is FROM client/admin, show to ALL team members (no filtering)
-            if ($senderIsClient || $senderIsAdmin) {
-                return true;
+            // === EMPLOYEE (TEAM MEMBER) LOGIC ===
+            // Employees now respect subgroup context filtering for complete message isolation
+
+            if ($subgroupContextInt !== null) {
+                // Employee viewing specific role channel (e.g., "My Team (Developer)")
+                // Only show messages targeted to that specific role
+                return $messageTargetRoleId === $subgroupContextInt;
             }
 
-            // If no target role (sent to All), everyone sees it
-            if (!$messageTargetRoleId) {
-                return true;
-            }
-
-            // Team members only see messages from OTHER team members if targeted at their team
-            return in_array($messageTargetRoleId, $userRoleIds);
+            // Employee viewing "All Teams" - only show messages sent to "All Teams" (NULL target_role_id)
+            return $messageTargetRoleId === null;
         });
 
         $messages = $filteredMessages->map(function ($m) {
@@ -293,26 +293,13 @@ class ChatController extends Controller
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
-        // Determine target_role_id
+        // Determine target_role_id from frontend request
+        // Frontend now provides target_role_id for ALL users:
+        // - "All Teams" selected → target_role_id = NULL (not sent in request)
+        // - Specific role selected → target_role_id = role ID
         $targetRoleId = $request->target_role_id;
 
-        // For group chats: auto-tag team member messages with their role
-        // (so only their team + client + admin can see them)
-        if ($conversation->type === 'group' && !$targetRoleId) {
-            $isAdmin = $user->hasRole('admin');
-            $isClient = $user->roles->contains(fn($role) => strtolower($role->name) === 'client');
-
-            // If not admin/client, auto-tag with sender's first non-admin/non-client role
-            if (!$isAdmin && !$isClient) {
-                $userRole = $user->roles->first(
-                    fn($role) =>
-                    strtolower($role->name) !== 'admin' && strtolower($role->name) !== 'client'
-                );
-                if ($userRole) {
-                    $targetRoleId = $userRole->id;
-                }
-            }
-        }
+        // Auto-tagging removed - frontend controls target_role_id for employees
 
         $msg = Message::create([
             'conversation_id' => $conversation->id,
@@ -772,9 +759,41 @@ class ChatController extends Controller
     }
 
     /**
+     * Update group name (Admin only)
+     */
+    public function updateGroupName(Request $request, $id)
+    {
+        $user = Auth::user();
+
+        if (!$user->hasRole('admin')) {
+            return response()->json(['error' => 'Only admins can update groups'], 403);
+        }
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        $group = Conversation::where('id', $id)
+            ->where('company_id', $user->company_id)
+            ->where('type', 'group')
+            ->firstOrFail();
+
+        $group->name = $request->name;
+        $group->save();
+
+        return response()->json([
+            'success' => true,
+            'group' => [
+                'id' => $group->id,
+                'name' => $group->name,
+            ],
+        ]);
+    }
+
+    /**
      * Add members to an existing group (Admin only)
      */
-    public function addGroupMembers(Request $request)
+    public function addGroupMembers(Request $request, $id)
     {
         $user = Auth::user();
 
@@ -783,12 +802,11 @@ class ChatController extends Controller
         }
 
         $request->validate([
-            'conversation_id' => 'required|exists:conversations,id',
             'member_ids' => 'required|array|min:1',
             'member_ids.*' => 'exists:users,id',
         ]);
 
-        $group = Conversation::where('id', $request->conversation_id)
+        $group = Conversation::where('id', $id)
             ->where('company_id', $user->company_id)
             ->where('type', 'group')
             ->firstOrFail();
@@ -815,7 +833,7 @@ class ChatController extends Controller
     /**
      * Remove a member from a group (Admin only)
      */
-    public function removeGroupMember(Request $request)
+    public function removeGroupMember(Request $request, $id, $userId)
     {
         $user = Auth::user();
 
@@ -823,12 +841,7 @@ class ChatController extends Controller
             return response()->json(['error' => 'Only admins can remove members'], 403);
         }
 
-        $request->validate([
-            'conversation_id' => 'required|exists:conversations,id',
-            'user_id' => 'required|exists:users,id',
-        ]);
-
-        $group = Conversation::where('id', $request->conversation_id)
+        $group = Conversation::where('id', $id)
             ->where('company_id', $user->company_id)
             ->where('type', 'group')
             ->firstOrFail();
@@ -838,12 +851,12 @@ class ChatController extends Controller
             ->whereHas('roles', fn($q) => $q->where('name', 'admin'))
             ->count();
 
-        $memberToRemove = User::find($request->user_id);
+        $memberToRemove = User::find($userId);
         if ($adminCount <= 1 && $memberToRemove && $memberToRemove->hasRole('admin')) {
             return response()->json(['error' => 'Cannot remove the last admin from the group'], 400);
         }
 
-        $group->participants()->detach($request->user_id);
+        $group->participants()->detach($userId);
 
         return response()->json([
             'success' => true,
@@ -932,7 +945,7 @@ class ChatController extends Controller
     /**
      * Delete a group (Admin only)
      */
-    public function deleteGroup(Request $request)
+    public function deleteGroup(Request $request, $id)
     {
         $user = Auth::user();
 
@@ -940,11 +953,7 @@ class ChatController extends Controller
             return response()->json(['error' => 'Only admins can delete groups'], 403);
         }
 
-        $request->validate([
-            'conversation_id' => 'required|exists:conversations,id',
-        ]);
-
-        $group = Conversation::where('id', $request->conversation_id)
+        $group = Conversation::where('id', $id)
             ->where('company_id', $user->company_id)
             ->where('type', 'group')
             ->firstOrFail();
@@ -1005,6 +1014,23 @@ class ChatController extends Controller
                     ];
                 }
             }
+        }
+
+        // For non-admin/non-client users (employees), filter to only their own role(s)
+        $isAdmin = $user->hasRole('admin');
+        $isClient = $user->roles->contains(fn($role) => strtolower($role->name) === 'client');
+
+        if (!$isAdmin && !$isClient) {
+            // Get user's non-admin/non-client role IDs
+            $userRoleIds = $user->roles
+                ->filter(fn($role) => strtolower($role->name) !== 'admin' && strtolower($role->name) !== 'client')
+                ->pluck('id')
+                ->toArray();
+
+            // Filter teams to only include user's roles
+            $roleTeams = array_filter($roleTeams, function ($team) use ($userRoleIds) {
+                return in_array($team['id'], $userRoleIds);
+            });
         }
 
         return response()->json(array_values($roleTeams));
