@@ -458,7 +458,7 @@
                                     @method('DELETE')
                                 </form>
                                 <button type="button" class="delete-task-btn text-red-500 hover:text-red-700 transition-colors duration-200 cursor-pointer">
-                                    <i class="fas fa-trash"></i>
+                                    <!-- <i class="fas fa-trash"></i>    -->
                                 </button>
                                 <button class="task-menu p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-all duration-200 cursor-pointer">
                                     <i class="fas fa-ellipsis-v"></i>

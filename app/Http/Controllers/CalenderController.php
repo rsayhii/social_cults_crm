@@ -111,7 +111,7 @@ class CalenderController extends Controller
         /* -------------------------
         5. LEAVES (From EmployeePortal)
      ------------------------- */
-        $leaves = EmployeePortal::get()
+        $leaves = EmployeePortal::where('company_id', $companyId)->get()
             ->map(function ($leave) {
                 return [
                     'id' => $leave->id,

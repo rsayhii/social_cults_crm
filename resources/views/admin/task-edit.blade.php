@@ -1042,7 +1042,7 @@
     </div>
 
     <script>
-        const csrfToken = document.querySelector('[name=_token]').value;
+        // csrfToken is already declared in layout component
         let selectedFiles = [];
         let selectedUsers = new Set();
 
@@ -1051,8 +1051,8 @@
             selectedUsers.add('{{ $user->id }}');
         @endforeach
 
-            // Category functionality
-            const categorySelect = document.getElementById('taskCategory');
+                    // Category functionality
+                    const categorySelect = document.getElementById('taskCategory');
         const customContainer = document.getElementById('customCategoryContainer');
         const customInput = document.getElementById('customCategoryInput');
 
@@ -1117,11 +1117,29 @@
         function initializeUserSelection() {
             const allUserCheckboxes = document.querySelectorAll('.user-checkbox');
 
+            // Helper function to update checkmark UI
+            function updateCheckmarkUI(card, isSelected) {
+                const checkIndicator = card.querySelector('.check-indicator');
+                const checkIcon = card.querySelector('.check-indicator i');
+
+                if (isSelected) {
+                    checkIndicator.classList.add('bg-indigo-500', 'border-indigo-500');
+                    checkIndicator.classList.remove('border-gray-300');
+                    checkIcon.classList.remove('opacity-0');
+                } else {
+                    checkIndicator.classList.remove('bg-indigo-500', 'border-indigo-500');
+                    checkIndicator.classList.add('border-gray-300');
+                    checkIcon.classList.add('opacity-0');
+                }
+            }
+
             // Initialize checkboxes based on selectedUsers Set
             allUserCheckboxes.forEach(checkbox => {
                 if (selectedUsers.has(checkbox.value)) {
                     checkbox.checked = true;
-                    checkbox.closest('.user-checkbox-card').classList.add('selected');
+                    const card = checkbox.closest('.user-checkbox-card');
+                    card.classList.add('selected');
+                    updateCheckmarkUI(card, true);
                 }
             });
 
@@ -1135,10 +1153,12 @@
                         checkbox.checked = false;
                         selectedUsers.delete(userId);
                         this.classList.remove('selected');
+                        updateCheckmarkUI(this, false);
                     } else {
                         checkbox.checked = true;
                         selectedUsers.add(userId);
                         this.classList.add('selected');
+                        updateCheckmarkUI(this, true);
                     }
                     updateSelectedUsersDisplay();
                     updateSelectedCount();
@@ -1156,7 +1176,9 @@
                     const userCheckbox = document.querySelector(`.user-checkbox[value="${userId}"]`);
                     if (userCheckbox) {
                         userCheckbox.checked = false;
-                        userCheckbox.closest('.user-checkbox-card').classList.remove('selected');
+                        const card = userCheckbox.closest('.user-checkbox-card');
+                        card.classList.remove('selected');
+                        updateCheckmarkUI(card, false);
                     }
 
                     updateSelectedUsersDisplay();
@@ -1173,10 +1195,12 @@
                         checkbox.checked = false;
                         selectedUsers.delete(checkbox.value);
                         card.classList.remove('selected');
+                        updateCheckmarkUI(card, false);
                     } else {
                         checkbox.checked = true;
                         selectedUsers.add(checkbox.value);
                         card.classList.add('selected');
+                        updateCheckmarkUI(card, true);
                     }
                 });
                 updateSelectedUsersDisplay();
@@ -1187,7 +1211,9 @@
             document.getElementById('clearSelectionBtn').addEventListener('click', function () {
                 allUserCheckboxes.forEach(checkbox => {
                     checkbox.checked = false;
-                    checkbox.closest('.user-checkbox-card').classList.remove('selected');
+                    const card = checkbox.closest('.user-checkbox-card');
+                    card.classList.remove('selected');
+                    updateCheckmarkUI(card, false);
                 });
                 selectedUsers.clear();
                 updateSelectedUsersDisplay();
@@ -1232,14 +1258,14 @@
                     const badge = document.createElement('div');
                     badge.className = 'selected-users-badge';
                     badge.innerHTML = `
-                            <div     class="w-6 h-6 rounded-full bg-gradient-to-r from-blue-100 to-indigo-100 flex items-center justify-center text-indigo-600 text-xs font-semibold mr-2">
-                                ${userInitial}
-                            </div>
-                            <span class="font-medium">${userName}</span>
-                            <button type="button" class="ml-2 text-indigo-400 hover:text-indigo-600 remove-selected-user" data-user-id="${checkbox.value}">
-                                <i class="fas fa-times text-xs"></i>
-                            </button>
-                        `;
+                                    <div     class="w-6 h-6 rounded-full bg-gradient-to-r from-blue-100 to-indigo-100 flex items-center justify-center text-indigo-600 text-xs font-semibold mr-2">
+                                        ${userInitial}
+                                    </div>
+                                    <span class="font-medium">${userName}</span>
+                                    <button type="button" class="ml-2 text-indigo-400 hover:text-indigo-600 remove-selected-user" data-user-id="${checkbox.value}">
+                                        <i class="fas fa-times text-xs"></i>
+                                    </button>
+                                `;
 
                     badge.querySelector('.remove-selected-user').addEventListener('click', function (e) {
                         e.stopPropagation();
@@ -1248,7 +1274,9 @@
                         const userCheckbox = document.querySelector(`.user-checkbox[value="${userId}"]`);
                         if (userCheckbox) {
                             userCheckbox.checked = false;
-                            userCheckbox.closest('.user-checkbox-card').classList.remove('selected');
+                            const card = userCheckbox.closest('.user-checkbox-card');
+                            card.classList.remove('selected');
+                            updateCheckmarkUI(card, false);
                         }
                         updateSelectedUsersDisplay();
                         updateSelectedCount();
@@ -1335,21 +1363,21 @@
                 const fileItem = document.createElement('div');
                 fileItem.className = 'file-item';
                 fileItem.innerHTML = `
-                        <div     class="flex items-center justify-between">
-                            <div     class="flex items-center flex-1 min-w-0">
-                                <div     class="w-12 h-12 rounded-lg bg-gradient-to-r from-indigo-100 to-purple-100 flex items-center justify-center text-indigo-600 mr-4">
-                                    <i c    lass="fas fa-file"></i>
+                                <div     class="flex items-center justify-between">
+                                    <div     class="flex items-center flex-1 min-w-0">
+                                        <div     class="w-12 h-12 rounded-lg bg-gradient-to-r from-indigo-100 to-purple-100 flex items-center justify-center text-indigo-600 mr-4">
+                                            <i c    lass="fas fa-file"></i>
+                                        </di    v>
+                                        <div     class="min-w-0">
+                                            <div     class="font-semibold text-gray-800 truncate">${file.name}</div>
+                                            <div     class="text-sm text-gray-500">${Math.round(file.size / 1024)} KB</div>
+                                        </di    v>
+                                    </di    v>
+                                    <but    ton type="button" class="text-red-500 hover:text-red-700 ml-4 remove-file" data-index="${index}" title="Remove file">
+                                        <i c    lass="fas fa-times text-lg"></i>
+                                    </bu    tton>
                                 </di    v>
-                                <div     class="min-w-0">
-                                    <div     class="font-semibold text-gray-800 truncate">${file.name}</div>
-                                    <div     class="text-sm text-gray-500">${Math.round(file.size / 1024)} KB</div>
-                                </di    v>
-                            </di    v>
-                            <but    ton type="button" class="text-red-500 hover:text-red-700 ml-4 remove-file" data-index="${index}" title="Remove file">
-                                <i c    lass="fas fa-times text-lg"></i>
-                            </bu    tton>
-                        </di    v>
-                    `;
+                            `;
                 fileItem.querySelector('.remove-file').addEventListener('click', () => {
                     selectedFiles.splice(index, 1);
                     updateFileList();
@@ -1473,12 +1501,12 @@
             const toast = document.createElement('div');
             toast.className = `fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-xl z-50 fade-in flex items-center text-white max-w-md ${type === 'error' ? 'bg-gradient-to-r from-red-500 to-rose-600' : type === 'warning' ? 'bg-gradient-to-r from-yellow-500 to-amber-600' : 'bg-gradient-to-r from-green-500 to-emerald-600'}`;
             toast.innerHTML = `
-                    <div     class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center mr-3">
-                        <i c    lass="${type === 'error' ? 'fas fa-exclamation-circle' : type === 'warning' ? 'fas fa-exclamation-triangle' : 'fas fa-check-circle'}"></i>
-                    </di    v>
-                    <div     class="flex-1"><span class="font-medium">${message}</span></div>
-                    <but    ton class="ml-4 text-white/80 hover:text-white" onclick="this.parentElement.remove()"> <i class="fas fa-times"></i> </button>
-                `;
+                            <div     class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center mr-3">
+                                <i c    lass="${type === 'error' ? 'fas fa-exclamation-circle' : type === 'warning' ? 'fas fa-exclamation-triangle' : 'fas fa-check-circle'}"></i>
+                            </di    v>
+                            <div     class="flex-1"><span class="font-medium">${message}</span></div>
+                            <but    ton class="ml-4 text-white/80 hover:text-white" onclick="this.parentElement.remove()"> <i class="fas fa-times"></i> </button>
+                        `;
             document.body.appendChild(toast);
             setTimeout(() => toast.remove(), 5000);
         }

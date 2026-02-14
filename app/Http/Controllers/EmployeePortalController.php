@@ -226,9 +226,10 @@ $this->authorize('manage', $leave);
             }
 
             // Update other fields
-            $leave->fill($request->only([
-                'admin_remarks', 'from_date', 'to_date', 'reason'
-            ]));
+         $leave->fill($request->only([
+        'admin_remarks', 'from_date', 'to_date', 'reason',
+        'leave_type', 'subject', 'sent_to'  // Add these
+    ]));
             
             // Recalculate total days if dates changed
             if ($request->has('from_date') || $request->has('to_date')) {
