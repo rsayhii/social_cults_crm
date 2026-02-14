@@ -1060,8 +1060,8 @@
                     projectTeamField.value = project.team;
                     projectStatusField.value = project.status;
                     projectPriorityField.value = project.priority;
-                    startDateField.value = project.start_date;
-                    deadlineField.value = project.deadline;
+                    startDateField.value = toInputDate(project.start_date);
+                    deadlineField.value = toInputDate(project.deadline);
                     projectDescriptionField.value = project.description || '';
                     projectBudgetField.value = project.budget || '';
                     progressSlider.value = project.progress;
@@ -1348,6 +1348,20 @@
             if (!dateString) return 'Not set';
             const options = { month: 'short', day: 'numeric', year: 'numeric' };
             return new Date(dateString).toLocaleDateString('en-US', options);
+        }
+
+        function toInputDate(value) {
+            if (!value) return '';
+            if (typeof value === 'string') {
+                const tIndex = value.indexOf('T');
+                if (tIndex > 0) return value.substring(0, tIndex);
+                const spaceIndex = value.indexOf(' ');
+                if (spaceIndex > 0) return value.substring(0, spaceIndex);
+                if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
+            }
+            const d = new Date(value);
+            if (isNaN(d.getTime())) return '';
+            return d.toISOString().split('T')[0];
         }
 
         function formatDateForInput(date) {

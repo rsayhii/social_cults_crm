@@ -234,12 +234,11 @@ $this->authorize('manage', $project);
     {
         try {
             $base = ProjectManagement::where('company_id', auth()->user()->company_id);
-
-
-          $totalProjects = $base->count();
-$inProgressCount = $base->where('status', 'in-progress')->count();
-$completedCount = $base->where('status', 'completed')->count();
-$highPriorityCount = $base->where('priority', 'high')->count();
+            
+            $totalProjects = (clone $base)->count();
+            $inProgressCount = (clone $base)->where('status', 'in-progress')->count();
+            $completedCount = (clone $base)->where('status', 'completed')->count();
+            $highPriorityCount = (clone $base)->where('priority', 'high')->count();
             
             return response()->json([
                 'success' => true,
