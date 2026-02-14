@@ -1717,9 +1717,9 @@
                     currency: $('currency')?.value || '₹',
                     tax_rate: parseFloat($('tax-slab')?.value || 0),
                     tax_mode: $('tax-mode')?.value || 'cgst',
+                    discount_percent: parseFloat($('discount')?.value || 0),
 
-                    discount_percent: discount_percent,
-
+                   
                     client_name: clientName,
                     client_phone: $('client-phone')?.value.trim() || '',
                     client_email: $('client-email')?.value.trim() || '',
@@ -1965,55 +1965,49 @@
                     return;
                 }
 
-                const inv = gatherInvoiceForm();
-                const totals = computeTotals(inv.items, inv.tax_rate, inv.discount);
+               const inv = gatherInvoiceForm();
+    const totals = computeTotals(inv.items, inv.tax_rate, inv.discount_percent); // ✅ Make sure this is discount_percent
 
-                // Add calculated totals
-                inv.subtotal = totals.subtotal;
-                inv.tax_amount = totals.taxAmount;
-                inv.discount_amount = totals.discountAmount;
-                inv.grand_total = totals.grandTotal;
+    // Add calculated totals
+    inv.subtotal = totals.subtotal;
+    inv.tax_amount = totals.taxAmount;
+    inv.discount_amount = totals.discountAmount;
+    inv.grand_total = totals.grandTotal;
 
+    console.log('Saving invoice data:', inv); // ✅ Check console to verify discount_percent is present
 
-                console.log('Saving invoice data:', inv); // Debug log
+    try {
+        const result = await saveInvoice(inv);
 
-                try {
-                    const result = await saveInvoice(inv);
+        if (result.success) {
+            $('btn-save').textContent = currentInvoiceId ? 'Invoice Updated!' : 'Invoice Saved!';
 
-                    if (result.success) {
-                        $('btn-save').textContent = currentInvoiceId ? 'Invoice Updated!' : 'Invoice Saved!';
-
-                        // Update invoice number if it was generated
-                        if (result.invoice && result.invoice.invoice_number) {
-                            $('invoice-number').value = result.invoice.invoice_number;
-                            currentInvoiceId = result.invoice.id;
-                        }
-
-                        // Update UI - Force refresh history
-                        await renderHistory(); // Await here to ensure it loads
-                        await renderSavedList(); // Also refresh recent invoices
-
-                        setTimeout(() => {
-                            $('btn-save').textContent = currentInvoiceId ? 'Update Invoice' : 'Save Invoice';
-                        }, 2000);
-
-                        // If we're in history tab, force a refresh
-                        if (!$('tab-history').classList.contains('hidden')) {
-                            await renderHistory();
-                        }
-
-                        if (!$('tab-history').classList.contains('hidden')) {
-                            await renderHistory();
-                        }
-
-                    } else {
-                        showToast('Error saving invoice: ' + (result.message || 'Unknown error'), 'error');
-                    }
-                } catch (error) {
-                    console.error('Error in saveInvoiceToStorage:', error);
-                    showToast('Error saving invoice: ' + error.message, 'error');
-                }
+            // Update invoice number if it was generated
+            if (result.invoice && result.invoice.invoice_number) {
+                $('invoice-number').value = result.invoice.invoice_number;
+                currentInvoiceId = result.invoice.id;
             }
+
+            // Update UI
+            await renderHistory();
+            await renderSavedList();
+
+            setTimeout(() => {
+                $('btn-save').textContent = currentInvoiceId ? 'Update Invoice' : 'Save Invoice';
+            }, 2000);
+
+            if (!$('tab-history').classList.contains('hidden')) {
+                await renderHistory();
+            }
+
+        } else {
+            showToast('Error saving invoice: ' + (result.message || 'Unknown error'), 'error');
+        }
+    } catch (error) {
+        console.error('Error in saveInvoiceToStorage:', error);
+        showToast('Error saving invoice: ' + error.message, 'error');
+    }
+}
             /* ========== EVENT LISTENERS SETUP ========== */
             function setupEventListeners() {
                 const addItemBtn = $('add-item');
@@ -2227,64 +2221,68 @@
                 }
             }
             function loadInvoiceForPrint(invoice) {
-                // Load invoice data into the form for printing
-                currentInvoiceId = invoice.id;
+    // Load invoice data into the form for printing
+    currentInvoiceId = invoice.id;
 
-                // Set basic invoice info
-                if ($('invoice-number')) $('invoice-number').value = invoice.invoice_number;
-                if ($('invoice-date')) $('invoice-date').value = invoice.invoice_date;
-                if ($('invoice-status')) $('invoice-status').value = invoice.status;
-                if ($('currency')) $('currency').value = invoice.currency;
-                if ($('tax-slab')) $('tax-slab').value = invoice.tax_rate;
-                if ($('tax-mode')) $('tax-mode').value = invoice.tax_mode;
-                if ($('discount')) $('discount').value = invoice.discount_percent || 0;
+    // Set basic invoice info
+    if ($('invoice-number')) $('invoice-number').value = invoice.invoice_number;
+    if ($('invoice-date')) $('invoice-date').value = invoice.invoice_date;
+    if ($('invoice-status')) $('invoice-status').value = invoice.status;
+    if ($('currency')) $('currency').value = invoice.currency;
+    if ($('tax-slab')) $('tax-slab').value = invoice.tax_rate;
+    if ($('tax-mode')) $('tax-mode').value = invoice.tax_mode;
+    
+    // ✅ CRITICAL FIX: Load discount_percent, not discount
+    if ($('discount')) {
+        $('discount').value = invoice.discount_percent || 0;
+    }
 
-                if ($('client-name')) $('client-name').value = invoice.client_name;
-                if ($('client-phone')) $('client-phone').value = invoice.client_phone;
-                if ($('client-email')) $('client-email').value = invoice.client_email;
-                if ($('client-address')) $('client-address').value = invoice.client_address;
-                if ($('invoice-description')) $('invoice-description').value = invoice.description;
+    if ($('client-name')) $('client-name').value = invoice.client_name;
+    if ($('client-phone')) $('client-phone').value = invoice.client_phone;
+    if ($('client-email')) $('client-email').value = invoice.client_email;
+    if ($('client-address')) $('client-address').value = invoice.client_address;
+    if ($('invoice-description')) $('invoice-description').value = invoice.description;
 
-                // Load items
-                const itemsBody = $('items-body');
-                if (itemsBody) {
-                    itemsBody.innerHTML = '';
-                    if (invoice.items && invoice.items.length > 0) {
-                        invoice.items.forEach(item => {
-                            addItemRow({
-                                desc: item.description,
-                                service: item.service_type,
-                                qty: item.quantity,
-                                price: item.price
-                            });
-                        });
-                    } else {
-                        addDefaultItem();
-                    }
-                }
+    // Load items
+    const itemsBody = $('items-body');
+    if (itemsBody) {
+        itemsBody.innerHTML = '';
+        if (invoice.items && invoice.items.length > 0) {
+            invoice.items.forEach(item => {
+                addItemRow({
+                    desc: item.description,
+                    service: item.service_type,
+                    qty: item.quantity,
+                    price: item.price
+                });
+            });
+        } else {
+            addDefaultItem();
+        }
+    }
 
-                // Load signature if exists
-                if (invoice.admin_signature) {
-                    const sigImage = $('sig-image');
-                    if (sigImage) {
-                        sigImage.innerHTML = `<img src="${invoice.admin_signature}" class="max-h-20 object-contain" alt="Signature" />`;
-                        sigImage.classList.remove('text-slate-400');
-                    }
-                }
+    // Load signature if exists
+    if (invoice.admin_signature) {
+        const sigImage = $('sig-image');
+        if (sigImage) {
+            sigImage.innerHTML = `<img src="${invoice.admin_signature}" class="max-h-20 object-contain" alt="Signature" />`;
+            sigImage.classList.remove('text-slate-400');
+        }
+    }
 
-                // Load terms
-                if (invoice.terms) {
-                    try {
-                        const terms = typeof invoice.terms === 'string' ? JSON.parse(invoice.terms) : invoice.terms;
-                        saveTerms(terms);
-                        renderTerms();
-                    } catch (e) {
-                        console.error('Error loading terms:', e);
-                    }
-                }
+    // Load terms
+    if (invoice.terms) {
+        try {
+            const terms = typeof invoice.terms === 'string' ? JSON.parse(invoice.terms) : invoice.terms;
+            saveTerms(terms);
+            renderTerms();
+        } catch (e) {
+            console.error('Error loading terms:', e);
+        }
+    }
 
-                calculateAndRender();
-            }
+    calculateAndRender();
+}
             /* ========== EMAIL ========== */
             async function emailInvoice(id = null) {
                 if (!id) {

@@ -17,6 +17,7 @@ class Invoice extends Model
         'tax_rate',
         'tax_mode',
         'discount',
+    'discount_percent',
         'client_name',
         'client_phone',
         'client_email',

@@ -1,0 +1,69 @@
+*   [33ma006a79[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m :wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wq:wqMerge branch 'abhishek'                                                                                                                                                                                                                                                                                               # Please enter a commit message to explain why this merge is necessary,                                                                                                                                                :wq:wq:wq:wq# the commit.:wq:wq:wq
+[31m|[m[32m\[m  
+[31m|[m * [33md07a63f[m[33m ([m[1;31morigin/abhishek[m[33m, [m[1;32mabhishek[m[33m)[m fix: fixed the invalid date issue
+[31m|[m * [33madd03f3[m feat: added the preview popup for the preview template
+[31m|[m * [33m0d38aff[m fix: bug while downloading the file in document format
+* [32m|[m   [33m3254d8a[m Merge branch 'rahul'
+[32m|[m[34m\[m [32m\[m  
+[32m|[m [34m|[m[32m/[m  
+[32m|[m[32m/[m[34m|[m   
+[32m|[m * [33me665b25[m[33m ([m[1;31morigin/rahul[m[33m, [m[1;32mrahul[m[33m)[m My new changes moved from main to rahul
+* [34m|[m   [33m90a1b02[m Resolved merge conflict in subscription routes
+[35m|[m[36m\[m [34m\[m  
+[35m|[m * [34m|[m [33m5478818[m fix: fixed bug in the proposal inner template
+[35m|[m * [34m|[m [33m155f490[m fix: fix the error of generating templates, feat: making it MTS and also added the ability to isolate the inner-templates for the default templates
+[35m|[m * [34m|[m [33md85f3ab[m feat: Made the proposal module support Multi tenant setup
+[35m|[m * [34m|[m [33m1d7b4cf[m fix: Edited the toolbar appearing bug
+[35m|[m * [34m|[m [33m211d9a3[m feat: Implement a ability to import and edit a custom proposal
+[35m|[m * [34m|[m [33m474f348[m feat: Added the toolbar for editing the proposals in the proposal module and fixed the importing format of the document
+[35m|[m * [34m|[m [33m0b457b1[m feat: Add a new proposal builder page with template management, document upload, and rich text editing capabilities.
+[35m|[m * [34m|[m [33mb6d0880[m feat: in proposal module added upload and editing capabilities.
+[35m|[m * [34m|[m [33m44ab979[m fix: fixed the saved succesfully toast notification bug
+[35m|[m * [34m|[m [33m7502842[m Feat: Changed the UI in the features section
+[35m|[m * [34m|[m [33m7377ff4[m Fix: corrected the image path and fixed the image size mismatch accross devices
+[35m|[m * [34m|[m [33m6298566[m feat: added the start trial card to homepage which leads to the start-trial page
+[35m|[m * [34m|[m [33ma2a2872[m fix: removed default windows error and added a Toast notification for both creating and deleting the notes
+[35m|[m * [34m|[m [33m2c15a37[m fix: fixed the issue in which the pinned notes and the this week cards were not being updated
+[35m|[m * [34m|[m [33m65a42ed[m fix: Made the total contacts and client numbers update dynamically
+[35m|[m * [34m|[m [33m274beb9[m fix: Fixed the present today error, so it shows the realtime data instead of hardcoded one
+[35m|[m * [34m|[m [33m778db6a[m feat: Replaced the default windows alert with themed toast notification
+[35m|[m * [34m|[m [33m8f6c8de[m fix: fixed the error saving the updated values and printed in the new pdf
+[35m|[m * [34m|[m [33m22b001f[m Fix: fixed the Csrf token bug in the report module
+[35m|[m * [34m|[m [33m21ff580[m Fix: fixed the csrf token error and null text content issue
+[35m|[m * [34m|[m [33m4223754[m feat: Add task management feature with dedicated view, controller, and model. And also fixed the error while creating a task
+[35m|[m * [34m|[m [33m248dc09[m feat: Add task management views with company ID integration and a personal attendance view.
+[35m|[m * [34m|[m [33m0ef6ca7[m Fixed CSRF token issue for the Notepad module
+[35m|[m * [34m|[m [33mb48c4e0[m Completed the my attendance module and made it mobile responsive aswell
+[35m|[m * [34m|[m [33m0912d72[m fix: Removed the unneccesary break Timer Div
+[35m|[m * [34m|[m [33m8c686dc[m feat: Introduce employee attendance management with punch-in/out, breaks, and location-based validation.
+[35m|[m * [34m|[m [33m3bef06a[m feat: implement responsive 'My Attendance' page with clock-in/out, location tracking, and break management.
+[35m|[m * [34m|[m [33m9159893[m feat: Add new `myattendance.blade.php` page with fully responsive design for mobile, tablet, and desktop.
+[35m|[m * [34m|[m   [33m1a8d2d2[m Merge branch 'main' into abhishek
+[35m|[m [1;31m|[m[1;32m\[m [34m\[m  
+[35m|[m * [1;32m|[m [34m|[m [33mde89437[m feat: Add initial web routes for CRM modules and seed default permissions.
+* [1;32m|[m [1;32m|[m [34m|[m [33m53a10a7[m rahuls code
+[1;32m|[m [1;32m|[m[1;32m/[m [34m/[m  
+[1;32m|[m[1;32m/[m[1;32m|[m [34m|[m   
+* [1;32m|[m [34m|[m [33mb50c546[m add permissions
+* [1;32m|[m [34m|[m [33m33cbaa4[m change
+* [1;32m|[m [34m|[m [33m692cf2c[m Merged abhishek branch and resolved web.php conflicts
+[34m|[m[1;32m\[m[1;32m|[m [34m|[m 
+[34m|[m [1;32m|[m[34m/[m  
+[34m|[m[34m/[m[1;32m|[m   
+[34m|[m * [33m9876605[m fix: changed the festivals to be universal holiday only
+[34m|[m * [33m3bb7e4e[m Feat: added ability to add holidays manually aswell which should be compatible with the imported holidays
+[34m|[m * [33m79d7362[m feat: implement calendar view and controller for managing leaves and holidays.
+[34m|[m * [33m9c924e0[m feat: Implement a comprehensive calendar module for managing holidays and employee leaves, including Excel import functionality for company-specific holidays.
+[34m|[m * [33m9ed326d[m Add calendar holiday import with company holidays support
+* [1;34m|[m [33m3405823[m support ticket into superadmin
+[1;34m|[m[1;34m/[m  
+* [33m022b343[m comment
+* [33m252e673[m Fix: Implement client service interaction chat interface.
+* [33m3557781[m migration issue resolved
+* [33m91f1725[m notification on [todo, contact] module
+* [33ma57e756[m chat bot v1
+* [33mce6d84c[m notify
+* [33ma36e094[m modifided database
+* [33m3e6aba0[m my first change
+* [33mec5e16c[m hello
+* [33mb500d6f[m first commit

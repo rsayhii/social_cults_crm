@@ -15,8 +15,6 @@ class PermissionSeeder extends Seeder
     {
         $permissions = [
             'dashboard',
-            'campaigns',
-            'tasks',
             'attendance records',
             'users',
             'roles',

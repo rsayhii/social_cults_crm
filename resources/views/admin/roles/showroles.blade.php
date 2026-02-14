@@ -45,14 +45,24 @@
                 Edit Role
             </a>
 
-            <form action="{{ route('roles.destroy', $role->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this role?');">
-                @csrf
-                @method('DELETE')
-                <button type="submit" 
-                        class="bg-red-600 hover:bg-red-700 text-white text-sm px-4 py-2 rounded-md shadow-sm">
-                    Delete
-                </button>
-            </form>
+            @php
+    $roleName = strtolower(trim($role->name));
+@endphp
+
+            @php
+    $roleName = strtolower(trim($role->name));
+@endphp
+
+@if(!in_array($roleName, ['admin', 'client']))
+    <form action="{{ route('roles.destroy', $role->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this role?');">
+        @csrf
+        @method('DELETE')
+        <button type="submit" 
+                class="bg-red-600 hover:bg-red-700 text-white text-sm px-4 py-2 rounded-md shadow-sm">
+            Delete
+        </button>
+    </form>
+@endif
         </div>
     </div>
 </div>

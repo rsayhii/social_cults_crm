@@ -90,9 +90,9 @@ Route::middleware(['auth', CheckCompanyAccess::class])->group(function () {
     });
 
     // Campaigns
-    Route::get('/campaigns', [CampaignsController::class, 'index'])
-        ->name('campaigns')
-        ->middleware('permission:campaigns');
+    // Route::get('/campaigns', [CampaignsController::class, 'index'])
+    //     ->name('campaigns')
+    //     ->middleware('permission:campaigns');
 
     // Tasks
     Route::get('/task', [TaskController::class, 'index'])

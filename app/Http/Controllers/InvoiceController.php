@@ -94,222 +94,272 @@ if ($search) {
     }
 
     public function store(Request $request)
-    {
-        Log::info('Invoice store request data:', $request->all());
-        
-        $request->validate([
-            'client_name' => 'required|string|max:255',
-            'invoice_date' => 'required|date',
-            'items' => 'required|array|min:1',
-            'items.*.description' => 'required|string',
-            'items.*.quantity' => 'required|integer|min:1',
-            'items.*.price' => 'required|numeric|min:0',
-        ]);
-
-        DB::beginTransaction();
-        
-        try {
-            $user = Auth::user();
-            $company = Company::findOrFail(auth()->user()->company_id);
-            
-            // Generate invoice number
-            // $year = date('Y');
-            // $lastInvoice = Invoice::where('company_id', $company->id)
-            //     ->whereYear('created_at', $year)
-            //     ->orderBy('id', 'desc')
-            //     ->first();
-                
-            // $serial = $lastInvoice ? intval(Str::afterLast($lastInvoice->invoice_number, '-')) + 1 : 1;
-            // $invoiceNumber = "INV-{$year}-" . str_pad($serial, 5, '0', STR_PAD_LEFT);
-            
-            // Calculate totals
-            $subtotal = 0;
-            foreach ($request->items as $item) {
-                $subtotal += $item['quantity'] * $item['price'];
-            }
-            
-            $taxRate = $request->tax_rate ?? 0.18;
-            $taxAmount = $subtotal * $taxRate;
-            $discount = $request->discount ?? 0;
-            $grandTotal = ($subtotal + $taxAmount) - $discount;
-            
-            // Handle signature if provided
-            $adminSignature = null;
-            if ($request->has('admin_signature') && !empty($request->admin_signature)) {
-                $signatureData = $request->admin_signature;
-                if (strpos($signatureData, 'data:image') === 0) {
-                    $adminSignature = $signatureData;
-                }
-            }
-            
-            // Create invoice
-            $invoice = Invoice::create([
-                'invoice_number' => $request->invoice_number,
-                'invoice_date' => $request->invoice_date,
-                'status' => $request->status ?? 'Pending',
-                'currency' => $request->currency ?? '₹',
-                'tax_rate' => $taxRate,
-                'tax_mode' => $request->tax_mode ?? 'cgst',
-                'discount' => $discount,
-                'client_name' => $request->client_name,
-                'client_phone' => $request->client_phone,
-                'client_email' => $request->client_email,
-                'client_address' => $request->client_address,
-                'description' => $request->description,
-                'subtotal' => $subtotal,
-                'tax_amount' => $taxAmount,
-                'grand_total' => $grandTotal,
-                'admin_signature' => $adminSignature,
-                'terms' => json_encode($request->terms ?? []),
-                'company_id' => $company->id,
-                'user_id' => $user->id,
-            ]);
-            
-           foreach ($request->items as $index => $item) {
-    InvoiceItem::create([
-        'invoice_id' => $invoice->id,
-        'company_id' => $company->id, // ✅ REQUIRED
-        'description' => $item['description'],
-        'service_type' => $item['service_type'] ?? null,
-        'quantity' => $item['quantity'],
-        'price' => $item['price'],
-        'total' => $item['quantity'] * $item['price'],
-        'sort_order' => $index,
-    ]);
-}
-
-            
-            DB::commit();
-            
-            // Load the invoice with items for the response
-    $invoice = Invoice::with('items')->find($invoice->id);
-
-
-    notifyCompany(auth()->user()->company_id, [
-    'title' => 'Invoice Generated',
-    'message' => 'Invoice #' . $invoice->id . ' created',
-    'module' => 'invoice',
-    'url' => route('invoices.index'),
-    'icon' => 'invoice',
-]);
-
+{
+    Log::info('Invoice store request data:', $request->all());
     
-    return response()->json([
-        'success' => true,
-        'message' => 'Invoice created successfully!',
-        'invoice' => $invoice  // Make sure invoice is included
+    $request->validate([
+        'client_name' => 'required|string|max:255',
+        'invoice_date' => 'required|date',
+        'items' => 'required|array|min:1',
+        'items.*.description' => 'required|string',
+        'items.*.quantity' => 'required|integer|min:1',
+        'items.*.price' => 'required|numeric|min:0',
     ]);
-            
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Failed to create invoice:', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to create invoice: ' . $e->getMessage()
-            ], 500);
+
+    DB::beginTransaction();
+    
+    try {
+        $user = Auth::user();
+        
+        // ✅ Add null check for company_id
+        if (!$user->company_id) {
+            throw new \Exception('User has no company assigned');
         }
+        
+        $company = Company::findOrFail($user->company_id);
+        
+        // Calculate totals
+        $subtotal = 0;
+        foreach ($request->items as $item) {
+            $subtotal += $item['quantity'] * $item['price'];
+        }
+        
+        $taxRate = $request->tax_rate ?? 0.18;
+        $taxAmount = $subtotal * $taxRate;
+        
+        // ✅ FIX: Handle both discount and discount_percent
+        $discountPercent = $request->discount_percent ?? $request->discount ?? 0;
+        $grossTotal = $subtotal + $taxAmount;
+        $discountAmount = $grossTotal * ($discountPercent / 100);
+        $grandTotal = $grossTotal - $discountAmount;
+        
+        // Handle signature if provided
+        $adminSignature = null;
+        if ($request->has('admin_signature') && !empty($request->admin_signature)) {
+            $signatureData = $request->admin_signature;
+            if (strpos($signatureData, 'data:image') === 0) {
+                $adminSignature = $signatureData;
+            }
+        }
+        
+        // ✅ FIX: Safely encode terms
+        $terms = $request->terms ?? [];
+        if (is_string($terms)) {
+            $terms = json_decode($terms, true) ?? [];
+        }
+        
+        // Create invoice
+        $invoice = Invoice::create([
+            'invoice_number' => $request->invoice_number,
+            'invoice_date' => $request->invoice_date,
+            'status' => $request->status ?? 'Pending',
+            'currency' => $request->currency ?? '₹',
+            'tax_rate' => $taxRate,
+            'tax_mode' => $request->tax_mode ?? 'cgst',
+            'discount' => $discountAmount, // ✅ Store calculated discount amount
+            'discount_percent' => $discountPercent, // ✅ Store discount percentage (add this column to migration)
+            'client_name' => $request->client_name,
+            'client_phone' => $request->client_phone,
+            'client_email' => $request->client_email,
+            'client_address' => $request->client_address,
+            'description' => $request->description,
+            'subtotal' => $subtotal,
+            'tax_amount' => $taxAmount,
+            'grand_total' => $grandTotal,
+            'admin_signature' => $adminSignature,
+            'terms' => json_encode($terms),
+            'company_id' => $company->id,
+            'user_id' => $user->id,
+        ]);
+        
+        // ✅ FIX: Add proper error handling for items
+        foreach ($request->items as $index => $item) {
+            try {
+                InvoiceItem::create([
+                    'invoice_id' => $invoice->id,
+                    'company_id' => $company->id,
+                    'description' => $item['description'],
+                    'service_type' => $item['service_type'] ?? null,
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price'],
+                    'total' => $item['quantity'] * $item['price'],
+                    'sort_order' => $index,
+                ]);
+            } catch (\Exception $e) {
+                Log::error("Failed to create invoice item {$index}: " . $e->getMessage());
+                throw $e;
+            }
+        }
+        
+        DB::commit();
+        
+        // Load the invoice with items for the response
+        $invoice = Invoice::with('items')->find($invoice->id);
+
+        // ✅ FIX: Add try-catch for notification
+        try {
+            notifyCompany(auth()->user()->company_id, [
+                'title' => 'Invoice Generated',
+                'message' => 'Invoice #' . $invoice->invoice_number . ' created',
+                'module' => 'invoice',
+                'url' => route('invoices.index'),
+                'icon' => 'invoice',
+            ]);
+        } catch (\Exception $e) {
+            Log::warning('Failed to send notification: ' . $e->getMessage());
+            // Don't fail the entire request if notification fails
+        }
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Invoice created successfully!',
+            'invoice' => $invoice
+        ]);
+        
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error('Failed to create invoice:', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+            'line' => $e->getLine(),
+            'file' => $e->getFile()
+        ]);
+        
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to create invoice: ' . $e->getMessage()
+        ], 500);
     }
+}
 
     public function update(Request $request, $id)
-    {
-        $request->validate([
-            'client_name' => 'required|string|max:255',
-            'invoice_date' => 'required|date',
-            'items' => 'required|array|min:1',
-            'items.*.description' => 'required|string',
-            'items.*.quantity' => 'required|integer|min:1',
-            'items.*.price' => 'required|numeric|min:0',
-        ]);
-
-        DB::beginTransaction();
-        
-        try {
-            $user = Auth::user();
-            $company = Company::findOrFail(auth()->user()->company_id);
-          $invoice = $this->baseQuery()
-    ->with(['company','items'])
-    ->findOrFail($id);
-
-$this->authorize('manage', $invoice);
-
-            
-            // Calculate totals
-            $subtotal = 0;
-            foreach ($request->items as $item) {
-                $subtotal += $item['quantity'] * $item['price'];
-            }
-            
-            $taxRate = $request->tax_rate ?? $invoice->tax_rate;
-            $taxAmount = $subtotal * $taxRate;
-            $discount = $request->discount ?? $invoice->discount;
-            $grandTotal = ($subtotal + $taxAmount) - $discount;
-            
-            // Handle signature if provided
-            if ($request->has('admin_signature') && !empty($request->admin_signature)) {
-                $signatureData = $request->admin_signature;
-                if (strpos($signatureData, 'data:image') === 0) {
-                    $invoice->admin_signature = $signatureData;
-                }
-            }
-            
-            // Update invoice
-            $invoice->update([
-                'invoice_number' => $request->invoice_number ?? $invoice->invoice_number,
-                'invoice_date' => $request->invoice_date,
-                'status' => $request->status ?? $invoice->status,
-                'currency' => $request->currency ?? $invoice->currency,
-                'tax_rate' => $taxRate,
-                'tax_mode' => $request->tax_mode ?? $invoice->tax_mode,
-                'discount' => $discount,
-                'client_name' => $request->client_name,
-                'client_phone' => $request->client_phone,
-                'client_email' => $request->client_email,
-                'client_address' => $request->client_address,
-                'description' => $request->description,
-                'subtotal' => $subtotal,
-                'tax_amount' => $taxAmount,
-                'grand_total' => $grandTotal,
-                'terms' => json_encode($request->terms ?? json_decode($invoice->terms, true) ?? []),
-            ]);
-            
-            // Delete existing items
-            $invoice->items()->delete();
-            
-            // Create new items
-            foreach ($request->items as $index => $item) {
-    InvoiceItem::create([
-        'invoice_id' => $invoice->id,
-        'company_id' => $company->id, // ✅ REQUIRED
-        'description' => $item['description'],
-        'service_type' => $item['service_type'] ?? null,
-        'quantity' => $item['quantity'],
-        'price' => $item['price'],
-        'total' => $item['quantity'] * $item['price'],
-        'sort_order' => $index,
+{
+    $request->validate([
+        'client_name' => 'required|string|max:255',
+        'invoice_date' => 'required|date',
+        'items' => 'required|array|min:1',
+        'items.*.description' => 'required|string',
+        'items.*.quantity' => 'required|integer|min:1',
+        'items.*.price' => 'required|numeric|min:0',
     ]);
-}
 
-            
-            DB::commit();
-            
-            return response()->json([
-                'success' => true,
-                'message' => 'Invoice updated successfully!',
-                'invoice' => $invoice->load('items')
-            ]);
-            
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to update invoice: ' . $e->getMessage()
-            ], 500);
+    DB::beginTransaction();
+    
+    try {
+        $user = Auth::user();
+        $company = Company::findOrFail(auth()->user()->company_id);
+        $invoice = $this->baseQuery()
+            ->with(['company','items'])
+            ->findOrFail($id);
+
+        $this->authorize('manage', $invoice);
+        
+        // Calculate totals
+        $subtotal = 0;
+        foreach ($request->items as $item) {
+            $subtotal += $item['quantity'] * $item['price'];
         }
+        
+        $taxRate = $request->tax_rate ?? $invoice->tax_rate;
+        $taxAmount = $subtotal * $taxRate;
+        $grossTotal = $subtotal + $taxAmount;
+        
+        // ✅ CRITICAL FIX: Get discount_percent from request, not discount
+        // If discount_percent is not in request, try to get it from the invoice
+        $discountPercent = 0;
+        if ($request->has('discount_percent')) {
+            $discountPercent = floatval($request->discount_percent);
+        } elseif ($invoice->discount_percent !== null) {
+            $discountPercent = floatval($invoice->discount_percent);
+        }
+        
+        // Calculate discount amount based on percentage
+        $discountAmount = $grossTotal * ($discountPercent / 100);
+        $grandTotal = $grossTotal - $discountAmount;
+        
+        // ✅ Add logging to debug
+        Log::info('Update Invoice Discount Debug:', [
+            'invoice_id' => $id,
+            'request_discount_percent' => $request->discount_percent ?? 'not set',
+            'calculated_discount_percent' => $discountPercent,
+            'gross_total' => $grossTotal,
+            'discount_amount' => $discountAmount,
+            'grand_total' => $grandTotal
+        ]);
+        
+        // Handle signature if provided
+        if ($request->has('admin_signature') && !empty($request->admin_signature)) {
+            $signatureData = $request->admin_signature;
+            if (strpos($signatureData, 'data:image') === 0) {
+                $invoice->admin_signature = $signatureData;
+            }
+        }
+        
+        // Safely handle terms
+        $terms = $request->terms ?? json_decode($invoice->terms, true) ?? [];
+        if (is_string($terms)) {
+            $terms = json_decode($terms, true) ?? [];
+        }
+        
+        // Update invoice
+        $invoice->update([
+            'invoice_number' => $request->invoice_number ?? $invoice->invoice_number,
+            'invoice_date' => $request->invoice_date,
+            'status' => $request->status ?? $invoice->status,
+            'currency' => $request->currency ?? $invoice->currency,
+            'tax_rate' => $taxRate,
+            'tax_mode' => $request->tax_mode ?? $invoice->tax_mode,
+            'discount' => $discountAmount, // ✅ Store calculated discount amount
+            'discount_percent' => $discountPercent, // ✅ Store discount percentage
+            'client_name' => $request->client_name,
+            'client_phone' => $request->client_phone,
+            'client_email' => $request->client_email,
+            'client_address' => $request->client_address,
+            'description' => $request->description,
+            'subtotal' => $subtotal,
+            'tax_amount' => $taxAmount,
+            'grand_total' => $grandTotal,
+            'terms' => json_encode($terms),
+        ]);
+        
+        // Delete existing items
+        $invoice->items()->delete();
+        
+        // Create new items
+        foreach ($request->items as $index => $item) {
+            InvoiceItem::create([
+                'invoice_id' => $invoice->id,
+                'company_id' => $company->id,
+                'description' => $item['description'],
+                'service_type' => $item['service_type'] ?? null,
+                'quantity' => $item['quantity'],
+                'price' => $item['price'],
+                'total' => $item['quantity'] * $item['price'],
+                'sort_order' => $index,
+            ]);
+        }
+        
+        DB::commit();
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Invoice updated successfully!',
+            'invoice' => $invoice->load('items')
+        ]);
+        
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error('Failed to update invoice:', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+            'line' => $e->getLine()
+        ]);
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to update invoice: ' . $e->getMessage()
+        ], 500);
     }
+}
 
     public function show($id)
     {

@@ -109,11 +109,21 @@ $role = Role::createForCompany(
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+   public function destroy(string $id)
 {
     $role = Role::forCompany(Auth::user()->company_id)->findOrFail($id);
 
-    // Prevent deleting role assigned to any user
+    // Normalize role name
+    $roleName = strtolower(trim($role->name));
+
+    // ❌ Prevent deleting default roles
+    if ($roleName === 'admin' || $roleName === 'client') {
+        return redirect()
+            ->route('roles')
+            ->with('error', 'Default roles (Admin / Client) cannot be deleted.');
+    }
+
+    // ❌ Prevent deleting role assigned to any user
     if ($role->users()->exists()) {
         return redirect()
             ->route('roles')

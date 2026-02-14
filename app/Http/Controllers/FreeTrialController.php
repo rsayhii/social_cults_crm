@@ -45,41 +45,46 @@ class FreeTrialController extends Controller
         'password'       => 'required|min:6|confirmed',
     ]);
 
-    DB::transaction(function () use ($request) {
+   DB::transaction(function () use ($request) {
 
-        // Company
-        $company = Company::create([
-            'name'           => $request->company_name,
-            'slug'           => Str::slug($request->company_name) . '-' . uniqid(),
-            'address'        => $request->address,
-            'email'          => $request->company_email,
-            'phone'          => $request->phone,
-            'gstin'          => $request->gstin,
-            'bank_name'      => $request->bank_name,
-            'account_number' => $request->account_number,
-            'ifsc_code'      => $request->ifsc_code,
-            'trial_ends_at'  => now()->addDays(30),
-            'is_paid'        => false,
-            'status'         => 'active',
-        ]);
+    // Company
+    $company = Company::create([
+        'name'           => $request->company_name,
+        'slug'           => Str::slug($request->company_name) . '-' . uniqid(),
+        'address'        => $request->address,
+        'email'          => $request->company_email,
+        'phone'          => $request->phone,
+        'gstin'          => $request->gstin,
+        'bank_name'      => $request->bank_name,
+        'account_number' => $request->account_number,
+        'ifsc_code'      => $request->ifsc_code,
+        'trial_ends_at'  => now()->addDays(30),
+        'is_paid'        => false,
+        'status'         => 'active',
+    ]);
 
-        // Admin user
-        $user = User::create([
-            'company_id' => $company->id,
-            'name'       => $request->name,
-            'email'      => $request->admin_email,
-            'password'   => Hash::make($request->password),
-        ]);
+    // ✅ Create Default Roles
+   $adminRole = \App\Models\Role::where('name', 'admin')
+        ->where('company_id', $company->id)
+        ->first();
 
+    $clientRole = \App\Models\Role::create([
+        'name' => 'Client',
+        'company_id' => $company->id,
+    ]);
 
-        $adminRole = \App\Models\Role::where('name', 'admin')
-                ->where('company_id', $company->id)
-                ->first();
+    // Admin user
+    $user = User::create([
+        'company_id' => $company->id,
+        'name'       => $request->name,
+        'email'      => $request->admin_email,
+        'password'   => Hash::make($request->password),
+    ]);
 
-                if ($adminRole) {
-                    $user->assignRole($adminRole);
-                }
-        Auth::login($user);
+    // ✅ Assign Admin Role
+    $user->assignRole($adminRole);
+
+    Auth::login($user);
     });
 
     return redirect()->route('dashboard')->with('showWelcome', true);
