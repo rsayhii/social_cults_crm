@@ -9,6 +9,7 @@ class Link extends Model
     protected $fillable = [
         'company_id',
         'type',
+        'category',
         'title',
         'url',
         'note',

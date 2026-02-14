@@ -85,15 +85,15 @@
                             @enderror
                         </div>
 
-                        <!-- Roles -->
+                        <!-- Role -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Roles</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Role</label>
                             <div class="space-y-3">
                                 @foreach($roles as $role)
                                     <div class="flex items-center">
-                                        <input type="checkbox" name="roles[]" id="role_{{ $role->id }}" value="{{ $role->id }}"
+                                        <input type="radio" name="roles[]" id="role_{{ $role->id }}" value="{{ $role->id }}"
                                                {{ $user->roles->contains('id', $role->id) ? 'checked' : '' }}
-                                               class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded @error('roles') border-red-500 @enderror">
+                                               class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300">
                                         <label for="role_{{ $role->id }}" class="ml-3 block text-sm font-medium text-gray-700">
                                             {{ ucfirst($role->name) }}
                                         </label>

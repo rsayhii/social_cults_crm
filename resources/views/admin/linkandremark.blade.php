@@ -744,39 +744,7 @@ document.getElementById('linkForm').onsubmit = async function(e) {
     }
 };
 
-        // form submit
-        document.getElementById('linkForm').onsubmit = async function(e){
-            e.preventDefault();
-            const id = document.getElementById('editLinkId').value;
-            const payload = {
-                type: document.getElementById('linkType').value,
-                title: document.getElementById('titleInput').value,
-                url: document.getElementById('urlInput').value,
-                note: document.getElementById('noteInput').value,
-                status: document.getElementById('statusInput').value,
-                category: document.getElementById('linkCategory').value
-            };
-
-            try{
-                const url = id ? `/links/update/${id}` : '/links/store';
-                const method = id ? 'PUT' : 'POST';
-                const res = await fetch(url, {
-                    method,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrf
-                    },
-                    body: JSON.stringify(payload)
-                });
-                if(!res.ok) throw new Error('Save failed');
-                await loadLinks();
-                closeModal();
-                logActivity(id ? `Updated link (${payload.title})` : `Added link (${payload.title})`);
-            }catch(err){ 
-                console.error(err); 
-                alert('Failed to save link'); 
-            }
-        }
+        
 
         // ------------------- delete -------------------
         async function deleteLink(id){ 
