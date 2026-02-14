@@ -447,7 +447,7 @@
         </div>
     </div>
     <!-- Delete Confirmation Modal -->
-    <div id="deleteConfirmModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div id="deleteConfirmModal" class="fixed w-[50%] h-[50%] top-[30%] left-[30%] z-50 flex items-center justify-center hidden">
         <div class="delete-modal-content fade-in">
             <div class="delete-modal-header">
                 <div class="flex justify-between items-center">
