@@ -34,10 +34,13 @@ class CompanyController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'address' => 'nullable|string',
-            'contact' => 'nullable|string',
+            'email' => 'nullable|email|max:255',
+            'phone' => 'nullable|string|max:20',
             'gstin' => 'nullable|string|max:50',
-            'bank_details' => 'nullable|string',
-            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048'
+            'bank_name' => 'nullable|string|max:255',
+            'account_number' => 'nullable|string|max:50',
+            'ifsc_code' => 'nullable|string|max:20',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:5120'
         ]);
 
         $user = Auth::user();
@@ -76,9 +79,12 @@ class CompanyController extends Controller
         $companyData = [
             'name' => $request->name,
             'address' => $request->address,
-            'contact' => $request->contact,
+            'email' => $request->email,
+            'phone' => $request->phone,
             'gstin' => $request->gstin,
-            'bank_details' => $request->bank_details,
+            'bank_name' => $request->bank_name,
+            'account_number' => $request->account_number,
+            'ifsc_code' => $request->ifsc_code,
         ];
 
         if ($logoPath) {
@@ -172,7 +178,7 @@ class CompanyController extends Controller
     public function saveSignature(Request $request)
     {
         $request->validate([
-            'signature' => 'required|string'
+            'signature' => 'nullable|string'
         ]);
 
         $user = Auth::user();

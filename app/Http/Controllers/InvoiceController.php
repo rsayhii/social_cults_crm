@@ -137,7 +137,7 @@ if ($search) {
         $adminSignature = null;
         if ($request->has('admin_signature') && !empty($request->admin_signature)) {
             $signatureData = $request->admin_signature;
-            if (strpos($signatureData, 'data:image') === 0) {
+            if (is_string($signatureData) && strpos($signatureData, 'data:image') === 0) {
                 $adminSignature = $signatureData;
             }
         }
@@ -290,7 +290,7 @@ if ($search) {
         // Handle signature if provided
         if ($request->has('admin_signature') && !empty($request->admin_signature)) {
             $signatureData = $request->admin_signature;
-            if (strpos($signatureData, 'data:image') === 0) {
+            if (is_string($signatureData) && strpos($signatureData, 'data:image') === 0) {
                 $invoice->admin_signature = $signatureData;
             }
         }
@@ -525,18 +525,48 @@ $this->authorize('manage', $invoice);
             ], 404);
         }
         
-        // For multiple invoices, you might want to create a zip file
-        // For simplicity, we'll just download the first one
         if ($invoices->count() === 1) {
             $invoice = $invoices->first();
             $pdf = Pdf::loadView('invoice.pdf', compact('invoice'));
             return $pdf->download("invoice-{$invoice->invoice_number}.pdf");
         }
-        
-        return response()->json([
-            'success' => false,
-            'message' => 'Multiple PDF download not implemented yet'
-        ]);
+
+        // Create a ZIP archive with multiple invoice PDFs
+        try {
+            $zip = new \ZipArchive();
+            $timestamp = now()->format('Y-m-d-H-i-s');
+            $zipFileName = "invoices-{$timestamp}.zip";
+            $zipPath = storage_path("app/{$zipFileName}");
+
+            if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unable to create ZIP file'
+                ], 500);
+            }
+
+            foreach ($invoices as $invoice) {
+                $pdf = Pdf::loadView('invoice.pdf', compact('invoice'))
+                    ->setPaper('a4', 'portrait')
+                    ->setOption('defaultFont', 'DejaVu Sans');
+                $pdfData = $pdf->output();
+                $entryName = "invoice-{$invoice->invoice_number}.pdf";
+                $zip->addFromString($entryName, $pdfData);
+            }
+
+            $zip->close();
+
+            return response()->download($zipPath, $zipFileName, [
+                'Content-Type' => 'application/zip',
+                'X-Filename' => $zipFileName,
+            ])->deleteFileAfterSend(true);
+        } catch (\Exception $e) {
+            Log::error('Bulk download ZIP error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to generate ZIP: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function getShareLink($id)

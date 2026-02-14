@@ -451,6 +451,7 @@ Route::middleware(['auth', CheckCompanyAccess::class])->group(function () {
 
             Route::post('/bulk-status', [InvoiceController::class, 'bulkUpdateStatus']);
             Route::post('/bulk-delete', [InvoiceController::class, 'bulkDelete']);
+            Route::post('/bulk-download', [InvoiceController::class, 'bulkDownload']);
         });
     });
 

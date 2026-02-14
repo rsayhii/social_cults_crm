@@ -23,6 +23,7 @@ class Company extends Model
         'is_paid',
         'status',
         'hidden_proposal_templates',
+        'logo',
     ];
 
 

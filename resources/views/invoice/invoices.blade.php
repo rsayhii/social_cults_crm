@@ -914,12 +914,12 @@
                                 <button id="bulk-pdf" class="action-btn secondary-btn text-xs">
                                     <i class="fas fa-file-pdf mr-1"></i> Download PDFs
                                 </button>
-                                <button id="bulk-print" class="action-btn secondary-btn text-xs">
+                                {{-- <button id="bulk-print" class="action-btn secondary-btn text-xs">
                                     <i class="fas fa-print mr-1"></i> Print Selected
-                                </button>
-                                <button id="bulk-email" class="action-btn secondary-btn text-xs">
+                                </button> --}}
+                                {{-- <button id="bulk-email" class="action-btn secondary-btn text-xs">
                                     <i class="fas fa-envelope mr-1"></i> Email Selected
-                                </button>
+                                </button> --}}
                             </div>
                         </div>
                     </div>
@@ -1195,16 +1195,6 @@
                                                         <label class="compact-label">Company Name *</label>
                                                         <input type="text" id="edit-company-name" class="compact-input" value="${currentCompany.name || ''}" required>
                                                     </div>
-                                                    <div>
-                                                        <label class="compact-label">Logo</label>
-                                                        <div id="logo-dropzone" class="dropzone mb-2 text-xs">
-                                                            Click or drop logo image (PNG, JPG, WebP)
-                                                        </div>
-                                                        <input id="edit-logo-file" type="file" accept="image/*" class="hidden" />
-                                                        <div id="logo-preview" class="border rounded p-2 h-20 flex items-center justify-center text-xs text-slate-500">
-                                                            ${currentCompany.logo ? `<img src="/storage/${currentCompany.logo}" class="max-h-16 object-contain" alt="Logo">` : 'No logo uploaded'}
-                                                        </div>
-                                                    </div>
                                                 </div>
 
                                                 <div>
@@ -1214,18 +1204,36 @@
 
                                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                     <div>
-                                                        <label class="compact-label">Contact Info</label>
-                                                        <input type="text" id="edit-company-contact" class="compact-input" value="${currentCompany.contact || ''}" placeholder="Phone, email, etc.">
+                                                        <label class="compact-label">Email</label>
+                                                        <input type="email" id="edit-company-email" class="compact-input" value="${currentCompany.email || ''}" placeholder="company@example.com">
                                                     </div>
                                                     <div>
+                                                        <label class="compact-label">Phone</label>
+                                                        <input type="text" id="edit-company-phone" class="compact-input" value="${currentCompany.phone || ''}" placeholder="+91 9876543210">
+                                                    </div>
+                                                </div>
+
+                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                     <div>
                                                         <label class="compact-label">GSTIN</label>
                                                         <input type="text" id="edit-company-gstin" class="compact-input" value="${currentCompany.gstin || ''}" placeholder="Company GST Number">
                                                     </div>
                                                 </div>
 
                                                 <div>
-                                                    <label class="compact-label">Bank Details</label>
-                                                    <textarea id="edit-company-bank" rows="3" class="compact-input" placeholder="Bank name, account number, IFSC, etc.">${currentCompany.bank_details || ''}</textarea>
+                                                    <label class="compact-label">Bank Name</label>
+                                                    <input type="text" id="edit-company-bank-name" class="compact-input" value="${currentCompany.bank_name || ''}" placeholder="Bank Name">
+                                                </div>
+
+                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div>
+                                                        <label class="compact-label">Account Number</label>
+                                                        <input type="text" id="edit-company-account-number" class="compact-input" value="${currentCompany.account_number || ''}" placeholder="Account Number">
+                                                    </div>
+                                                    <div>
+                                                        <label class="compact-label">IFSC Code</label>
+                                                        <input type="text" id="edit-company-ifsc-code" class="compact-input" value="${currentCompany.ifsc_code || ''}" placeholder="IFSC Code">
+                                                    </div>
                                                 </div>
 
                                                 <div class="pt-4 border-t border-slate-200">
@@ -1351,9 +1359,12 @@
                     company_id: currentCompany.id,
                     name: document.getElementById('edit-company-name').value.trim(),
                     address: document.getElementById('edit-company-address').value.trim(),
-                    contact: document.getElementById('edit-company-contact').value.trim(),
+                    email: document.getElementById('edit-company-email').value.trim(),
+                    phone: document.getElementById('edit-company-phone').value.trim(),
                     gstin: document.getElementById('edit-company-gstin').value.trim(),
-                    bank_details: document.getElementById('edit-company-bank').value.trim(),
+                    bank_name: document.getElementById('edit-company-bank-name').value.trim(),
+                    account_number: document.getElementById('edit-company-account-number').value.trim(),
+                    ifsc_code: document.getElementById('edit-company-ifsc-code').value.trim(),
                 };
 
                 // Get logo data if uploaded
@@ -1387,13 +1398,21 @@
                         // Update company info in preview
                         const previewCompany = $('preview-company');
                         if (previewCompany) {
-                            previewCompany.textContent = `${currentCompany.name || ''}\n${currentCompany.address || ''}\n${currentCompany.contact || ''}${currentCompany.gstin ? '\nGSTIN: ' + currentCompany.gstin : ''}`;
+                            let contactInfo = '';
+                            if(currentCompany.email) contactInfo += currentCompany.email + '\n';
+                            if(currentCompany.phone) contactInfo += currentCompany.phone + '\n';
+                            
+                            previewCompany.textContent = `${currentCompany.name || ''}\n${currentCompany.address || ''}\n${contactInfo}${currentCompany.gstin ? 'GSTIN: ' + currentCompany.gstin : ''}`;
                         }
 
                         // Update bank details in preview
                         const previewBank = $('preview-bank');
                         if (previewBank) {
-                            previewBank.textContent = currentCompany.bank_details || '';
+                            let bankDetails = '';
+                            if (currentCompany.bank_name) bankDetails += currentCompany.bank_name + '\n';
+                            if (currentCompany.account_number) bankDetails += 'A/C: ' + currentCompany.account_number + '\n';
+                            if (currentCompany.ifsc_code) bankDetails += 'IFSC: ' + currentCompany.ifsc_code;
+                            previewBank.textContent = bankDetails;
                         }
 
                         showToast('Company details saved successfully!', 'success');
@@ -1462,7 +1481,7 @@
                     return { success: false, message: 'Network error' };
                 }
             }
-            async function bulkUpdateStatus(ids, status) {
+            async function bulkUpdateStatusOnServer(ids, status) {
                 try {
                     const response = await fetch(`${API_BASE_URL}/invoices/bulk-status`, {
                         method: 'POST',
@@ -1627,7 +1646,17 @@
                         });
 
                         tr.querySelector('.desc').addEventListener(ev, calculateAndRender);
-                        tr.querySelector('.service').addEventListener(ev, calculateAndRender);
+                       tr.querySelector('.service').addEventListener(ev, function () {
+    const selectedService = this.value;
+    const descInput = tr.querySelector('.desc');
+
+    // If description is empty OR matches old service, auto-fill
+    if (!descInput.value || SERVICE_LIST.includes(descInput.value)) {
+        descInput.value = selectedService;
+    }
+
+    calculateAndRender();
+});
                     });
 
                     updateItemSerials();
@@ -2730,8 +2759,38 @@
                     return;
                 }
 
-                // For multiple invoices, we need server-side zip generation
-                showToast('Multiple PDF download feature coming soon! For now, please download invoices one by one.', 'info');
+                // Multiple invoices: request server to generate ZIP of PDFs
+                try {
+                    const response = await fetch(`${API_BASE_URL}/invoices/bulk-download`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/zip',
+                            'X-CSRF-TOKEN': CSRF_TOKEN
+                        },
+                        body: JSON.stringify({ ids })
+                    });
+                    if (!response.ok) {
+                        const text = await response.text();
+                        console.error('Bulk download failed:', text);
+                        showToast('Error generating PDFs. Please try again.', 'error');
+                        return;
+                    }
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const filename = (response.headers.get('X-Filename')) || `invoices-${new Date().toISOString().slice(0,10)}.zip`;
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    window.URL.revokeObjectURL(url);
+                    showToast('PDFs downloaded successfully.', 'success');
+                } catch (error) {
+                    console.error('Error downloading PDFs:', error);
+                    showToast('Network error while downloading PDFs.', 'error');
+                }
             }
             async function bulkPrintInvoices() {
                 const ids = getSelectedInvoiceIds();
@@ -2746,7 +2805,22 @@
                     return;
                 }
 
-                showToast('Multiple invoice print feature coming soon! For now, please print invoices one by one.', 'info');
+                // Print multiple invoices sequentially
+                try {
+                    for (const id of ids) {
+                        const result = await loadInvoice(id);
+                        if (result.success) {
+                            loadInvoiceForPrint(result.invoice);
+                            await new Promise(resolve => setTimeout(resolve, 300));
+                            window.print();
+                            await new Promise(resolve => setTimeout(resolve, 800));
+                        }
+                    }
+                    showToast('Printing initiated for selected invoices.', 'success');
+                } catch (error) {
+                    console.error('Error printing invoices:', error);
+                    showToast('Error printing selected invoices.', 'error');
+                }
             }
             async function bulkEmailInvoices() {
                 const ids = getSelectedInvoiceIds();
@@ -2892,24 +2966,58 @@
                     updateSignaturePreview(signature);
                 }
             }
+            function resizeImage(file, maxWidth, maxHeight, callback) {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > maxWidth || height > maxHeight) {
+                            if (width > height) {
+                                height *= maxWidth / width;
+                                width = maxWidth;
+                            } else {
+                                width *= maxHeight / height;
+                                height = maxHeight;
+                            }
+                        }
+
+                        const canvas = document.createElement('canvas');
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        // Use PNG to preserve transparency
+                        const dataUrl = canvas.toDataURL('image/png');
+                        callback(dataUrl);
+                    };
+                };
+            }
+
             function handleSignatureUpload(file) {
                 if (!file.type.match('image.*')) {
                     showToast('Please select an image file (PNG, JPG, WebP)', 'error');
                     return;
                 }
 
-                if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                // Client-side validation for 5MB (though we resize anyway)
+                if (file.size > 5 * 1024 * 1024) {
                     showToast('File size must be less than 5MB', 'error');
                     return;
                 }
 
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const signatureData = e.target.result;
+                showToast('Processing signature...', 'info');
+
+                // Resize to max 800x400 to ensure it fits in DB and loads fast
+                resizeImage(file, 800, 400, (signatureData) => {
                     updateSignaturePreview(signatureData);
                     saveSignatureToServer(signatureData);
-                };
-                reader.readAsDataURL(file);
+                });
             }
             function updateSignaturePreview(signatureData) {
                 // Update admin signature preview
@@ -2958,7 +3066,8 @@
                 saveSignatureToServer(null);
             }
             async function saveSignatureToServer(signatureData) {
-                const result = await saveSignature({ signature: signatureData });
+                // Fix: Pass signatureData directly, not wrapped in an object
+                const result = await saveSignature(signatureData);
                 if (!result.success) {
                     console.error('Failed to save signature:', result.message);
                 }
