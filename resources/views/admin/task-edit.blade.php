@@ -862,10 +862,10 @@
                                 <div>
                                     <label class="form-label">&nbsp;</label>
                                     <div class="mt-6">
-                                        <button type="button" id="addRoleBtn"
+                                        <!-- <button type="button" id="addRoleBtn"
                                             class="text-sm text-indigo-600 hover:text-indigo-800 flex items-center font-medium">
                                             <i class="fas fa-plus-circle mr-1.5"></i> Add New Role
-                                        </button>
+                                        </button> -->
                                     </div>
                                 </div>
                             </div>
