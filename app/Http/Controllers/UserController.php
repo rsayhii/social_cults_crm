@@ -23,8 +23,27 @@ class UserController extends Controller
     // Show create form
     public function create()
     {
+        $authUser = Auth::user();
+        if (!$authUser) {
+            abort(401);
+        }
+        $companyId = $authUser->company_id;
+        $rolesQuery = Role::forCompany($companyId);
 
-        $roles = Role::forCompany(Auth::user()->company_id)->get();
+        $adminRole = Role::forCompany($companyId)
+            ->whereRaw('LOWER(name) = ?', ['admin'])
+            ->first();
+
+        if ($adminRole) {
+            $adminExists = User::where('company_id', $companyId)
+                ->whereHas('roles', fn($q) => $q->where('id', $adminRole->id))
+                ->exists();
+            if ($adminExists) {
+                $rolesQuery->whereRaw('LOWER(name) <> ?', ['admin']);
+            }
+        }
+
+        $roles = $rolesQuery->get();
         return view('admin.user.addusers', compact('roles'));
     }
 
@@ -40,6 +59,33 @@ class UserController extends Controller
         ]);
 
         $authUser = Auth::user();
+        if (!$authUser) {
+            abort(401);
+        }
+
+        $requestedRoles = (array) $request->input('roles', []);
+        if (count($requestedRoles) > 1) {
+            return back()->withErrors(['roles' => 'Only one role can be assigned per user.'])->withInput();
+        }
+        if (!empty($requestedRoles)) {
+            $rolesForCompany = Role::forCompany($authUser->company_id)
+                ->whereIn('id', $requestedRoles)
+                ->get();
+            $adminRole = $rolesForCompany->first(function ($r) {
+                return strtolower($r->name) === 'admin';
+            });
+            if ($adminRole) {
+                $adminExists = User::where('company_id', $authUser->company_id)
+                    ->whereHas('roles', function ($q) use ($adminRole) {
+                        $q->where('id', $adminRole->id);
+                    })
+                    ->exists();
+                if ($adminExists) {
+                    return back()->withErrors(['roles' => 'An admin already exists for this company.'])->withInput();
+                }
+            }
+        }
+
         $user = User::create([
             'company_id' => $authUser->company_id,
             'name' => $request->name,
@@ -47,14 +93,17 @@ class UserController extends Controller
             'password' => Hash::make($request->password),
             'salary' => $request->salary,
         ]);
-        if ($request->filled('roles')) {
+
+        if (!empty($requestedRoles)) {
             $roles = Role::forCompany($authUser->company_id)
-                ->whereIn('id', (array)$request->roles)
+                ->whereIn('id', $requestedRoles)
                 ->get();
             $user->syncRoles($roles);
         }
+
         return redirect()->route('users')->with('success', 'User created successfully!');
     }
+
 
     // Show a specific user
     public function show(User $user)
@@ -68,7 +117,27 @@ class UserController extends Controller
     public function edit(User $user)  // Changed to User $user for consistency
     {
          $this->authorize('manage', $user);
-        $roles = Role::forCompany(Auth::user()->company_id)->get();
+        $authUser = Auth::user();
+        if (!$authUser) {
+            abort(401);
+        }
+        $companyId = $authUser->company_id;
+
+        $rolesQuery = Role::forCompany($companyId);
+        $adminRole = Role::forCompany($companyId)
+            ->whereRaw('LOWER(name) = ?', ['admin'])
+            ->first();
+
+        if ($adminRole) {
+            $existingAdmin = User::where('company_id', $companyId)
+                ->whereHas('roles', fn($q) => $q->where('id', $adminRole->id))
+                ->first();
+            if ($existingAdmin && $existingAdmin->id !== $user->id) {
+                $rolesQuery->whereRaw('LOWER(name) <> ?', ['admin']);
+            }
+        }
+
+        $roles = $rolesQuery->get();
         return view('admin.user.editusers', compact('user', 'roles'));
     }
 
@@ -83,6 +152,30 @@ class UserController extends Controller
             'password' => 'nullable|min:6',  // Made password optional for updates
             'salary' => 'nullable|numeric',  // Made salary optional if not always updated
         ]);
+
+        // Enforce single role selection and one admin per company on update
+        if ($request->has('roles')) {
+            $requestedRoles = (array) $request->input('roles', []);
+            if (count($requestedRoles) > 1) {
+                return back()->withErrors(['roles' => 'Only one role can be assigned per user.'])->withInput();
+            }
+            if (!empty($requestedRoles)) {
+                $rolesForCompany = Role::forCompany(Auth::user()->company_id)
+                    ->whereIn('id', $requestedRoles)
+                    ->get();
+                $adminRole = $rolesForCompany->first(function ($r) {
+                    return strtolower($r->name) === 'admin';
+                });
+                if ($adminRole) {
+                    $existingAdmin = User::where('company_id', Auth::user()->company_id)
+                        ->whereHas('roles', fn($q) => $q->where('id', $adminRole->id))
+                        ->first();
+                    if ($existingAdmin && $existingAdmin->id !== $user->id) {
+                        return back()->withErrors(['roles' => 'An admin already exists for this company.'])->withInput();
+                    }
+                }
+            }
+        }
 
         $updateData = [
             'name' => $request->name,
@@ -101,7 +194,7 @@ class UserController extends Controller
 
         if ($request->has('roles')) {
             $roles = Role::forCompany(Auth::user()->company_id)
-                ->whereIn('id', (array)$request->roles)
+                ->whereIn('id', (array) $request->roles)
                 ->get();
             $user->syncRoles($roles);
         }

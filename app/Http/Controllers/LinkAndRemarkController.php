@@ -26,6 +26,7 @@ class LinkAndRemarkController extends Controller
     {
         $validated = $request->validate([
             'type' => 'required',
+            'category' => 'required|in:marketing,support,internal',
             'title' => 'required|string|max:255',
             'url' => 'required|url',
             'note' => 'nullable|string',
@@ -49,11 +50,14 @@ class LinkAndRemarkController extends Controller
         $this->authorize('manage', $link);
 
         $validated = $request->validate([
-            'type' => 'required',
-            'title' => 'required|string|max:255',
-            'url' => 'required|url',
-            'note' => 'nullable|string',
-            'status' => 'required|in:active,inactive'
+            'type' => 'sometimes|required',
+            'category' => 'sometimes|required|in:marketing,support,internal',
+            'title' => 'sometimes|required|string|max:255',
+            'url' => 'sometimes|required|url',
+            'note' => 'sometimes|nullable|string',
+            'status' => 'sometimes|required|in:active,inactive',
+            'clicks' => 'sometimes|integer|min:0',
+            'engagement' => 'sometimes|numeric|min:0'
         ]);
 
         $link->update($validated);
