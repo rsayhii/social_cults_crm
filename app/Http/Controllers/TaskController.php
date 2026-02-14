@@ -16,7 +16,7 @@ class TaskController extends Controller
     public function index()
     {
         $tasks = Task::with('users', 'role', 'assigner.roles')->recent()->get();
-        $users = User::with('roles')->where('company_id',Auth::user()->company_id)->get();
+        $users = User::with('roles')->where('company_id', Auth::user()->company_id)->get();
         $roles = Role::forCompany(Auth::user()->company_id)->get();
 
         // Calculate stats
@@ -51,7 +51,7 @@ class TaskController extends Controller
         $this->authorize('manage', $task);
 
         $task->load('users', 'role', 'assigner.roles');
-        $users = User::with('roles')->get();
+        $users = User::with('roles')->where('company_id', Auth::user()->company_id)->get();
         $roles = Role::forCompany(Auth::user()->company_id)->get();
 
         return view('admin.task-edit', compact('task', 'users', 'roles'));
@@ -236,10 +236,16 @@ class TaskController extends Controller
             }
         }
 
-        return response()->json([
-            'success' => true,
-            'task' => $task->load('users', 'role', 'assigner.roles')->toArray()
-        ]);
+        // Check if this is an AJAX request
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'task' => $task->load('users', 'role', 'assigner.roles')->toArray()
+            ]);
+        }
+
+        // Traditional form submission - redirect
+        return redirect()->route('tasks.index')->with('success', 'Task updated successfully!');
     }
     public function destroy(Task $task)
     {

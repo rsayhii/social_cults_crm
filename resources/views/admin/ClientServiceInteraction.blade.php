@@ -388,6 +388,15 @@
                             <i class="fas fa-chevron-right text-xs ml-1"></i>
                         </button>
                     </div>
+                    {{-- Edit Group Button (Admin Only) --}}
+                    @if(auth()->user()->hasRole('admin'))
+                        <div id="editGroupBtn" class="hidden">
+                            <button onclick="openEditGroupModal(activeChat)"
+                                class="text-gray-500 hover:text-indigo-600 transition p-2" title="Edit Group">
+                                <i class="fas fa-cog text-lg"></i>
+                            </button>
+                        </div>
+                    @endif
                 </div>
 
                 <!-- Members Modal -->
@@ -479,6 +488,102 @@
                                     class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
                                     <i class="fas fa-plus mr-1"></i> Create Group
                                 </button>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                {{-- Edit Group Modal (Admin Only) --}}
+                @if(auth()->user()->hasRole('admin'))
+                    <div id="editGroupModal"
+                        class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+                        <div class="bg-white rounded-xl shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden">
+                            {{-- Modal Header --}}
+                            <div
+                                class="p-4 border-b border-gray-200 flex justify-between items-center bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
+                                <h3 class="font-bold text-lg">
+                                    <i class="fas fa-edit mr-2"></i>Edit Group
+                                </h3>
+                                <button onclick="closeEditGroupModal()" class="text-white hover:text-gray-200">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+
+                            {{-- Modal Body --}}
+                            <div class="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
+                                {{-- Hidden field to store group ID --}}
+                                <input type="hidden" id="editGroupId">
+
+                                {{-- Group Name --}}
+                                <div class="mb-6">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <i class="fas fa-tag text-indigo-500 mr-1"></i> Group Name *
+                                    </label>
+                                    <input type="text" id="editGroupName"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                        placeholder="Enter group name...">
+                                </div>
+
+                                {{-- Current Members --}}
+                                <div class="mb-6">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <i class="fas fa-users text-green-500 mr-1"></i> Current Members (<span
+                                            id="currentMemberCount">0</span>)
+                                    </label>
+                                    <div id="currentMembersList"
+                                        class="max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3 bg-gray-50 space-y-2">
+                                        <p class="text-sm text-gray-400 text-center py-4">Loading members...</p>
+                                    </div>
+                                </div>
+
+                                {{-- Add Members Section --}}
+                                <div class="border-t border-gray-200 pt-6">
+                                    <label class="block text-sm font-medium text-gray-700 mb-3">
+                                        <i class="fas fa-user-plus text-indigo-500 mr-1"></i> Add More Members
+                                    </label>
+
+                                    {{-- Clients Tab --}}
+                                    <div class="mb-4">
+                                        <h4 class="text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">Clients
+                                        </h4>
+                                        <div id="editClientsList"
+                                            class="max-h-40 overflow-y-auto border border-gray-200 rounded-lg p-2 bg-white">
+                                            <p class="text-sm text-gray-400 text-center py-2">Loading...</p>
+                                        </div>
+                                    </div>
+
+                                    {{-- Team Members by Role --}}
+                                    <div>
+                                        <h4 class="text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">Team
+                                            Members</h4>
+                                        <select id="editRoleSelector"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg mb-2 focus:ring-2 focus:ring-indigo-500">
+                                            <option value="">-- Select a Role --</option>
+                                        </select>
+                                        <div id="editRoleUsersList"
+                                            class="max-h-40 overflow-y-auto border border-gray-200 rounded-lg p-2 bg-white hidden">
+                                            <p class="text-sm text-gray-400 text-center py-2">Select a role to see users</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>       
+
+                            {{-- Modal Footer --}}
+                            <div class="p-4 border-t border-gray-200 flex justify-between gap-2 bg-gray-50">
+                                <button onclick="confirmDeleteGroup()"
+                                    class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition flex items-center">
+                                    <i class="fas fa-trash mr-2"></i> Delete Group
+                                </button>
+                                <div class="flex gap-2">
+                                    <button onclick="closeEditGroupModal()"
+                                        class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                                        Cancel
+                                    </button>
+                                    <button onclick="submitEditGroup()"
+                                        class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition flex items-center">
+                                        <i class="fas fa-save mr-2"></i> Save Changes
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -712,10 +817,10 @@
                             const label = document.createElement('label');
                             label.className = 'flex items-center p-1 hover:bg-gray-100 rounded cursor-pointer';
                             label.innerHTML = `
-                                                                                                                                                        <input type="checkbox" class="mr-2 client-checkbox" data-id="${client.id}" data-name="${escapeHtml(client.name)}">
-                                                                                                                                                        <span class="text-sm">${escapeHtml(client.name)}</span>
-                                                                                                                                                        <span class="text-xs text-gray-400 ml-1">(${escapeHtml(client.email)})</span>
-                                                                                                                                                                               `;
+                                                                                                                                                                                    <input type="checkbox" class="mr-2 client-checkbox" data-id="${client.id}" data-name="${escapeHtml(client.name)}">
+                                                                                                                                                                                    <span class="text-sm">${escapeHtml(client.name)}</span>
+                                                                                                                                                                                    <span class="text-xs text-gray-400 ml-1">(${escapeHtml(client.email)})</span>
+                                                                                                                                                                                                                                      `;
                             label.querySelector('input').addEventListener('change', (e) => {
                                 if (e.target.checked) {
                                     selectedMembers.set(client.id, { name: client.name, type: 'client' });
@@ -778,9 +883,9 @@
                         const selectAllLabel = document.createElement('label');
                         selectAllLabel.className = 'flex items-center p-1 hover:bg-indigo-100 rounded cursor-pointer font-medium border-b mb-1 pb-1';
                         selectAllLabel.innerHTML = `
-                                                                                                                                                    <input type="checkbox" class="mr-2" id="selectAllRoleUsers">
-                                                                                                                                                    <span class="text-sm text-indigo-600">Select All (${data.users.length})</span>
-                                                                                                                                                `;
+                                                                                                                                                                                <input type="checkbox" class="mr-2" id="selectAllRoleUsers">
+                                                                                                                                                                                <span class="text-sm text-indigo-600">Select All (${data.users.length})</span>
+                                                                                                                                                                            `;
                         selectAllLabel.querySelector('input').addEventListener('change', (e) => {
                             const checkboxes = container.querySelectorAll('.role-user-checkbox');
                             checkboxes.forEach(cb => {
@@ -803,9 +908,9 @@
                             label.className = 'flex items-center p-1 hover:bg-gray-100 rounded cursor-pointer';
                             const isChecked = selectedMembers.has(user.id);
                             label.innerHTML = `
-                                                                                                                                                        <input type="checkbox" class="mr-2 role-user-checkbox" data-id="${user.id}" data-name="${escapeHtml(user.name)}" ${isChecked ? 'checked' : ''}>
-                                                                                                                                                        <span class="text-sm">${escapeHtml(user.name)}</span>
-                                                                                                                                                    `;
+                                                                                                                                                                                    <input type="checkbox" class="mr-2 role-user-checkbox" data-id="${user.id}" data-name="${escapeHtml(user.name)}" ${isChecked ? 'checked' : ''}>
+                                                                                                                                                                                    <span class="text-sm">${escapeHtml(user.name)}</span>
+                                                                                                                                                                                `;
                             label.querySelector('input').addEventListener('change', (e) => {
                                 if (e.target.checked) {
                                     selectedMembers.set(user.id, { name: user.name, type: 'team' });
@@ -841,11 +946,11 @@
                     const badge = document.createElement('span');
                     badge.className = `inline-flex items-center px-2 py-1 rounded-full text-xs ${data.type === 'client' ? 'bg-sky-100 text-sky-700' : 'bg-indigo-100 text-indigo-700'}`;
                     badge.innerHTML = `
-                                                                                                                                                ${escapeHtml(data.name)}
-                                                                                                                                                <button class="ml-1 hover:text-red-500" onclick="removeMemberFromSelection(${id})">
-                                                                                                                                                    <i class="fas fa-times"></i>
-                                                                                                                                                </button>
-                                                                                                                                            `;
+                                                                                                                                                                            ${escapeHtml(data.name)}
+                                                                                                                                                                            <button class="ml-1 hover:text-red-500" onclick="removeMemberFromSelection(${id})">
+                                                                                                                                                                                <i class="fas fa-times"></i>
+                                                                                                                                                                            </button>
+                                                                                                                                                                        `;
                     container.appendChild(badge);
                 });
             }
@@ -902,6 +1007,322 @@
                     .catch(err => {
                         console.error('Error creating group:', err);
                         alert('Failed to create group');
+                    });
+            }
+
+            // ============================================
+            // EDIT GROUP FUNCTIONS
+            // ============================================
+
+            let currentEditingGroupId = null;
+            let editMembersToAdd = new Set();
+            let editMembersToRemove = new Set();
+            let currentGroupMembers = [];
+
+            // Open Edit Group Modal
+            function openEditGroupModal(groupId) {
+                currentEditingGroupId = groupId;
+                editMembersToAdd.clear();
+                editMembersToRemove.clear();
+
+                // Fetch group details
+                fetch(`/chat/groups/${groupId}/members`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.error) {
+                            alert(data.error);
+                            return;
+                        }
+
+                        document.getElementById('editGroupId').value = groupId;
+                        document.getElementById('editGroupName').value = data.group_name;
+                        currentGroupMembers = data.members || [];
+                        renderCurrentMembers(data.members);
+                        loadEditAddMembersOptions();
+                    })
+                    .catch(err => {
+                        console.error('Error loading group:', err);
+                        alert('Failed to load group details');
+                    });
+
+                document.getElementById('editGroupModal').classList.remove('hidden');
+            }
+
+            // Close Edit Group Modal
+            function closeEditGroupModal() {
+                document.getElementById('editGroupModal').classList.add('hidden');
+                currentEditingGroupId = null;
+                editMembersToAdd.clear();
+                editMembersToRemove.clear();
+            }
+
+            // Render current members with remove buttons
+            function renderCurrentMembers(members) {
+                const container = document.getElementById('currentMembersList');
+                const countEl = document.getElementById('currentMemberCount');
+
+                if (!members || members.length === 0) {
+                    container.innerHTML = '<p class="text-sm text-gray-400 text-center py-4">No members in this group</p>';
+                    countEl.textContent = '0';
+                    return;
+                }
+
+                countEl.textContent = members.length;
+                container.innerHTML = '';
+
+                members.forEach(member => {
+                    const memberDiv = document.createElement('div');
+                    memberDiv.className = 'flex items-center justify-between p-2 hover:bg-gray-100 rounded';
+                    memberDiv.id = `edit-member-${member.id}`;
+                    memberDiv.innerHTML = `
+                                                <div class="flex items-center flex-1">
+                                                    <i class="fas fa-user text-gray-400 mr-2"></i>
+                                                    <span class="text-sm">${escapeHtml(member.name)}</span>
+                                                    ${member.is_client ? '<span class="ml-2 text-xs bg-sky-100 text-sky-700 px-2 py-0.5 rounded">Client</span>' : ''}
+                                                </div>
+                                                <button onclick="removeMemberFromEditGroup(${member.id}, '${escapeHtml(member.name)}')" 
+                                                    class="text-red-500 hover:text-red-700 p-1">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            `;
+                    container.appendChild(memberDiv);
+                });
+            }
+
+            // Remove member from group
+            function removeMemberFromEditGroup(memberId, memberName) {
+                editMembersToRemove.add(memberId);
+                // Remove from UI
+                const memberEl = document.getElementById(`edit-member-${memberId}`);
+                if (memberEl) {
+                    memberEl.remove();
+                }
+                // Update count
+                const countEl = document.getElementById('currentMemberCount');
+                const currentCount = parseInt(countEl.textContent) || 0;
+                countEl.textContent = Math.max(0, currentCount - 1);
+            }
+
+            // Load options for adding members
+            function loadEditAddMembersOptions() {
+                // Load clients
+                fetch('/chat/clients-list')
+                    .then(res => res.json())
+                    .then(clients => renderEditClientsList(clients))
+                    .catch(err => console.error('Error loading clients:', err));
+
+                // Load roles
+                fetch('/chat/roles-list')
+                    .then(res => res.json())
+                    .then(roles => {
+                        const selector = document.getElementById('editRoleSelector');
+                        selector.innerHTML = '<option value="">-- Select a Role --</option>';
+                        roles.forEach(role => {
+                            const opt = document.createElement('option');
+                            opt.value = role.id;
+                            opt.textContent = `${role.name} (${role.user_count} users)`;
+                            selector.appendChild(opt);
+                        });
+                    })
+                    .catch(err => console.error('Error loading roles:', err));
+
+                // Add event listener for role selector
+                document.getElementById('editRoleSelector').addEventListener('change', loadEditRoleUsers);
+            }
+
+            // Render clients list for adding
+            function renderEditClientsList(clients) {
+                const container = document.getElementById('editClientsList');
+                container.innerHTML = '';
+
+                if (!clients || clients.length === 0) {
+                    container.innerHTML = '<p class="text-sm text-gray-400 text-center py-2">No clients available</p>';
+                    return;
+                }
+
+                clients.forEach(client => {
+                    // Skip if already a member
+                    if (currentGroupMembers.some(m => m.id === client.id)) return;
+
+                    const label = document.createElement('label');
+                    label.className = 'flex items-center p-2 hover:bg-gray-100 rounded cursor-pointer';
+                    label.innerHTML = `
+                                                <input type="checkbox" class="mr-2" data-id="${client.id}" data-name="${escapeHtml(client.name)}">
+                                                <span class="text-sm">${escapeHtml(client.name)}</span>
+                                                <span class="text-xs text-gray-500 ml-1">(${escapeHtml(client.email)})</span>
+                                            `;
+
+                    label.querySelector('input').addEventListener('change', (e) => {
+                        if (e.target.checked) {
+                            editMembersToAdd.add(parseInt(client.id));
+                        } else {
+                            editMembersToAdd.delete(parseInt(client.id));
+                        }
+                    });
+
+                    container.appendChild(label);
+                });
+            }
+
+            // Load users by role for adding
+            function loadEditRoleUsers() {
+                const roleId = document.getElementById('editRoleSelector').value;
+                const container = document.getElementById('editRoleUsersList');
+
+                if (!roleId) {
+                    container.classList.add('hidden');
+                    return;
+                }
+
+                container.classList.remove('hidden');
+                container.innerHTML = '<p class="text-sm text-gray-400 text-center py-2">Loading...</p>';
+
+                fetch(`/chat/users-by-role/${roleId}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        container.innerHTML = '';
+
+                        if (!data.users || data.users.length === 0) {
+                            container.innerHTML = '<p class="text-sm text-gray-400 text-center py-2">No users in this role</p>';
+                            return;
+                        }
+
+                        data.users.forEach(user => {
+                            // Skip if already a member
+                            if (currentGroupMembers.some(m => m.id === user.id)) return;
+
+                            const label = document.createElement('label');
+                            label.className = 'flex items-center p-2 hover:bg-gray-100 rounded cursor-pointer';
+                            label.innerHTML = `
+                                                        <input type="checkbox" class="mr-2" data-id="${user.id}" data-name="${escapeHtml(user.name)}">
+                                                        <span class="text-sm">${escapeHtml(user.name)}</span>
+                                                    `;
+
+                            label.querySelector('input').addEventListener('change', (e) => {
+                                if (e.target.checked) {
+                                    editMembersToAdd.add(parseInt(user.id));
+                                } else {
+                                    editMembersToAdd.delete(parseInt(user.id));
+                                }
+                            });
+
+                            container.appendChild(label);
+                        });
+                    })
+                    .catch(err => {
+                        console.error('Error loading role users:', err);
+                        container.innerHTML = '<p class="text-sm text-red-400 text-center py-2">Failed to load users</p>';
+                    });
+            }
+
+            // Submit Edit Group
+            function submitEditGroup() {
+                const groupId = currentEditingGroupId;
+                const newName = document.getElementById('editGroupName').value.trim();
+
+                if (!newName) {
+                    alert('Please enter a group name');
+                    return;
+                }
+
+                // 1. Update group name
+                fetch(`/chat/groups/${groupId}/name`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({ name: newName })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.error) {
+                            alert(data.error);
+                            return Promise.reject(data.error);
+                        }
+
+                        // 2. Remove members
+                        const removePromises = Array.from(editMembersToRemove).map(memberId =>
+                            fetch(`/chat/groups/${groupId}/members/${memberId}`, {
+                                method: 'DELETE',
+                                headers: {
+                                    'X-CSRF-TOKEN': csrfToken,
+                                    'Accept': 'application/json'
+                                }
+                            })
+                        );
+
+                        return Promise.all(removePromises);
+                    })
+                    .then(() => {
+                        // 3. Add new members
+                        if (editMembersToAdd.size > 0) {
+                            return fetch(`/chat/groups/${groupId}/members`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': csrfToken
+                                },
+                                body: JSON.stringify({
+                                    member_ids: Array.from(editMembersToAdd)
+                                })
+                            }).then(res => res.json());
+                        }
+                        return Promise.resolve();
+                    })
+                    .then(() => {
+                        alert('Group updated successfully!');
+                        closeEditGroupModal();
+                        loadChatList(); // Refresh the chat list
+
+                        // Reload the chat if it's currently open
+                        if (activeChat === groupId) {
+                            const chatName = document.getElementById('chatWithName').textContent;
+                            openChat(groupId, newName, 'group', 0);
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Error updating group:', err);
+                        alert('Failed to update group');
+                    });
+            }
+
+            // Confirm and Delete Group
+            function confirmDeleteGroup() {
+                if (!confirm('Are you sure you want to delete this group? This will delete all messages in the group and cannot be undone.')) {
+                    return;
+                }
+
+                const groupId = currentEditingGroupId;
+
+                fetch(`/chat/groups/${groupId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    }
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.error) {
+                            alert(data.error);
+                            return;
+                        }
+
+                        alert('Group deleted successfully!');
+                        closeEditGroupModal();
+                        loadChatList(); // Refresh the chat list
+
+                        // Close the chat if this group was open
+                        if (activeChat === groupId) {
+                            activeChat = null;
+                            activeChatType = null;
+                            messagesArea.innerHTML = '<div class="flex flex-col items-center justify-center h-full text-gray-500" id="emptyChatState"><i class="fas fa-comments text-4xl mb-4 text-gray-300"></i><p class="text-lg">Select a chat to start messaging</p></div>';
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Error deleting group:', err);
+                        alert('Failed to delete group');
                     });
             }
 
@@ -1032,16 +1453,16 @@
                                 : '';
 
                             div.innerHTML = `
-                                                                                                                                                                                    <div class="flex items-center">
-                                                                                                                                                                                        <div class="w-10 h-10 rounded-full ${member.is_client ? 'bg-amber-100' : 'bg-indigo-100'} flex items-center justify-center mr-3">
-                                                                                                                                                                                            <i class="fas ${member.is_client ? 'fa-building text-amber-600' : 'fa-user text-indigo-600'}"></i>
-                                                                                                                                                                                        </div>
-                                                                                                                                                                                        <div>
-                                                                                                                                                                                            <p class="font-medium text-gray-800">${escapeHtml(member.name)}${clientBadge}</p>
-                                                                                                                                                                                            <p class="text-xs text-gray-500">${escapeHtml(member.email)}</p>
-                                                                                                                                                                                        </div>
-                                                                                                                                                                                    </div>
-                                                                                                                                                                                `;
+                                                                                                                                                                                                                <div class="flex items-center">
+                                                                                                                                                                                                                    <div class="w-10 h-10 rounded-full ${member.is_client ? 'bg-amber-100' : 'bg-indigo-100'} flex items-center justify-center mr-3">
+                                                                                                                                                                                                                        <i class="fas ${member.is_client ? 'fa-building text-amber-600' : 'fa-user text-indigo-600'}"></i>
+                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                    <div>
+                                                                                                                                                                                                                        <p class="font-medium text-gray-800">${escapeHtml(member.name)}${clientBadge}</p>
+                                                                                                                                                                                                                        <p class="text-xs text-gray-500">${escapeHtml(member.email)}</p>
+                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                            `;
                             membersList.appendChild(div);
                         });
                     })
@@ -1092,11 +1513,11 @@
                         ? 'No direct chats yet. Select a user above to start chatting.'
                         : 'No group chats yet. Click "Join My Role Group" to get started.';
                     chatListEl.innerHTML = `
-                                        <div class="p-8 text-center text-gray-500">
-                                            <i class="fas fa-${currentTab === 'direct' ? 'user' : 'users'} text-3xl mb-4 text-gray-300"></i>
-                                            <p>${emptyMsg}</p>
-                                        </div>
-                                    `;
+                                                                    <div class="p-8 text-center text-gray-500">
+                                                                        <i class="fas fa-${currentTab === 'direct' ? 'user' : 'users'} text-3xl mb-4 text-gray-300"></i>
+                                                                        <p>${emptyMsg}</p>
+                                                                    </div>
+                                                                `;
                     return;
                 }
 
@@ -1125,24 +1546,24 @@
                             const header = document.createElement('div');
                             header.className = 'p-3 hover:bg-gray-50 cursor-pointer flex items-center transition-colors';
                             header.innerHTML = `
-                                                <i class="fas fa-chevron-right text-gray-400 mr-2 transition-transform duration-200 expand-icon text-xs"></i>
-                                                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mr-3 relative flex-shrink-0">
-                                                    <i class="fas fa-users text-white text-lg"></i>
-                                                </div>
-                                                <div class="flex-1 min-w-0 grid grid-cols-[1fr_auto] gap-x-2">
-                                                    <div class="flex items-center min-w-0">
-                                                        <h4 class="font-semibold text-gray-900 truncate">${escapeHtml(name)}</h4>
-                                                        ${unreadBadge}
-                                                    </div>
-                                                    <span class="text-xs text-gray-400 whitespace-nowrap">${ts}</span>
+                                                                            <i class="fas fa-chevron-right text-gray-400 mr-2 transition-transform duration-200 expand-icon text-xs"></i>
+                                                                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mr-3 relative flex-shrink-0">
+                                                                                <i class="fas fa-users text-white text-lg"></i>
+                                                                            </div>
+                                                                            <div class="flex-1 min-w-0 grid grid-cols-[1fr_auto] gap-x-2">
+                                                                                <div class="flex items-center min-w-0">
+                                                                                    <h4 class="font-semibold text-gray-900 truncate">${escapeHtml(name)}</h4>
+                                                                                    ${unreadBadge}
+                                                                                </div>
+                                                                                <span class="text-xs text-gray-400 whitespace-nowrap">${ts}</span>
 
-                                                    <div class="col-span-2 flex items-center mt-0.5">
-                                                        <span class="text-[10px] bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded-full mr-2 flex-shrink-0">
-                                                            ${chat.participant_count || 0} members
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            `;
+                                                                                <div class="col-span-2 flex items-center mt-0.5">
+                                                                                    <span class="text-[10px] bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded-full mr-2 flex-shrink-0">
+                                                                                        ${chat.participant_count || 0} members
+                                                                                    </span>
+                                                                                </div>
+                                                                            </div>
+                                                                        `;
 
                             // Subgroups container
                             const subgroupsContainer = document.createElement('div');
@@ -1168,37 +1589,69 @@
                             groupContainer.appendChild(subgroupsContainer);
                             chatListEl.appendChild(groupContainer);
                         } else {
-                            // Team Member Group
-                            const el = document.createElement('div');
-                            el.className = 'p-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors';
-                            el.dataset.chatId = chat.id;
-                            el.dataset.chatType = 'group';
+                            // Team Member Group - NOW EXPANDABLE like admin/client
+                            const groupContainer = document.createElement('div');
+                            groupContainer.className = 'border-b border-gray-100';
 
-                            el.innerHTML = `
-                                                <div class="flex items-center">
-                                                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mr-3 flex-shrink-0">
-                                                        <i class="fas fa-users text-white text-lg"></i>
-                                                    </div>
-                                                    <div class="flex-1 min-w-0 grid grid-cols-[1fr_auto] gap-x-2">
-                                                        <div class="flex items-center min-w-0">
-                                                            <h4 class="font-semibold text-gray-900 truncate">${escapeHtml(name)}</h4>
-                                                            ${unreadBadge}
-                                                        </div>
-                                                        <span class="text-xs text-gray-400 whitespace-nowrap">${ts}</span>
+                            // Group Header (clickable to expand/collapse)
+                            const header = document.createElement('div');
+                            header.className = 'p-3 hover:bg-gray-50 cursor-pointer transition-colors flex items-center';
+                            header.dataset.chatId = chat.id;
+                            header.dataset.chatType = 'group';
 
-                                                        <div class="col-span-2 flex items-center mt-0.5 min-w-0">
-                                                             <span class="text-[10px] bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded-full mr-2 flex-shrink-0">
-                                                                ${chat.participant_count || 0} members
-                                                            </span>
-                                                            <p class="text-sm text-gray-500 truncate flex-1">${escapeHtml(last)}</p>
-                                                        </div>
-                                                    </div>
+                            // Expand/collapse icon
+                            const icon = document.createElement('i');
+                            icon.className = 'fas fa-chevron-right text-gray-400 mr-2 transition-transform';
+                            icon.style.fontSize = '0.75rem';
+
+                            header.innerHTML = `
+                                        <div class="flex items-center flex-1 ml-5">
+                                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mr-3 flex-shrink-0">
+                                                <i class="fas fa-users text-white text-lg"></i>
+                                            </div>
+                                            <div class="flex-1 min-w-0 grid grid-cols-[1fr_auto] gap-x-2">
+                                                <div class="flex items-center min-w-0">
+                                                    <h4 class="font-semibold text-gray-900 truncate">${escapeHtml(name)}</h4>
+                                                    ${unreadBadge}
                                                 </div>
-                                            `;
-                            el.addEventListener('click', () => {
-                                openChat(chat.id, name, 'group', chat.participant_count || 0);
+                                                <span class="text-xs text-gray-400 whitespace-nowrap">${ts}</span>
+                                                <div class="col-span-2 flex items-center mt-0.5 min-w-0">
+                                                    <span class="text-[10px] bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded-full mr-2 flex-shrink-0">
+                                                        ${chat.participant_count || 0} members
+                                                    </span>
+                                                    <p class="text-sm text-gray-500 truncate flex-1">${escapeHtml(last)}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `;
+
+                            // Insert icon at beginning
+                            header.insertBefore(icon, header.firstChild);
+
+                            // Subgroups container
+                            const subgroupsContainer = document.createElement('div');
+                            subgroupsContainer.className = 'pl-8 hidden';
+                            subgroupsContainer.dataset.loaded = 'false';
+
+                            // Click handler to expand/collapse
+                            header.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                const isExpanded = !subgroupsContainer.classList.contains('hidden');
+                                if (isExpanded) {
+                                    subgroupsContainer.classList.add('hidden');
+                                    icon.style.transform = 'rotate(0deg)';
+                                } else {
+                                    subgroupsContainer.classList.remove('hidden');
+                                    icon.style.transform = 'rotate(90deg)';
+                                    if (subgroupsContainer.dataset.loaded === 'false') {
+                                        loadGroupSubgroups(chat.id, subgroupsContainer, name);
+                                    }
+                                }
                             });
-                            chatListEl.appendChild(el);
+
+                            groupContainer.appendChild(header);
+                            groupContainer.appendChild(subgroupsContainer);
+                            chatListEl.appendChild(groupContainer);
                         }
                     } else {
                         // Direct Chat
@@ -1208,23 +1661,23 @@
                         el.dataset.chatType = 'direct';
 
                         el.innerHTML = `
-                                            <div class="flex items-center">
-                                                <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center mr-3 flex-shrink-0">
-                                                    <span class="text-indigo-700 font-bold text-lg">${(name[0] || 'U').toUpperCase()}</span>
-                                                </div>
-                                                <div class="flex-1 min-w-0 grid grid-cols-[1fr_auto] gap-x-2">
-                                                    <div class="flex items-center min-w-0">
-                                                        <h4 class="font-semibold text-gray-900 truncate">${escapeHtml(name)}</h4>
-                                                        ${unreadBadge}
-                                                    </div>
-                                                    <span class="text-xs text-gray-400 whitespace-nowrap">${ts}</span>
+                                                                        <div class="flex items-center">
+                                                                            <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center mr-3 flex-shrink-0">
+                                                                                <span class="text-indigo-700 font-bold text-lg">${(name[0] || 'U').toUpperCase()}</span>
+                                                                            </div>
+                                                                            <div class="flex-1 min-w-0 grid grid-cols-[1fr_auto] gap-x-2">
+                                                                                <div class="flex items-center min-w-0">
+                                                                                    <h4 class="font-semibold text-gray-900 truncate">${escapeHtml(name)}</h4>
+                                                                                    ${unreadBadge}
+                                                                                </div>
+                                                                                <span class="text-xs text-gray-400 whitespace-nowrap">${ts}</span>
 
-                                                    <div class="col-span-2 mt-0.5 min-w-0">
-                                                        <p class="text-sm text-gray-500 truncate">${escapeHtml(last)}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        `;
+                                                                                <div class="col-span-2 mt-0.5 min-w-0">
+                                                                                    <p class="text-sm text-gray-500 truncate">${escapeHtml(last)}</p>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    `;
                         el.addEventListener('click', () => {
                             openChat(chat.id, name, 'direct', 0);
                         });
@@ -1251,12 +1704,15 @@
                         allTeamsBtn.className = 'p-3 hover:bg-indigo-50 cursor-pointer flex items-center border-l-2 border-transparent hover:border-indigo-400 subgroup-item';
                         allTeamsBtn.dataset.targetRoleId = '';
                         allTeamsBtn.innerHTML = `
-                                                                                                    <i class="fas fa-users text-gray-500 mr-3"></i>
-                                                                                                    <span class="text-sm font-medium text-gray-700">All Teams</span>
-                                                                                                    <span class="ml-auto text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">${totalMembers}</span>
-                                                                                                `;
+                                                                                                                                <i class="fas fa-users text-gray-500 mr-3"></i>
+                                                                                                                                <span class="text-sm font-medium text-gray-700">All Teams</span>
+                                                                                                                                <span class="ml-auto text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">${totalMembers}</span>
+                                                                                                                            `;
                         allTeamsBtn.addEventListener('click', (e) => {
                             e.stopPropagation();
+                            // Clear previous highlights and add new
+                            clearSubgroupHighlights();
+                            allTeamsBtn.classList.add('subgroup-active');
                             openChat(groupId, `${groupName} - All Teams`, 'group', totalMembers, null);
                         });
                         container.appendChild(allTeamsBtn);
@@ -1267,599 +1723,614 @@
                                 const teamBtn = document.createElement('div');
                                 teamBtn.className = 'p-3 hover:bg-indigo-50 cursor-pointer flex items-center border-l-2 border-transparent hover:border-indigo-400 subgroup-item';
                                 teamBtn.dataset.targetRoleId = team.id;
-                                teamBtn.innerHTML = `
-                                                                        <i class="fas fa-user-tie text-indigo-500 mr-3"></i>
-                                                                        <span class="text-sm font-medium text-gray-700">${escapeHtml(team.name)}</span>
-                                                                        <span class="ml-auto text-xs bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full">${team.member_count}</span>
-                                                                    `;
-                                teamBtn.addEventListener('click', (e) => {
-                                    e.stopPropagation();
-                                    // Clear previous highlights and add new
-                                    clearSubgroupHighlights();
-                                    teamBtn.classList.add('subgroup-active');
-                                    // Close mobile sidebar
-                                    const sidebar = document.getElementById('chatSidebar');
-                                    if (sidebar.classList.contains('sidebar-mobile-visible')) {
-                                        toggleMobileSidebar();
+                                // For employees (non-admin/non-client), show "My Team (RoleName)" for clarity
+                                        const labelText = (isAdmin || isClient) ? escapeHtml(team.name) : `My Team (${escapeHtml(team.name)})`;
+
+                                        teamBtn.innerHTML = `
+                                                                                                    <i class="fas fa-user-tie text-indigo-500 mr-3"></i>
+                                                                                                    <span class="text-sm font-medium text-gray-700">${labelText}</span>
+                                                                                                    <span class="ml-auto text-xs bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full">${team.member_count}</span>
+                                                                                                `;
+                                        teamBtn.addEventListener('click', (e) => {
+                                            e.stopPropagation();
+                                            // Clear previous highlights and add new
+                                            clearSubgroupHighlights();
+                                            teamBtn.classList.add('subgroup-active');
+                                            // Close mobile sidebar
+                                            const sidebar = document.getElementById('chatSidebar');
+                                            if (sidebar.classList.contains('sidebar-mobile-visible')) {
+                                                toggleMobileSidebar();
+                                            }
+                                            openChat(groupId, `${groupName} - @${team.name}`, 'group', team.member_count || 0, team.id);
+                                        });
+                                        container.appendChild(teamBtn);
+                                    });
+                                }
+                            })
+                            .catch(err => {
+                                console.error('Error loading subgroups:', err);
+                                container.innerHTML = '<div class="py-2 text-xs text-red-400 text-center">Failed to load</div>';
+                            });
+                    }
+
+                    // Open chat (with optional targetRoleId for subgroup context)
+                    function openChat(id, name, type, participantCnt = 0, targetRoleId = null) {
+                        activeChat = id;
+                        activeChatType = type;
+                        chatWithName.textContent = name;
+                        emptyChatState.classList.add('hidden');
+
+                        // Set the active subgroup context (used for message filtering in backend)
+                        selectedTargetRole = targetRoleId;
+                        groupTeams = [];
+
+                        // Hide old teams panel (no longer used)
+                        document.getElementById('teamsPanel').classList.add('hidden');
+
+                        // Show subgroup indicator if targeting a specific team
+                        const indicator = document.getElementById('selectedTeamIndicator');
+                        if (targetRoleId) {
+                            indicator.classList.remove('hidden');
+                            document.getElementById('selectedTeamName').textContent = name.includes('@') ? name.split('@')[1] : 'Specific Team';
+                        } else if (type === 'group') {
+                            indicator.classList.remove('hidden');
+                            document.getElementById('selectedTeamName').textContent = 'All Teams';
+                        } else {
+                            indicator.classList.add('hidden');
+                        }
+
+                        // Update header based on chat type
+                        if (type === 'group') {
+                            chatAvatar.innerHTML = '<i class="fas fa-users text-white"></i>';
+                            chatAvatar.className = 'w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mr-3';
+                            chatTeamInfo.textContent = targetRoleId ? 'Team Channel' : 'Group Chat';
+                            participantCount.classList.remove('hidden');
+
+                            // Fetch actual participant count from API
+                            fetch('/chat/role-groups')
+                                .then(res => res.json())
+                                .then(groups => {
+                                    const thisGroup = groups.find(g => g.id === id);
+                                    if (thisGroup) {
+                                        participantNumber.textContent = thisGroup.participant_count || 0;
+                                    } else {
+                                        participantNumber.textContent = participantCnt;
                                     }
-                                    openChat(groupId, `${groupName} - @${team.name}`, 'group', team.member_count || 0, team.id);
+                                })
+                                .catch(() => {
+                                    participantNumber.textContent = participantCnt;
                                 });
-                                container.appendChild(teamBtn);
+                        } else {
+                            chatAvatar.innerHTML = '<i class="fas fa-user text-indigo-600"></i>';
+                            chatAvatar.className = 'w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center mr-3';
+                            chatTeamInfo.textContent = '';
+                            participantCount.classList.add('hidden');
+                        }
+
+                        // Show/hide edit group button for admins
+                        if (isAdmin) {
+                            const editBtn = document.getElementById('editGroupBtn');
+                            if (editBtn) {
+                                if (type === 'group') {
+                                    editBtn.classList.remove('hidden');
+                                } else {
+                                    editBtn.classList.add('hidden');
+                                }
+                            }
+                        }
+
+                        // Build context key for message count tracking (includes subgroup)
+                        const contextKey = targetRoleId !== null && targetRoleId !== undefined ? `${id}_${targetRoleId}` : `${id}`;
+                        lastMessageCounts.set(contextKey, 0);  // Reset for fresh load
+
+                        // Clear messages immediately and show loading
+                        messagesArea.innerHTML = `<div class="p-6 text-center text-gray-400">
+                                                                                                <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                                                                                                <p>Loading messages...</p>
+                                                                                            </div>`;
+
+                        // Build URL with optional target_role_id for subgroup filtering
+                        let messagesUrl = `/chat/messages/${id}`;
+                        if (targetRoleId !== undefined && targetRoleId !== null) {
+                            messagesUrl += `?target_role_id=${targetRoleId}`;
+                        }
+
+                        console.log('[DEBUG] Fetching messages URL:', messagesUrl, 'targetRoleId:', targetRoleId);
+
+                        // Capture context at fetch time to prevent stale renders
+                        const fetchedChatId = id;
+                        const fetchedTargetRole = targetRoleId;
+
+                        fetch(messagesUrl)
+                            .then(r => {
+                                if (!r.ok) throw r;
+                                return r.json();
+                            })
+                            .then(data => {
+                                // GUARD: Only render if this is still the active chat context
+                                // (prevents stale fetch results from overwriting newer ones)
+                                if (activeChat !== fetchedChatId || selectedTargetRole !== fetchedTargetRole) {
+                                    console.log('[DEBUG] Ignoring stale fetch result. Current:', activeChat, selectedTargetRole, 'Fetched:', fetchedChatId, fetchedTargetRole);
+                                    return;
+                                }
+
+                                console.log('[DEBUG] Messages received:', data.length, 'messages');
+                                data.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+                                renderMessagesFromDB(data);
+                            })
+                            .catch(err => {
+                                console.error('Error loading messages', err);
+                                // Only show error if still relevant
+                                if (activeChat === fetchedChatId && selectedTargetRole === fetchedTargetRole) {
+                                    messagesArea.innerHTML = `<div class="p-6 text-center text-red-500">Unable to load messages</div>`;
+                                }
+                            });
+                    }
+
+                    // Render messages
+                    function renderMessagesFromDB(messages) {
+                        if (!Array.isArray(messages)) return;
+
+                        const chatId = activeChat;
+                        const chatContext = selectedTargetRole;
+                        const contextKey = (chatContext !== null && chatContext !== undefined) ? `${chatId}_${chatContext}` : `${chatId}`;
+
+                        console.log('[DEBUG] Render - contextKey:', contextKey, 'selectedTargetRole:', selectedTargetRole, 'messages:', messages.length);
+
+                        // ALWAYS clear and render fresh (simplified to fix the bug)
+                        messagesArea.innerHTML = '';
+
+                        if (messages.length === 0) {
+                            messagesArea.innerHTML = `<div class="p-6 text-center text-gray-400">
+                                                                                                    <i class="fas fa-comments text-3xl mb-2"></i>
+                                                                                                    <p>No messages yet in this channel</p>
+                                                                                                </div>`;
+                        } else {
+                            let lastDate = null;
+                            messages.forEach(msg => {
+                                // Check for date change
+                                const msgDate = new Date(msg.created_at).toDateString();
+                                if (msgDate !== lastDate) {
+                                    const separator = document.createElement('div');
+                                    separator.className = 'date-separator';
+                                    separator.innerHTML = `<span>${formatMessageDate(msg.created_at)}</span>`;
+                                    messagesArea.appendChild(separator);
+                                    lastDate = msgDate;
+                                }
+
+                                appendMessage(msg, '');
                             });
                         }
-                    })
-                    .catch(err => {
-                        console.error('Error loading subgroups:', err);
-                        container.innerHTML = '<div class="py-2 text-xs text-red-400 text-center">Failed to load</div>';
-                    });
-            }
 
-            // Open chat (with optional targetRoleId for subgroup context)
-            function openChat(id, name, type, participantCnt = 0, targetRoleId = null) {
-                activeChat = id;
-                activeChatType = type;
-                chatWithName.textContent = name;
-                emptyChatState.classList.add('hidden');
-
-                // Set the active subgroup context (used for message filtering in backend)
-                selectedTargetRole = targetRoleId;
-                groupTeams = [];
-
-                // Hide old teams panel (no longer used)
-                document.getElementById('teamsPanel').classList.add('hidden');
-
-                // Show subgroup indicator if targeting a specific team
-                const indicator = document.getElementById('selectedTeamIndicator');
-                if (targetRoleId) {
-                    indicator.classList.remove('hidden');
-                    document.getElementById('selectedTeamName').textContent = name.includes('@') ? name.split('@')[1] : 'Specific Team';
-                } else if (type === 'group') {
-                    indicator.classList.remove('hidden');
-                    document.getElementById('selectedTeamName').textContent = 'All Teams';
-                } else {
-                    indicator.classList.add('hidden');
-                }
-
-                // Update header based on chat type
-                if (type === 'group') {
-                    chatAvatar.innerHTML = '<i class="fas fa-users text-white"></i>';
-                    chatAvatar.className = 'w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mr-3';
-                    chatTeamInfo.textContent = targetRoleId ? 'Team Channel' : 'Group Chat';
-                    participantCount.classList.remove('hidden');
-
-                    // Fetch actual participant count from API
-                    fetch('/chat/role-groups')
-                        .then(res => res.json())
-                        .then(groups => {
-                            const thisGroup = groups.find(g => g.id === id);
-                            if (thisGroup) {
-                                participantNumber.textContent = thisGroup.participant_count || 0;
-                            } else {
-                                participantNumber.textContent = participantCnt;
-                            }
-                        })
-                        .catch(() => {
-                            participantNumber.textContent = participantCnt;
-                        });
-                } else {
-                    chatAvatar.innerHTML = '<i class="fas fa-user text-indigo-600"></i>';
-                    chatAvatar.className = 'w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center mr-3';
-                    chatTeamInfo.textContent = '';
-                    participantCount.classList.add('hidden');
-                }
-
-                // Build context key for message count tracking (includes subgroup)
-                const contextKey = targetRoleId !== null && targetRoleId !== undefined ? `${id}_${targetRoleId}` : `${id}`;
-                lastMessageCounts.set(contextKey, 0);  // Reset for fresh load
-
-                // Clear messages immediately and show loading
-                messagesArea.innerHTML = `<div class="p-6 text-center text-gray-400">
-                                                                    <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
-                                                                    <p>Loading messages...</p>
-                                                                </div>`;
-
-                // Build URL with optional target_role_id for subgroup filtering
-                let messagesUrl = `/chat/messages/${id}`;
-                if (targetRoleId !== undefined && targetRoleId !== null) {
-                    messagesUrl += `?target_role_id=${targetRoleId}`;
-                }
-
-                console.log('[DEBUG] Fetching messages URL:', messagesUrl, 'targetRoleId:', targetRoleId);
-
-                // Capture context at fetch time to prevent stale renders
-                const fetchedChatId = id;
-                const fetchedTargetRole = targetRoleId;
-
-                fetch(messagesUrl)
-                    .then(r => {
-                        if (!r.ok) throw r;
-                        return r.json();
-                    })
-                    .then(data => {
-                        // GUARD: Only render if this is still the active chat context
-                        // (prevents stale fetch results from overwriting newer ones)
-                        if (activeChat !== fetchedChatId || selectedTargetRole !== fetchedTargetRole) {
-                            console.log('[DEBUG] Ignoring stale fetch result. Current:', activeChat, selectedTargetRole, 'Fetched:', fetchedChatId, fetchedTargetRole);
-                            return;
-                        }
-
-                        console.log('[DEBUG] Messages received:', data.length, 'messages');
-                        data.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-                        renderMessagesFromDB(data);
-                    })
-                    .catch(err => {
-                        console.error('Error loading messages', err);
-                        // Only show error if still relevant
-                        if (activeChat === fetchedChatId && selectedTargetRole === fetchedTargetRole) {
-                            messagesArea.innerHTML = `<div class="p-6 text-center text-red-500">Unable to load messages</div>`;
-                        }
-                    });
-            }
-
-            // Render messages
-            function renderMessagesFromDB(messages) {
-                if (!Array.isArray(messages)) return;
-
-                const chatId = activeChat;
-                const chatContext = selectedTargetRole;
-                const contextKey = (chatContext !== null && chatContext !== undefined) ? `${chatId}_${chatContext}` : `${chatId}`;
-
-                console.log('[DEBUG] Render - contextKey:', contextKey, 'selectedTargetRole:', selectedTargetRole, 'messages:', messages.length);
-
-                // ALWAYS clear and render fresh (simplified to fix the bug)
-                messagesArea.innerHTML = '';
-
-                if (messages.length === 0) {
-                    messagesArea.innerHTML = `<div class="p-6 text-center text-gray-400">
-                                                                        <i class="fas fa-comments text-3xl mb-2"></i>
-                                                                        <p>No messages yet in this channel</p>
-                                                                    </div>`;
-                } else {
-                    let lastDate = null;
-                    messages.forEach(msg => {
-                        // Check for date change
-                        const msgDate = new Date(msg.created_at).toDateString();
-                        if (msgDate !== lastDate) {
-                            const separator = document.createElement('div');
-                            separator.className = 'date-separator';
-                            separator.innerHTML = `<span>${formatMessageDate(msg.created_at)}</span>`;
-                            messagesArea.appendChild(separator);
-                            lastDate = msgDate;
-                        }
-
-                        appendMessage(msg, '');
-                    });
-                }
-
-                lastMessageCounts.set(contextKey, messages.length);
-
-                setTimeout(() => {
-                    messagesArea.scrollTop = messagesArea.scrollHeight;
-                }, 10);
-            }
-
-            // Append message
-            function appendMessage(msg, extraClass = '') {
-                const isSent = (msg.sender_id == userId);
-                const wrapper = document.createElement('div');
-                wrapper.className = `flex ${isSent ? 'justify-end' : 'justify-start'} mb-4 message-transition ${extraClass}`;
-
-                // Show badge for group chats when sender is a client or admin
-                let roleBadge = '';
-                if (activeChatType === 'group' && !isSent) {
-                    if (msg.is_admin) {
-                        roleBadge = '<span class="ml-2 px-2 py-0.5 text-xs rounded-full bg-indigo-100 text-indigo-700">Admin</span>';
-                    } else if (msg.is_client) {
-                        roleBadge = '<span class="ml-2 px-2 py-0.5 text-xs rounded-full bg-sky-100 text-sky-700">Client</span>';
-                    }
-                }
-
-                // Team target indicator (shows which team the message was sent to)
-                let targetBadge = '';
-                if (msg.target_role_name && activeChatType === 'group') {
-                    targetBadge = `<span class="ml-2 px-2 py-0.5 text-xs rounded-full bg-purple-100 text-purple-700">
-                                                                                                                    <i class="fas fa-arrow-right mr-1"></i>@${escapeHtml(msg.target_role_name)}
-                                                                                                                </span>`;
-                }
-
-                const senderName = activeChatType === 'group' && !isSent
-                    ? `<div class="text-xs text-gray-500 mb-1 ml-10">${escapeHtml(msg.sender_name || 'User')}${roleBadge}${targetBadge}</div>`
-                    : '';
-
-                if (isSent) {
-                    // Show target badge on sent messages if targeting a team
-                    const sentTargetBadge = msg.target_role_name
-                        ? `<div class="text-xs text-purple-600 mb-1 text-right"><i class="fas fa-arrow-right mr-1"></i>@${escapeHtml(msg.target_role_name)}</div>`
-                        : '';
-
-                    wrapper.innerHTML = `
-                                                                                                                                                                        <div class="max-w-xs lg:max-w-md">
-                                                                                                                                                                            ${sentTargetBadge}
-                                                                                                                                                                            <div class="bg-indigo-600 text-white p-3 rounded-xl chat-bubble-right shadow-sm">
-                                                                                                                                                                                <p>${escapeHtml(msg.message)}</p>
-                                                                                                                                                                            </div>
-                                                                                                                                                                            <div class="text-xs text-gray-500 mt-1 text-right">${new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} <i class="fas fa-check-double text-indigo-500 ml-1"></i></div>
-                                                                                                                                                                        </div>
-                                                                                                                                                                    `;
-                } else {
-                    // Special styling for client and admin messages
-                    let messageBoxClass = 'bg-white p-3 rounded-xl chat-bubble-left shadow-sm';
-                    let avatarClass = 'bg-gray-200';
-                    let avatarIcon = 'fa-user text-gray-500';
-                    let textClass = 'text-gray-800';
-
-                    if (msg.is_admin) {
-                        messageBoxClass =
-                            'bg-indigo-50 p-3 rounded-xl shadow-sm';
-                        avatarClass =
-                            'bg-indigo-100 ring-2 ring-indigo-500';
-                        avatarIcon =
-                            'fa-user-shield text-indigo-600';
-                        textClass =
-                            'text-slate-900';
-                        headerClass =
-                            'text-indigo-700';
-                    }
-
-                    else if (msg.is_client) {
-                        messageBoxClass =
-                            'bg-sky-50 p-3 rounded-xl shadow-sm';
-                        avatarClass =
-                            'bg-sky-100 ring-2 ring-sky-500';
-                        avatarIcon =
-                            'fa-briefcase text-sky-600';
-                        textClass =
-                            'text-slate-800';
-                        headerClass =
-                            'text-sky-700';
-                    }
-
-
-
-                    wrapper.innerHTML = `
-                                                                                                                                                                        <div class="max-w-xs lg:max-w-md">
-                                                                                                                                                                            ${senderName}
-                                                                                                                                                                            <div class="flex items-end">
-                                                                                                                                                                                <div class="w-8 h-8 rounded-full ${avatarClass} flex items-center justify-center mr-2 flex-shrink-0">
-                                                                                                                                                                                    <i class="fas ${avatarIcon} text-xs"></i>
-                                                                                                                                                                                </div>
-                                                                                                                                                                                <div class="${messageBoxClass}">
-                                                                                                                                                                                    <p class="${textClass}">${escapeHtml(msg.message)}</p>
-                                                                                                                                                                                </div>
-                                                                                                                                                                            </div>
-                                                                                                                                                                            <div class="text-xs text-gray-500 mt-1 ml-10">${new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-                                                                                                                                                                        </div>
-                                                                                                                                                                    `;
-                }
-                messagesArea.appendChild(wrapper);
-            }
-
-            // Send message
-            document.getElementById('sendMessageBtn').addEventListener('click', sendMessage);
-            messageInput.addEventListener('keypress', function (e) {
-                if (e.key === 'Enter') sendMessage();
-            });
-
-            function sendMessage() {
-                const text = messageInput.value.trim();
-                if (!text || !activeChat) return;
-
-                const now = new Date().toISOString();
-
-                // Get target role info for optimistic update
-                const targetRoleId = selectedTargetRole;
-                const targetRoleName = targetRoleId ? groupTeams.find(t => t.id == targetRoleId)?.name : null;
-
-                const optimisticMsg = {
-                    id: Date.now(),
-                    message: text,
-                    sender_id: userId,
-                    sender_name: '{{ auth()->user()->name ?? auth()->user()->email }}',
-                    target_role_id: targetRoleId,
-                    target_role_name: targetRoleName,
-                    created_at: now
-                };
-                appendMessage(optimisticMsg);
-
-                const chatId = activeChat;
-                const currentCount = lastMessageCounts.get(chatId) || 0;
-                lastMessageCounts.set(chatId, currentCount + 1);
-
-                messageInput.value = '';
-                messagesArea.scrollTop = messagesArea.scrollHeight;
-
-                // Build request body with target_role_id
-                const requestBody = {
-                    conversation_id: activeChat,
-                    message: text
-                };
-                if (targetRoleId) {
-                    requestBody.target_role_id = targetRoleId;
-                }
-
-                fetch('/chat/send', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken
-                    },
-                    body: JSON.stringify(requestBody)
-                })
-                    .then(r => {
-                        if (!r.ok) throw r;
-                        return r.json();
-                    })
-                    .then(data => {
-                        refreshMessages();
-                    })
-                    .catch(err => {
-                        console.error('Send error', err);
-                        alert('Unable to send message');
-                        const lastChild = messagesArea.lastElementChild;
-                        if (lastChild) lastChild.remove();
-                        lastMessageCounts.set(chatId, currentCount);
-                    });
-            }
-
-            // Refresh messages
-            const debouncedRefreshMessages = debounce(() => {
-                if (!activeChat) return;
-
-                // Build URL with target_role_id if viewing a subgroup
-                let refreshUrl = `/chat/messages/${activeChat}`;
-                if (selectedTargetRole !== null && selectedTargetRole !== undefined) {
-                    refreshUrl += `?target_role_id=${selectedTargetRole}`;
-                }
-
-                fetch(refreshUrl)
-                    .then(r => r.json())
-                    .then(data => {
-                        data.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-                        renderMessagesFromDB(data);
-                    })
-                    .catch(err => console.error('Refresh error', err));
-            }, 300);
-
-            function refreshMessages() {
-                debouncedRefreshMessages();
-            }
-
-            // Escape html
-            function escapeHtml(unsafe) {
-                if (unsafe === null || unsafe === undefined) return '';
-                return String(unsafe)
-                    .replaceAll('&', '&amp;')
-                    .replaceAll('<', '&lt;')
-                    .replaceAll('>', '&gt;')
-                    .replaceAll('"', '&quot;')
-                    .replaceAll("'", '&#039;');
-            }
-
-            // Fetch same-role users for direct chat
-            const clientSelect = document.getElementById('clientSelectSidebar');
-            const startChatBtn = document.getElementById('startChatBtn');
-
-            function fetchSameRoleUsers() {
-                clientSelect.innerHTML = '<option value="">Loading users...</option>';
-                startChatBtn.style.display = 'none';
-
-                fetch('/chat/same-role-users')
-                    .then(res => res.json())
-                    .then(users => {
-                        clientSelect.innerHTML = '<option value="">-- Select User --</option>';
-                        if (users.length === 0) {
-                            clientSelect.innerHTML += '<option value="" disabled>No users with same role</option>';
-                            return;
-                        }
-                        users.forEach(u => {
-                            clientSelect.innerHTML += `<option value="${u.id}">${u.name || u.email}</option>`;
-                        });
-                    })
-                    .catch(err => {
-                        console.error("Error fetching users:", err);
-                        clientSelect.innerHTML = '<option value="">Error loading users</option>';
-                    });
-            }
-
-            if (clientSelect) {
-                clientSelect.addEventListener('change', function () {
-                    if (this.value) {
-                        startChatBtn.style.display = 'block';
-                        startChatBtn.classList.remove('hidden');
-                    } else {
-                        startChatBtn.style.display = 'none';
-                    }
-                });
-            }
-
-            startChatBtn.addEventListener('click', function () {
-                const selectedUserId = clientSelect.value;
-                if (!selectedUserId) {
-                    alert("Please select a user.");
-                    return;
-                }
-
-                fetch('/chat/create-conversation', {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": csrfToken
-                    },
-                    body: JSON.stringify({
-                        team_id: userId,
-                        client_id: selectedUserId
-                    })
-                })
-                    .then(res => res.json())
-                    .then(convo => {
-                        if (!convo.id) {
-                            console.error(convo);
-                            alert(convo.message || "Conversation could not be created.");
-                            return;
-                        }
-
-                        const userName = clientSelect.options[clientSelect.selectedIndex].text;
-                        openChat(convo.id, userName, 'direct', 0);
-                        loadChatList();
-                    })
-                    .catch(err => {
-                        console.error("Error creating conversation", err);
-                        alert("Failed to create conversation.");
-                    });
-            });
-
-            // Join or create role group
-            function joinOrCreateRoleGroup() {
-                const btn = document.getElementById('joinRoleGroupBtn');
-                if (btn) {
-                    btn.disabled = true;
-                    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Joining...';
-                }
-
-                fetch('/chat/get-or-create-role-group', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken
-                    }
-                })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.error) {
-                            alert(data.error);
-                            return;
-                        }
-
-                        // Switch to group tab and open the group
-                        switchTab('group');
-                        loadChatList();
-
-                        // Disable button since user has joined
-                        if (btn) {
-                            btn.disabled = true;
-                            btn.classList.remove('from-indigo-500', 'to-purple-600', 'hover:from-indigo-600', 'hover:to-purple-700');
-                            btn.classList.add('bg-green-500', 'cursor-not-allowed');
-                            btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Already in Role Group';
-                            const infoText = btn.nextElementSibling;
-                            if (infoText) {
-                                infoText.textContent = 'You have joined the ' + userRole + ' group';
-                            }
-                        }
+                        lastMessageCounts.set(contextKey, messages.length);
 
                         setTimeout(() => {
-                            openChat(data.id, data.name, 'group', 0);
-                        }, 500);
-                    })
-                    .catch(err => {
-                        console.error('Error joining group:', err);
-                        alert('Failed to join group');
-                        // Re-enable button on error
-                        if (btn) {
-                            btn.disabled = false;
-                            btn.innerHTML = '<i class="fas fa-users mr-2"></i>Join My Role Group';
+                            messagesArea.scrollTop = messagesArea.scrollHeight;
+                        }, 10);
+                    }
+
+                    // Append message
+                    function appendMessage(msg, extraClass = '') {
+                        const isSent = (msg.sender_id == userId);
+                        const wrapper = document.createElement('div');
+                        wrapper.className = `flex ${isSent ? 'justify-end' : 'justify-start'} mb-4 message-transition ${extraClass}`;
+
+                        // Show badge for group chats when sender is a client or admin
+                        let roleBadge = '';
+                        if (activeChatType === 'group' && !isSent) {
+                            if (msg.is_admin) {
+                                roleBadge = '<span class="ml-2 px-2 py-0.5 text-xs rounded-full bg-indigo-100 text-indigo-700">Admin</span>';
+                            } else if (msg.is_client) {
+                                roleBadge = '<span class="ml-2 px-2 py-0.5 text-xs rounded-full bg-sky-100 text-sky-700">Client</span>';
+                            }
                         }
+
+                        // Team target indicator (shows which team the message was sent to)
+                        let targetBadge = '';
+                        if (msg.target_role_name && activeChatType === 'group') {
+                            targetBadge = `<span class="ml-2 px-2 py-0.5 text-xs rounded-full bg-purple-100 text-purple-700">
+                                                                                                                                                <i class="fas fa-arrow-right mr-1"></i>@${escapeHtml(msg.target_role_name)}
+                                                                                                                                            </span>`;
+                        }
+
+                        const senderName = activeChatType === 'group' && !isSent
+                            ? `<div class="text-xs text-gray-500 mb-1 ml-10">${escapeHtml(msg.sender_name || 'User')}${roleBadge}${targetBadge}</div>`
+                            : '';
+
+                        if (isSent) {
+                            // Show target badge on sent messages if targeting a team
+                            const sentTargetBadge = msg.target_role_name
+                                ? `<div class="text-xs text-purple-600 mb-1 text-right"><i class="fas fa-arrow-right mr-1"></i>@${escapeHtml(msg.target_role_name)}</div>`
+                                : '';
+
+                            wrapper.innerHTML = `
+                                                                                                                                                                                                    <div class="max-w-xs lg:max-w-md">
+                                                                                                                                                                                                        ${sentTargetBadge}
+                                                                                                                                                                                                        <div class="bg-indigo-600 text-white p-3 rounded-xl chat-bubble-right shadow-sm">
+                                                                                                                                                                                                            <p>${escapeHtml(msg.message)}</p>
+                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                        <div class="text-xs text-gray-500 mt-1 text-right">${new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} <i class="fas fa-check-double text-indigo-500 ml-1"></i></div>
+                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                `;
+                        } else {
+                            // Special styling for client and admin messages
+                            let messageBoxClass = 'bg-white p-3 rounded-xl chat-bubble-left shadow-sm';
+                            let avatarClass = 'bg-gray-200';
+                            let avatarIcon = 'fa-user text-gray-500';
+                            let textClass = 'text-gray-800';
+
+                            if (msg.is_admin) {
+                                messageBoxClass =
+                                    'bg-indigo-50 p-3 rounded-xl shadow-sm';
+                                avatarClass =
+                                    'bg-indigo-100 ring-2 ring-indigo-500';
+                                avatarIcon =
+                                    'fa-user-shield text-indigo-600';
+                                textClass =
+                                    'text-slate-900';
+                                headerClass =
+                                    'text-indigo-700';
+                            }
+
+                            else if (msg.is_client) {
+                                messageBoxClass =
+                                    'bg-sky-50 p-3 rounded-xl shadow-sm';
+                                avatarClass =
+                                    'bg-sky-100 ring-2 ring-sky-500';
+                                avatarIcon =
+                                    'fa-briefcase text-sky-600';
+                                textClass =
+                                    'text-slate-800';
+                                headerClass =
+                                    'text-sky-700';
+                            }
+
+
+
+                            wrapper.innerHTML = `
+                                                                                                                                                                                                    <div class="max-w-xs lg:max-w-md">
+                                                                                                                                                                                                        ${senderName}
+                                                                                                                                                                                                        <div class="flex items-end">
+                                                                                                                                                                                                            <div class="w-8 h-8 rounded-full ${avatarClass} flex items-center justify-center mr-2 flex-shrink-0">
+                                                                                                                                                                                                                <i class="fas ${avatarIcon} text-xs"></i>
+                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                            <div class="${messageBoxClass}">
+                                                                                                                                                                                                                <p class="${textClass}">${escapeHtml(msg.message)}</p>
+                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                        <div class="text-xs text-gray-500 mt-1 ml-10">${new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                `;
+                        }
+                        messagesArea.appendChild(wrapper);
+                    }
+
+                    // Send message
+                    document.getElementById('sendMessageBtn').addEventListener('click', sendMessage);
+                    messageInput.addEventListener('keypress', function (e) {
+                        if (e.key === 'Enter') sendMessage();
                     });
-            }
 
-            // Search toggle
-            document.getElementById('searchToggle').addEventListener('click', function () {
-                const searchBar = document.getElementById('searchBar');
-                searchBar.classList.toggle('hidden');
-            });
+                    function sendMessage() {
+                        const text = messageInput.value.trim();
+                        if (!text || !activeChat) return;
 
-            // Search filter
-            document.getElementById('chatSearch').addEventListener('input', function (e) {
-                const query = e.target.value.toLowerCase();
-                const items = chatListEl.querySelectorAll('[data-chat-id]');
-                items.forEach(item => {
-                    const name = item.querySelector('h4').textContent.toLowerCase();
-                    if (name.includes(query)) {
-                        item.style.display = '';
-                    } else {
-                        item.style.display = 'none';
-                    }
-                });
-            });
+                        const now = new Date().toISOString();
 
-            // Custom Dropdown Logic
-            const nativeSelect = document.getElementById('clientSelectSidebar');
-            const customTrigger = document.getElementById('customTrigger');
-            const customTriggerText = document.getElementById('customTriggerText');
-            const customOptions = document.getElementById('customOptions');
-            const customDropdown = document.getElementById('customDropdown');
+                        // Get target role info for optimistic update
+                        const targetRoleId = selectedTargetRole;
+                        const targetRoleName = targetRoleId ? groupTeams.find(t => t.id == targetRoleId)?.name : null;
 
-            if (nativeSelect && customTrigger && customOptions) {
-                // Toggle
-                customTrigger.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const isShown = customOptions.classList.contains('show');
-                    // Close others if needed
-                    document.querySelectorAll('.custom-dropdown-options.show').forEach(el => el.classList.remove('show'));
-
-                    if (!isShown) {
-                        customOptions.classList.add('show');
-                        customTrigger.style.borderColor = '#6366f1'; // Highlight border
-                    } else {
-                        customOptions.classList.remove('show');
-                        customTrigger.style.borderColor = '';
-                    }
-                });
-
-                // Close on outside click
-                document.addEventListener('click', (e) => {
-                    if (!customDropdown.contains(e.target)) {
-                        customOptions.classList.remove('show');
-                        customTrigger.style.borderColor = '';
-                    }
-                });
-
-                // Sync logic: rebuild custom options when native select changes
-                function syncCustomDropdown() {
-                    customOptions.innerHTML = '';
-                    Array.from(nativeSelect.options).forEach(opt => {
-                        // Skip placeholder if we want... but let's keep it to allow resetting?
-                        // Usually dropdowns hide value="" option in list if it's "select user"
-                        // But let's show all
-
-                        const div = document.createElement('div');
-                        div.className = 'custom-option' + (opt.selected ? ' selected' : '');
-                        div.textContent = opt.text;
-                        div.dataset.value = opt.value;
-
-                        div.onclick = () => {
-                            nativeSelect.value = opt.value;
-                            customTriggerText.textContent = opt.text;
-                            customOptions.classList.remove('show');
-
-                            // Reset border
-                            customTrigger.style.borderColor = '';
-
-                            // Update selected styling
-                            document.querySelectorAll('.custom-option').forEach(el => el.classList.remove('selected'));
-                            div.classList.add('selected');
-
-                            // Dispatch change event so existing listeners fire
-                            nativeSelect.dispatchEvent(new Event('change'));
+                        const optimisticMsg = {
+                            id: Date.now(),
+                            message: text,
+                            sender_id: userId,
+                            sender_name: '{{ auth()->user()->name ?? auth()->user()->email }}',
+                            target_role_id: targetRoleId,
+                            target_role_name: targetRoleName,
+                            created_at: now
                         };
-                        customOptions.appendChild(div);
+                        appendMessage(optimisticMsg);
 
-                        // Set initial text if selected
-                        if (opt.selected) {
-                            customTriggerText.textContent = opt.text;
+                        const chatId = activeChat;
+                        const currentCount = lastMessageCounts.get(chatId) || 0;
+                        lastMessageCounts.set(chatId, currentCount + 1);
+
+                        messageInput.value = '';
+                        messagesArea.scrollTop = messagesArea.scrollHeight;
+
+                        // Build request body with target_role_id
+                        const requestBody = {
+                            conversation_id: activeChat,
+                            message: text
+                        };
+                        if (targetRoleId) {
+                            requestBody.target_role_id = targetRoleId;
                         }
+
+                        fetch('/chat/send', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken
+                            },
+                            body: JSON.stringify(requestBody)
+                        })
+                            .then(r => {
+                                if (!r.ok) throw r;
+                                return r.json();
+                            })
+                            .then(data => {
+                                refreshMessages();
+                            })
+                            .catch(err => {
+                                console.error('Send error', err);
+                                alert('Unable to send message');
+                                const lastChild = messagesArea.lastElementChild;
+                                if (lastChild) lastChild.remove();
+                                lastMessageCounts.set(chatId, currentCount);
+                            });
+                    }
+
+                    // Refresh messages
+                    const debouncedRefreshMessages = debounce(() => {
+                        if (!activeChat) return;
+
+                        // Build URL with target_role_id if viewing a subgroup
+                        let refreshUrl = `/chat/messages/${activeChat}`;
+                        if (selectedTargetRole !== null && selectedTargetRole !== undefined) {
+                            refreshUrl += `?target_role_id=${selectedTargetRole}`;
+                        }
+
+                        fetch(refreshUrl)
+                            .then(r => r.json())
+                            .then(data => {
+                                data.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+                                renderMessagesFromDB(data);
+                            })
+                            .catch(err => console.error('Refresh error', err));
+                    }, 300);
+
+                    function refreshMessages() {
+                        debouncedRefreshMessages();
+                    }
+
+                    // Escape html
+                    function escapeHtml(unsafe) {
+                        if (unsafe === null || unsafe === undefined) return '';
+                        return String(unsafe)
+                            .replaceAll('&', '&amp;')
+                            .replaceAll('<', '&lt;')
+                            .replaceAll('>', '&gt;')
+                            .replaceAll('"', '&quot;')
+                            .replaceAll("'", '&#039;');
+                    }
+
+                    // Fetch same-role users for direct chat
+                    const clientSelect = document.getElementById('clientSelectSidebar');
+                    const startChatBtn = document.getElementById('startChatBtn');
+
+                    function fetchSameRoleUsers() {
+                        clientSelect.innerHTML = '<option value="">Loading users...</option>';
+                        startChatBtn.style.display = 'none';
+
+                        fetch('/chat/same-role-users')
+                            .then(res => res.json())
+                            .then(users => {
+                                clientSelect.innerHTML = '<option value="">-- Select User --</option>';
+                                if (users.length === 0) {
+                                    clientSelect.innerHTML += '<option value="" disabled>No users with same role</option>';
+                                    return;
+                                }
+                                users.forEach(u => {
+                                    clientSelect.innerHTML += `<option value="${u.id}">${u.name || u.email}</option>`;
+                                });
+                            })
+                            .catch(err => {
+                                console.error("Error fetching users:", err);
+                                clientSelect.innerHTML = '<option value="">Error loading users</option>';
+                            });
+                    }
+
+                    if (clientSelect) {
+                        clientSelect.addEventListener('change', function () {
+                            if (this.value) {
+                                startChatBtn.style.display = 'block';
+                                startChatBtn.classList.remove('hidden');
+                            } else {
+                                startChatBtn.style.display = 'none';
+                            }
+                        });
+                    }
+
+                    startChatBtn.addEventListener('click', function () {
+                        const selectedUserId = clientSelect.value;
+                        if (!selectedUserId) {
+                            alert("Please select a user.");
+                            return;
+                        }
+
+                        fetch('/chat/create-conversation', {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRF-TOKEN": csrfToken
+                            },
+                            body: JSON.stringify({
+                                team_id: userId,
+                                client_id: selectedUserId
+                            })
+                        })
+                            .then(res => res.json())
+                            .then(convo => {
+                                if (!convo.id) {
+                                    console.error(convo);
+                                    alert(convo.message || "Conversation could not be created.");
+                                    return;
+                                }
+
+                                const userName = clientSelect.options[clientSelect.selectedIndex].text;
+                                openChat(convo.id, userName, 'direct', 0);
+                                loadChatList();
+                            })
+                            .catch(err => {
+                                console.error("Error creating conversation", err);
+                                alert("Failed to create conversation.");
+                            });
                     });
-                }
 
-                // Observe changes to native select options
-                const observer = new MutationObserver(syncCustomDropdown);
-                observer.observe(nativeSelect, { childList: true, subtree: true, attributes: true });
+                    // Join or create role group
+                    function joinOrCreateRoleGroup() {
+                        const btn = document.getElementById('joinRoleGroupBtn');
+                        if (btn) {
+                            btn.disabled = true;
+                            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Joining...';
+                        }
 
-                // Initial sync
-                syncCustomDropdown();
-            }
+                        fetch('/chat/get-or-create-role-group', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken
+                            }
+                        })
+                            .then(res => res.json())
+                            .then(data => {
+                                if (data.error) {
+                                    alert(data.error);
+                                    return;
+                                }
 
-        </script>
+                                // Switch to group tab and open the group
+                                switchTab('group');
+                                loadChatList();
 
-    </div>
+                                // Disable button since user has joined
+                                if (btn) {
+                                    btn.disabled = true;
+                                    btn.classList.remove('from-indigo-500', 'to-purple-600', 'hover:from-indigo-600', 'hover:to-purple-700');
+                                    btn.classList.add('bg-green-500', 'cursor-not-allowed');
+                                    btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Already in Role Group';
+                                    const infoText = btn.nextElementSibling;
+                                    if (infoText) {
+                                        infoText.textContent = 'You have joined the ' + userRole + ' group';
+                                    }
+                                }
+
+                                setTimeout(() => {
+                                    openChat(data.id, data.name, 'group', 0);
+                                }, 500);
+                            })
+                            .catch(err => {
+                                console.error('Error joining group:', err);
+                                alert('Failed to join group');
+                                // Re-enable button on error
+                                if (btn) {
+                                    btn.disabled = false;
+                                    btn.innerHTML = '<i class="fas fa-users mr-2"></i>Join My Role Group';
+                                }
+                            });
+                    }
+
+                    // Search toggle
+                    document.getElementById('searchToggle').addEventListener('click', function () {
+                        const searchBar = document.getElementById('searchBar');
+                        searchBar.classList.toggle('hidden');
+                    });
+
+                    // Search filter
+                    document.getElementById('chatSearch').addEventListener('input', function (e) {
+                        const query = e.target.value.toLowerCase();
+                        const items = chatListEl.querySelectorAll('[data-chat-id]');
+                        items.forEach(item => {
+                            const name = item.querySelector('h4').textContent.toLowerCase();
+                            if (name.includes(query)) {
+                                item.style.display = '';
+                            } else {
+                                item.style.display = 'none';
+                            }
+                        });
+                    });
+
+                    // Custom Dropdown Logic
+                    const nativeSelect = document.getElementById('clientSelectSidebar');
+                    const customTrigger = document.getElementById('customTrigger');
+                    const customTriggerText = document.getElementById('customTriggerText');
+                    const customOptions = document.getElementById('customOptions');
+                    const customDropdown = document.getElementById('customDropdown');
+
+                    if (nativeSelect && customTrigger && customOptions) {
+                        // Toggle
+                        customTrigger.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const isShown = customOptions.classList.contains('show');
+                            // Close others if needed
+                            document.querySelectorAll('.custom-dropdown-options.show').forEach(el => el.classList.remove('show'));
+
+                            if (!isShown) {
+                                customOptions.classList.add('show');
+                                customTrigger.style.borderColor = '#6366f1'; // Highlight border
+                            } else {
+                                customOptions.classList.remove('show');
+                                customTrigger.style.borderColor = '';
+                            }
+                        });
+
+                        // Close on outside click
+                        document.addEventListener('click', (e) => {
+                            if (!customDropdown.contains(e.target)) {
+                                customOptions.classList.remove('show');
+                                customTrigger.style.borderColor = '';
+                            }
+                        });
+
+                        // Sync logic: rebuild custom options when native select changes
+                        function syncCustomDropdown() {
+                            customOptions.innerHTML = '';
+                            Array.from(nativeSelect.options).forEach(opt => {
+                                // Skip placeholder if we want... but let's keep it to allow resetting?
+                                // Usually dropdowns hide value="" option in list if it's "select user"
+                                // But let's show all
+
+                                const div = document.createElement('div');
+                                div.className = 'custom-option' + (opt.selected ? ' selected' : '');
+                                div.textContent = opt.text;
+                                div.dataset.value = opt.value;
+
+                                div.onclick = () => {
+                                    nativeSelect.value = opt.value;
+                                    customTriggerText.textContent = opt.text;
+                                    customOptions.classList.remove('show');
+
+                                    // Reset border
+                                    customTrigger.style.borderColor = '';
+
+                                    // Update selected styling
+                                    document.querySelectorAll('.custom-option').forEach(el => el.classList.remove('selected'));
+                                    div.classList.add('selected');
+
+                                    // Dispatch change event so existing listeners fire
+                                    nativeSelect.dispatchEvent(new Event('change'));
+                                };
+                                customOptions.appendChild(div);
+
+                                // Set initial text if selected
+                                if (opt.selected) {
+                                    customTriggerText.textContent = opt.text;
+                                }
+                            });
+                        }
+
+                        // Observe changes to native select options
+                        const observer = new MutationObserver(syncCustomDropdown);
+                        observer.observe(nativeSelect, { childList: true, subtree: true, attributes: true });
+
+                        // Initial sync
+                        syncCustomDropdown();
+                    }
+
+                </script>
+
+            </div>
 
 @endsection
