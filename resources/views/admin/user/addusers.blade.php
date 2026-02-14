@@ -83,33 +83,6 @@
                 </div>
 
 
-
-                  <!-- Password Field -->
-                <div class="mb-6">
-                    <label for="salary" class="block text-sm font-medium text-gray-700 mb-2">
-                        <svg class="inline w-4 h-4 mr-1 -mt-0.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 8.25L9 8.25M15 11.25H9M12 17.25L9 14.25H10.5C12.1569 14.25 13.5 12.9069 13.5 11.25C13.5 9.59315 12.1569 8.25 10.5 8.25M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"></path>
-</svg>
-                        salary
-                    </label>
-                    <input type="text" 
-                           name="salary" 
-                           id="salary"
-                           class="w-full px-4 py-2.5 border {{ $errors->has('salary') ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-indigo-500' }} rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-1 transition-colors"
-                           placeholder="₹30000"
-                           required>
-                    @error('salary')
-                        <p class="mt-1.5 text-sm text-red-600 flex items-center">
-                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
-                            {{ $message }}
-                        </p>
-                    @enderror
-                </div>
-
-
-
-
-                <!-- Roles Field (Multi-Checkbox) -->
                 <div class="mb-8">
                     <label class="block text-sm font-medium text-gray-700 mb-3">
                         <svg class="inline w-4 h-4 mr-1 -mt-0.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -125,7 +98,8 @@
                                        name="roles[]"
                                        value="{{ $role->id }}"
                                        {{ in_array($role->id, old('roles', [])) ? 'checked' : '' }}
-                                       class="w-4 h-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                                       class="w-4 h-4 text-indigo-600 border-gray-300 focus:ring-indigo-500 role-radio"
+                                       data-role-name="{{ strtolower($role->name) }}">
                                 <span class="ml-3 text-sm font-medium text-gray-700 capitalize">{{ $role->name }}</span>
                                 <span class="ml-auto text-xs text-gray-500">
                                     @if(strtolower($role->name) === 'admin') Super user
@@ -143,6 +117,55 @@
                         </p>
                     @enderror
                 </div>
+
+                <!-- Salary Field -->
+                <div class="mb-6" id="salary-field">
+                    <label for="salary" class="block text-sm font-medium text-gray-700 mb-2">
+                        <svg class="inline w-4 h-4 mr-1 -mt-0.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 8.25L9 8.25M15 11.25H9M12 17.25L9 14.25H10.5C12.1569 14.25 13.5 12.9069 13.5 11.25C13.5 9.59315 12.1569 8.25 10.5 8.25M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"></path>
+                        </svg>
+                        salary
+                    </label>
+                    <input type="text" 
+                           name="salary" 
+                           id="salary"
+                           class="w-full px-4 py-2.5 border {{ $errors->has('salary') ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-indigo-500' }} rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-1 transition-colors"
+                           placeholder="₹30000"
+                          >
+                    @error('salary')
+                        <p class="mt-1.5 text-sm text-red-600 flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                            {{ $message }}
+                        </p>
+                    @enderror
+                </div>
+
+<script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const roleRadios = document.querySelectorAll('.role-radio');
+            const salaryField = document.getElementById('salary-field');
+            const salaryInput = document.getElementById('salary');
+
+            function toggleSalaryField() {
+                const selectedRole = document.querySelector('.role-radio:checked');
+                
+                if (selectedRole && selectedRole.dataset.roleName === 'client') {
+                    salaryField.style.display = 'none';
+                    salaryInput.removeAttribute('required');
+                    salaryInput.value = '';
+                } else {
+                    salaryField.style.display = 'block';
+                    salaryInput.setAttribute('required', 'required');
+                }
+            }
+
+            toggleSalaryField();
+
+            roleRadios.forEach(radio => {
+                radio.addEventListener('change', toggleSalaryField);
+            });
+        });
+</script>
 
                 <!-- Actions -->
                 <div class="flex items-center justify-between pt-4 border-t border-gray-200">
