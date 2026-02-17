@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
-use App\Models\SuperAdmin\Customer;
+use App\Models\Company;
 use App\Models\SuperAdmin\Payment;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -12,16 +12,26 @@ class SuperAdminDashboardController extends Controller
 {
     public function index()
     {
-        $totalCustomers = Customer::count();
-        $activeTrials = Customer::where('status', 'trial')->count();
-        $paidMembers = Customer::where('status', 'active')->count();
+        // Total companies (customers)
+        $totalCustomers = Company::count();
         
+        // Active trials: companies with trial_ends_at in the future
+        $activeTrials = Company::where('trial_ends_at', '>', now())
+            ->where('is_paid', false)
+            ->count();
+        
+        // Paid members: companies with is_paid = true
+        $paidMembers = Company::where('is_paid', true)->count();
+        
+        // Revenue data
         $totalRevenue = Payment::where('status', 'completed')->sum('total_amount');
         $monthlyRevenue = Payment::where('status', 'completed')
             ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
             ->sum('total_amount');
         
-        $recentCustomers = Customer::latest()->take(5)->get();
+        // Recent customers (companies)
+        $recentCustomers = Company::with('user')->latest()->take(5)->get();
         
         // Get dynamic data for charts
         $revenueData = $this->getRevenueData();
@@ -79,7 +89,7 @@ class SuperAdminDashboardController extends Controller
             $month = $date->format('M');
             $months[] = $month;
             
-            $customers = Customer::whereMonth('created_at', $date->month)
+            $customers = Company::whereMonth('created_at', $date->month)
                 ->whereYear('created_at', $date->year)
                 ->count();
             

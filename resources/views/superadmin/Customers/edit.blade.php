@@ -23,16 +23,16 @@
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
-                <input type="text" name="name" value="{{ old('name', $customer->name) }}" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter customer name">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Company Name *</label>
+                <input type="text" name="name" value="{{ old('name', $customer->name) }}" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter company name">
                 @error('name')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                 @enderror
             </div>
             
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
-                <input type="email" name="email" value="{{ old('email', $customer->email) }}" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter email address">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Company Email *</label>
+                <input type="email" name="email" value="{{ old('email', $customer->email) }}" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter company email">
                 @error('email')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                 @enderror
@@ -47,24 +47,11 @@
             </div>
             
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Business Name</label>
-                <input type="text" name="business_name" value="{{ old('business_name', $customer->business_name) }}" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter business name">
-                @error('business_name')
-                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                @enderror
-            </div>
-            
-            <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Address</label>
                 <textarea name="address" rows="3" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter full address">{{ old('address', $customer->address) }}</textarea>
                 @error('address')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                 @enderror
-            </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Current Plan</label>
-                <input type="text" value="{{ $customer->plan }}" class="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-50 text-gray-500" readonly>
             </div>
             
             <div>
@@ -80,64 +67,37 @@
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                 @enderror
             </div>
-            
+
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Trial Start Date</label>
-                <input type="date" name="trial_start_date" value="{{ old('trial_start_date', $customer->trial_start_date) }}" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-            </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Trial End Date</label>
-                <input type="date" name="trial_end_date" value="{{ old('trial_end_date', $customer->trial_end_date) }}" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-            </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Subscription Start</label>
-                <input type="date" name="subscription_start_date" value="{{ old('subscription_start_date', $customer->subscription_start_date) }}" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-            </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Subscription End</label>
-                <input type="date" name="subscription_end_date" value="{{ old('subscription_end_date', $customer->subscription_end_date) }}" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-            </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Amount Paid (₹)</label>
-                <input type="number" name="amount_paid" value="{{ old('amount_paid', $customer->amount_paid) }}" step="0.01" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="0.00">
-                @error('amount_paid')
-                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                @enderror
-            </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
-                <select name="payment_method" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <option value="">Select Method</option>
-                    <option value="credit_card" {{ $customer->payment_method == 'credit_card' ? 'selected' : '' }}>Credit Card</option>
-                    <option value="bank_transfer" {{ $customer->payment_method == 'bank_transfer' ? 'selected' : '' }}>Bank Transfer</option>
-                    <option value="upi" {{ $customer->payment_method == 'upi' ? 'selected' : '' }}>UPI</option>
-                    <option value="cash" {{ $customer->payment_method == 'cash' ? 'selected' : '' }}>Cash</option>
-                </select>
+                 <label class="block text-sm font-medium text-gray-700 mb-2">Trial Ends At</label>
+                 <input type="datetime-local" name="trial_ends_at" value="{{ $customer->trial_ends_at ? $customer->trial_ends_at->format('Y-m-d\TH:i') : '' }}" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
             </div>
         </div>
         
         <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-700 mb-2">License Key</label>
-            <div class="flex items-center">
-                <input type="text" value="{{ $customer->license_key }}" class="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-50 text-gray-500 font-mono" readonly>
-                <button type="button" onclick="copyToClipboard('{{ $customer->license_key }}')" class="ml-2 px-4 py-3 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition duration-200">
-                    <i class="fas fa-copy"></i>
-                </button>
+            <h4 class="font-medium text-gray-700 mb-3">Admin Account Details</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Admin Name</label>
+                    <input type="text" name="admin_name" value="{{ old('admin_name', $customer->user->name ?? '') }}" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Admin name">
+                    @error('admin_name')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Admin Email</label>
+                    <input type="email" name="admin_email" value="{{ old('admin_email', $customer->user->email ?? '') }}" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Admin email">
+                    @error('admin_email')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
         </div>
         
         <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Login URL</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Company Slug</label>
             <div class="flex items-center">
-                <input type="text" value="{{ $customer->login_url }}" class="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-50 text-blue-500 truncate" readonly>
-                <a href="{{ $customer->login_url }}" target="_blank" class="ml-2 px-4 py-3 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition duration-200">
-                    <i class="fas fa-external-link-alt"></i>
-                </a>
+                <input type="text" value="{{ $customer->slug }}" class="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-50 text-gray-500 font-mono" readonly>
             </div>
         </div>
         

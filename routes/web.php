@@ -43,7 +43,7 @@ use App\Http\Controllers\SuperAdmin\SuperAdminDashboardController;
 use App\Http\Controllers\SuperAdmin\SuperAdminInvoiceController;
 use App\Http\Controllers\SuperAdmin\TrialController;
 use App\Http\Controllers\FreeTrialController;
-use App\Http\Controllers\Superadmin\AuthController;
+use App\Http\Controllers\SuperAdmin\AuthController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\TicketRecordController;
 use App\Http\Controllers\UpgradePlanController;

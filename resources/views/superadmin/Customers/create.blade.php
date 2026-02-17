@@ -20,18 +20,19 @@
     <form action="{{ route('superadmin.customers.store') }}" method="POST">
         @csrf
         
+        <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Company Details</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
-                <input type="text" name="name" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter customer name">
-                @error('name')
+                <label class="block text-sm font-medium text-gray-700 mb-2">Company Name *</label>
+                <input type="text" name="company_name" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter company name">
+                @error('company_name')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                 @enderror
             </div>
             
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
-                <input type="email" name="email" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter email address">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Company Email *</label>
+                <input type="email" name="email" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter company email">
                 @error('email')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                 @enderror
@@ -46,22 +47,42 @@
             </div>
             
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Business Name</label>
-                <input type="text" name="business_name" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter business name">
-                @error('business_name')
-                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                @enderror
-            </div>
-            
-            <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Address</label>
-                <textarea name="address" rows="3" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter full address"></textarea>
+                <textarea name="address" rows="1" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter full address"></textarea>
                 @error('address')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                 @enderror
             </div>
         </div>
+
+        <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Admin Account Details</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Admin Name *</label>
+                <input type="text" name="admin_name" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter admin name">
+                @error('admin_name')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Admin Email *</label>
+                <input type="email" name="admin_email" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter admin login email">
+                @error('admin_email')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Password *</label>
+                <input type="password" name="password" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter password (min 8 chars)">
+                @error('password')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+        </div>
         
+        <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Subscription & Details</h3>
         <div class="mb-6">
             <label class="block text-sm font-medium text-gray-700 mb-3">Subscription Type *</label>
             <div class="flex space-x-6">
@@ -103,7 +124,7 @@
             </a>
             <button type="submit" class="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition duration-200 font-medium">
                 <i class="fas fa-plus mr-2"></i>
-                Submit
+                Create Customer
             </button>
         </div>
     </form>

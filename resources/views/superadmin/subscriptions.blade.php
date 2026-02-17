@@ -73,7 +73,7 @@
 <tr>
     <td class="py-3 px-6">
         <div class="flex items-center">
-            <img src="{{ $company->logo_url }}" class="w-8 h-8 rounded-full mr-3">
+            <!-- <img src="{{ $company->logo_url }}" class="w-8 h-8 rounded-full mr-3"> -->
             <div>
                 <p class="font-medium text-gray-800">{{ $company->name }}</p>
                 <p class="text-sm text-gray-500">{{ $company->email }}</p>

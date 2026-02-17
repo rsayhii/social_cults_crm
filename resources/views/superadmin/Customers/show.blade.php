@@ -38,11 +38,11 @@
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <p class="text-gray-500 text-sm">Full Name</p>
+                    <p class="text-gray-500 text-sm">Company Name</p>
                     <p class="font-medium text-gray-800 text-lg">{{ $customer->name }}</p>
                 </div>
                 <div>
-                    <p class="text-gray-500 text-sm">Email Address</p>
+                    <p class="text-gray-500 text-sm">Company Email</p>
                     <p class="font-medium text-gray-800">{{ $customer->email }}</p>
                 </div>
                 <div>
@@ -50,8 +50,12 @@
                     <p class="font-medium text-gray-800">{{ $customer->phone ?? 'N/A' }}</p>
                 </div>
                 <div>
-                    <p class="text-gray-500 text-sm">Business Name</p>
-                    <p class="font-medium text-gray-800">{{ $customer->business_name ?? 'N/A' }}</p>
+                    <p class="text-gray-500 text-sm">Admin Name</p>
+                    <p class="font-medium text-gray-800">{{ $customer->user->name ?? 'N/A' }}</p>
+                </div>
+                <div>
+                    <p class="text-gray-500 text-sm">Admin Email</p>
+                    <p class="font-medium text-gray-800">{{ $customer->user->email ?? 'N/A' }}</p>
                 </div>
                 <div class="md:col-span-2">
                     <p class="text-gray-500 text-sm">Address</p>
@@ -62,10 +66,10 @@
         
         <!-- Subscription Timeline -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
-            <h2 class="text-xl font-bold text-gray-800 mb-6">Subscription Timeline</h2>
+            <h2 class="text-xl font-bold text-gray-800 mb-6">Subscription Details</h2>
             
             <div class="space-y-6">
-                @if($customer->trial_start_date)
+                @if($customer->trial_ends_at)
                 <div class="flex items-start">
                     <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-4 flex-shrink-0">
                         <i class="fas fa-clock text-blue-600"></i>
@@ -73,63 +77,48 @@
                     <div class="flex-1">
                         <div class="flex justify-between items-center mb-1">
                             <h3 class="font-medium text-gray-800">Trial Period</h3>
-                            @if($customer->status == 'trial')
+                            @if($customer->trial_ends_at->isFuture())
                             <span class="status-badge status-trial">Active</span>
                             @else
-                            <span class="text-gray-500 text-sm">Completed</span>
+                            <span class="text-gray-500 text-sm">Expired</span>
                             @endif
                         </div>
                         <p class="text-gray-600 text-sm">
-                            Started: {{ $customer->trial_start_date }} | 
-                            Ends: {{ $customer->trial_end_date }}
+                            Ends: {{ $customer->trial_ends_at->format('M d, Y') }}
                         </p>
                         @php
-                            $trialDaysRemaining = \Carbon\Carbon::parse($customer->trial_end_date)->diffInDays(now());
+                            $trialDaysRemaining = $customer->trial_ends_at->diffInDays(now());
                         @endphp
-                        @if($customer->status == 'trial' && $trialDaysRemaining > 0)
+                        @if($customer->trial_ends_at->isFuture())
                         <div class="mt-2">
                             <div class="w-full bg-gray-200 rounded-full h-2">
                                 <div class="bg-blue-600 h-2 rounded-full" style="width: {{ min(100, (30 - $trialDaysRemaining) / 30 * 100) }}%"></div>
                             </div>
-                            <p class="text-gray-500 text-sm mt-1">{{ $trialDaysRemaining }} days remaining</p>
+                            <p class="text-gray-500 text-sm mt-1">{{ 30 - $trialDaysRemaining }} days used ({{ $customer->trial_ends_at->diffForHumans() }})</p>
                         </div>
+                        @else
+                         <p class="text-red-500 text-sm mt-1">Trial Expired</p>
                         @endif
                     </div>
                 </div>
                 @endif
                 
-                @if($customer->subscription_start_date)
                 <div class="flex items-start">
                     <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-4 flex-shrink-0">
                         <i class="fas fa-id-card text-green-600"></i>
                     </div>
                     <div class="flex-1">
                         <div class="flex justify-between items-center mb-1">
-                            <h3 class="font-medium text-gray-800">Paid Subscription</h3>
-                            @if($customer->status == 'active')
-                            <span class="status-badge status-active">Active</span>
+                            <h3 class="font-medium text-gray-800">Plan Status</h3>
+                            @if($customer->is_paid)
+                            <span class="status-badge status-active">Paid</span>
                             @else
-                            <span class="text-gray-500 text-sm">Inactive</span>
+                            <span class="text-gray-500 text-sm">Free/Trial</span>
                             @endif
                         </div>
-                        <p class="text-gray-600 text-sm">
-                            Started: {{ $customer->subscription_start_date }} | 
-                            Renews: {{ $customer->subscription_end_date }}
-                        </p>
-                        @php
-                            $subDaysRemaining = \Carbon\Carbon::parse($customer->subscription_end_date)->diffInDays(now());
-                        @endphp
-                        @if($customer->status == 'active' && $subDaysRemaining > 0)
-                        <div class="mt-2">
-                            <div class="w-full bg-gray-200 rounded-full h-2">
-                                <div class="bg-green-600 h-2 rounded-full" style="width: {{ min(100, (365 - $subDaysRemaining) / 365 * 100) }}%"></div>
-                            </div>
-                            <p class="text-gray-500 text-sm mt-1">{{ $subDaysRemaining }} days remaining</p>
-                        </div>
-                        @endif
                     </div>
                 </div>
-                @endif
+
             </div>
         </div>
         
@@ -143,36 +132,11 @@
                         <i class="fas fa-user-plus text-blue-600 text-sm"></i>
                     </div>
                     <div>
-                        <p class="font-medium text-gray-800">Customer Created</p>
+                        <p class="font-medium text-gray-800">Company Created</p>
                         <p class="text-sm text-gray-600">Account was created on {{ $customer->created_at->format('M d, Y') }}</p>
                         <p class="text-xs text-gray-500 mt-1">{{ $customer->created_at->diffForHumans() }}</p>
                     </div>
                 </div>
-                
-                @if($customer->trial_start_date)
-                <div class="flex items-start">
-                    <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center mr-3 flex-shrink-0">
-                        <i class="fas fa-clock text-purple-600 text-sm"></i>
-                    </div>
-                    <div>
-                        <p class="font-medium text-gray-800">Trial Started</p>
-                        <p class="text-sm text-gray-600">30-day trial started on {{ $customer->trial_start_date }}</p>
-                    </div>
-                </div>
-                @endif
-                
-                @if($customer->subscription_start_date)
-                <div class="flex items-start">
-                    <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-3 flex-shrink-0">
-                        <i class="fas fa-rupee-sign text-green-600 text-sm"></i>
-                    </div>
-                    <div>
-                        <p class="font-medium text-gray-800">Subscription Activated</p>
-                        <p class="text-sm text-gray-600">Paid subscription started on {{ $customer->subscription_start_date }}</p>
-                        <p class="text-sm text-gray-600">Amount: ₹{{ number_format($customer->amount_paid) }}</p>
-                    </div>
-                </div>
-                @endif
             </div>
         </div>
     </div>
@@ -180,41 +144,18 @@
     <!-- Subscription Info Card -->
     <div>
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
-            <h2 class="text-xl font-bold text-gray-800 mb-6">Subscription Information</h2>
+            <h2 class="text-xl font-bold text-gray-800 mb-6">Company Information</h2>
             
             <div class="space-y-4">
                 <div>
-                    <p class="text-gray-500 text-sm">Current Plan</p>
-                    <p class="font-medium text-gray-800">{{ $customer->plan }}</p>
+                    <p class="text-gray-500 text-sm">GSTIN</p>
+                    <p class="font-medium text-gray-800">{{ $customer->gstin ?? 'N/A' }}</p>
                 </div>
-                
-                @if($customer->trial_start_date)
+
                 <div>
-                    <p class="text-gray-500 text-sm">Trial Start Date</p>
-                    <p class="font-medium text-gray-800">{{ $customer->trial_start_date }}</p>
+                    <p class="text-gray-500 text-sm">Slug</p>
+                    <p class="font-mono text-gray-600">{{ $customer->slug }}</p>
                 </div>
-                @endif
-                
-                @if($customer->trial_end_date)
-                <div>
-                    <p class="text-gray-500 text-sm">Trial End Date</p>
-                    <p class="font-medium text-gray-800">{{ $customer->trial_end_date }}</p>
-                </div>
-                @endif
-                
-                @if($customer->subscription_start_date)
-                <div>
-                    <p class="text-gray-500 text-sm">Subscription Start</p>
-                    <p class="font-medium text-gray-800">{{ $customer->subscription_start_date }}</p>
-                </div>
-                @endif
-                
-                @if($customer->subscription_end_date)
-                <div>
-                    <p class="text-gray-500 text-sm">Subscription End</p>
-                    <p class="font-medium text-gray-800">{{ $customer->subscription_end_date }}</p>
-                </div>
-                @endif
                 
                 <div>
                     <p class="text-gray-500 text-sm">Status</p>
@@ -223,27 +164,17 @@
                     </p>
                 </div>
                 
-                <div>
-                    <p class="text-gray-500 text-sm">Amount Paid</p>
-                    <p class="font-medium text-gray-800">₹{{ number_format($customer->amount_paid) }}</p>
-                </div>
-                
-                @if($customer->payment_method)
-                <div>
-                    <p class="text-gray-500 text-sm">Payment Method</p>
-                    <p class="font-medium text-gray-800">{{ ucfirst(str_replace('_', ' ', $customer->payment_method)) }}</p>
-                </div>
-                @endif
+                <!-- <div>
+                    <p class="text-gray-500 text-sm">Total Paid</p>
+                    <p class="font-medium text-gray-800">₹{{ number_format($customer->payments->sum('amount')) }}</p>
+                </div> -->
             </div>
             
-            <div class="mt-8 pt-6 border-t border-gray-200">
+            <!-- <div class="mt-8 pt-6 border-t border-gray-200">
                 <div class="grid grid-cols-2 gap-2">
                     <button class="px-3 py-2 border border-gray-300 rounded text-sm font-medium hover:bg-gray-50">Extend Trial</button>
-                    <button class="px-3 py-2 border border-gray-300 rounded text-sm font-medium hover:bg-gray-50">Renew Subscription</button>
-                    <button class="px-3 py-2 border border-blue-300 text-blue-600 rounded text-sm font-medium hover:bg-blue-50">Send Invoice</button>
-                    <button class="px-3 py-2 border border-green-300 text-green-600 rounded text-sm font-medium hover:bg-green-50">Reset Password</button>
                 </div>
-            </div>
+            </div> -->
         </div>
         
         <!-- CRM Access Card -->
@@ -252,27 +183,8 @@
             
             <div class="space-y-4">
                 <div>
-                    <p class="text-gray-500 text-sm">License Key</p>
-                    <div class="flex items-center mt-1">
-                        <p class="font-mono font-medium text-gray-800 bg-gray-100 p-2 rounded flex-1 text-sm truncate">{{ $customer->license_key ?? 'Not generated' }}</p>
-                        @if($customer->license_key)
-                        <button onclick="copyToClipboard('{{ $customer->license_key }}')" class="ml-2 p-2 text-gray-500 hover:text-gray-700">
-                            <i class="fas fa-copy"></i>
-                        </button>
-                        @endif
-                    </div>
-                </div>
-                
-                <div>
-                    <p class="text-gray-500 text-sm">Login URL</p>
-                    <div class="flex items-center mt-1">
-                        <p class="font-medium text-blue-600 bg-blue-50 p-2 rounded flex-1 truncate text-sm">{{ $customer->login_url ?? 'Not generated' }}</p>
-                        @if($customer->login_url)
-                        <a href="{{ $customer->login_url }}" target="_blank" class="ml-2 p-2 text-gray-500 hover:text-gray-700">
-                            <i class="fas fa-external-link-alt"></i>
-                        </a>
-                        @endif
-                    </div>
+                    <p class="text-gray-500 text-sm">Login URL (Autogenerated)</p>
+                     <p class="text-sm text-gray-500">Subdomain/Slug based login usually</p>
                 </div>
                 
                 <div>
@@ -288,7 +200,7 @@
             
             <div class="mt-8 pt-6 border-t border-gray-200">
                 <h3 class="font-medium text-gray-800 mb-3">Danger Zone</h3>
-                <form action="{{ route('superadmin.customers.destroy', $customer) }}" method="POST" class="inline">
+                <form action="{{ route('superadmin.customers.destroy', $customer->id) }}" method="POST" class="inline">
                     @csrf
                     @method('DELETE')
                     <button type="submit" onclick="return confirm('Are you absolutely sure? This will permanently delete the customer and all their data.')" class="w-full px-4 py-2 border border-red-300 text-red-600 rounded text-sm font-medium hover:bg-red-50 flex items-center justify-center">

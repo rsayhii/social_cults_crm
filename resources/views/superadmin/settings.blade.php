@@ -11,7 +11,60 @@
 </div>
 
 <!-- Settings Content -->
-<div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+<!-- Settings Content -->
+<div class="space-y-6">
+    <!-- Account Settings -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <h3 class="text-lg font-bold text-gray-800 mb-6">Account Settings</h3>
+        
+        <form action="{{ route('superadmin.settings.update') }}" method="POST">
+            @csrf
+            
+            <div class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                        <input type="text" name="name" value="{{ old('name', $superadmin->name) }}" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                        @error('name')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                        <input type="email" name="email" value="{{ old('email', $superadmin->email) }}" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                        @error('email')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">New Password <span class="text-gray-400 text-xs">(Leave blank to keep current)</span></label>
+                        <input type="password" name="password" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        @error('password')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
+                        <input type="password" name="password_confirmation" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                </div>
+                
+                <div class="pt-4 border-t border-gray-200">
+                    <button type="submit" class="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition duration-200 font-medium">
+                        Update Credentials
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- General Settings -->
+    <!-- <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
     <h3 class="text-lg font-bold text-gray-800 mb-6">General Settings</h3>
     
     <form action="{{ route('superadmin.settings.update') }}" method="POST">
@@ -52,5 +105,6 @@
             </div>
         </div>
     </form>
+    </div> -->
 </div>
 @endsection

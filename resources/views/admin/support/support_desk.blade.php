@@ -147,7 +147,7 @@
                                                 {{ $ticket->created_at->format('M d, H:i') }}
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                <a href="{{ route('ticket.record.show', $ticket->id) }}"
+                                                <a href="{{ route('ticket.record.show', encrypt($ticket->id)) }}"
                                                     class="text-blue-600 hover:text-blue-900">Manage</a>
                                             </td>
                                         </tr>

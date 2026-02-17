@@ -114,7 +114,7 @@
             <div class="lg:col-span-1">
                 <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6 mb-6">
                     <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Management</h3>
-                    <form action="{{ route('ticket.record.update', $ticket->id) }}" method="POST" class="space-y-4">
+                    <form action="{{ route('ticket.record.update', encrypt($ticket->id)) }}" method="POST" class="space-y-4">
                         @csrf
                         @method('PUT')
 
@@ -163,7 +163,7 @@
                     </form>
 
                     <div class="mt-6 pt-6 border-t border-gray-100">
-                        <form action="{{ route('ticket.record.destroy', $ticket->id) }}" method="POST"
+                        <form action="{{ route('ticket.record.destroy', encrypt($ticket->id)) }}" method="POST"
                             onsubmit="return confirm('Are you sure you want to delete this ticket? This action cannot be undone and will delete all attachments.');">
                             @csrf
                             @method('DELETE')

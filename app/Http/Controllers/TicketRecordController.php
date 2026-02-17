@@ -48,12 +48,14 @@ class TicketRecordController extends Controller
 
     public function show($id)
     {
+         $id = decrypt($id);
         $ticket = HelpAndSupport::with(['client', 'assignedAgent'])->findOrFail($id);
         return view('admin.support.manage_ticket', compact('ticket'));
     }
 
     public function update(Request $request, $id)
     {
+        $id = decrypt($id);
         $ticket = HelpAndSupport::findOrFail($id);
 
         $request->validate([
@@ -113,6 +115,7 @@ class TicketRecordController extends Controller
 
     public function destroy($id)
     {
+        $id = decrypt($id);
         $ticket = HelpAndSupport::findOrFail($id);
 
         try {

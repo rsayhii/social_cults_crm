@@ -173,7 +173,7 @@
                     <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 mr-3"></div>
                     <div>
                         <p class="font-medium text-gray-800">{{ $customer->name }}</p>
-                        <p class="text-sm text-gray-500">{{ $customer->business_name }}</p>
+                        <p class="text-sm text-gray-500">{{ $customer->user->name ?? 'No Admin' }}</p>
                     </div>
                 </div>
                 <div class="text-right">

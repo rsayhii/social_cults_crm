@@ -279,7 +279,7 @@
             @endif
         </div>
         <div class="flex flex-wrap gap-3">
-            <a href="{{ route('invoices.index') }}" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition duration-200 font-medium flex items-center">
+            <a href="{{ route('superadmin.invoices.index') }}" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition duration-200 font-medium flex items-center">
                 <i class="fas fa-list mr-2"></i>
                 View All Invoices
             </a>

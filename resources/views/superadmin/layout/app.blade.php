@@ -140,24 +140,24 @@
                             <span class="text-sm">Active Subscriptions</span>
                         </a>
                     </li>
-                    <li>
+                    <!-- <li>
                         <a href="{{ route('superadmin.payments.index') }}" class="{{ request()->routeIs('payments.*') ? 'active-menu flex items-center space-x-3 px-4 py-3 rounded-lg bg-blue-50 text-blue-600 font-medium' : 'menu-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition duration-200' }}">
                             <i class="fas fa-credit-card"></i>
                             <span>Payments</span>
                         </a>
-                    </li>
-                    <li>
+                    </li> -->
+                    <!-- <li>
                         <a href="{{ route('superadmin.invoices.index') }}" class="{{ request()->routeIs('invoices.*') ? 'active-menu flex items-center space-x-3 px-4 py-3 rounded-lg bg-blue-50 text-blue-600 font-medium' : 'menu-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition duration-200' }}">
                             <i class="fas fa-file-invoice"></i>
                             <span>Invoices</span>
                         </a>
-                    </li>
-                    <li>
+                    </li> -->
+                    <!-- <li>
                         <a href="{{ route('superadmin.revenue.index') }}" class="{{ request()->routeIs('revenue.*') ? 'active-menu flex items-center space-x-3 px-4 py-3 rounded-lg bg-blue-50 text-blue-600 font-medium' : 'menu-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition duration-200' }}">
                             <i class="fas fa-chart-bar"></i>
                             <span>Revenue Report</span>
                         </a>
-                    </li>
+                    </li> -->
                      <li>
                         <a href="{{ route('ticket.record.index') }}" class="{{ request()->routeIs('revenue.*') ? 'active-menu flex items-center space-x-3 px-4 py-3 rounded-lg bg-blue-50 text-blue-600 font-medium' : 'menu-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition duration-200' }}">
                              <i class="fas fa-headset w-4 h-4"></i>

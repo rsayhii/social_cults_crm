@@ -70,11 +70,11 @@ class Payment extends Model
     }
     
     /**
-     * Get the customer that owns the payment.
+     * Get the company that owns the payment.
      */
-    public function customer(): BelongsTo
+    public function company(): BelongsTo
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(\App\Models\Company::class, 'customer_id');
     }
     
     /**

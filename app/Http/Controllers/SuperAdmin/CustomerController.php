@@ -5,53 +5,22 @@ namespace App\Http\Controllers\SuperAdmin;
 
 
 use App\Http\Controllers\Controller;
-use App\Models\SuperAdmin\Customer;
+use App\Models\Company;
+use App\Models\User;
+use App\Models\Role;
 use App\Models\SuperAdmin\Payment;
-use App\Models\SuperAdmin\Subscription;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 
 class CustomerController extends Controller
 {
-    // Show all customers
+    // Show all customers (Companies)
     public function index()
     {
-        // For testing, create some dummy customers if none exist
-        if (Customer::count() === 0) {
-            // Create customer
-            $customer = Customer::create([
-                'name' => 'Rajesh Kumar',
-                'email' => 'rajesh@example.com',
-                'phone' => '+91 9876543210',
-                'business_name' => 'Kumar Enterprises',
-                'address' => '123 Business Street, Mumbai',
-                'status' => 'active',
-                'plan' => 'Paid (₹5000/year)',
-                'amount_paid' => 5000,
-                'license_key' => 'CRM-LIC-' . Str::upper(Str::random(10)),
-                'login_url' => 'https://crm.example.com/login/rajesh-kumar',
-                'subscription_start_date' => now(),
-                'subscription_end_date' => now()->addYear(),
-                'payment_method' => 'credit_card'
-            ]);
-            
-            // Create payment record for this customer
-            Payment::create([
-                'customer_id' => $customer->id,
-                'amount' => 5000,
-                'total_amount' => 5000,
-                'payment_method' => 'credit_card',
-                'status' => 'completed',
-                'notes' => 'Initial subscription payment',
-                'currency' => 'INR',
-                'payment_date' => now(),
-                'transaction_id' => 'PAY-' . Str::upper(uniqid()),
-            ]);
-        }
-        
-        $customers = Customer::latest()->paginate(10);
+        $customers = Company::with('user')->latest()->paginate(10);
         return view('superadmin.customers.customers', compact('customers'));
     }
 
@@ -61,130 +30,156 @@ class CustomerController extends Controller
         return view('superadmin.customers.create');
     }
 
-    // Store new customer
+    // Store new customer (Company + Admin)
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:customers',
-            'phone' => 'nullable|string',
-            'business_name' => 'nullable|string',
+            // Company Details
+            'company_name' => 'required|string|max:255|unique:companies,name',
+            'business_name' => 'nullable|string|max:255', // Optional, can map to something else or just ignore if not in DB
+            'email' => 'required|email|unique:companies,email', // Company Email
+            'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string',
+            
+            // Admin User Details
+            'admin_name' => 'required|string|max:255',
+            'admin_email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8',
+            
+            // Subscription
             'subscription_type' => 'required|in:trial,paid',
-            'status' => 'required|in:active,trial,pending'
+            'status' => 'required|in:active,trial,pending',
+            
+            // Payment (if paid)
+            'amount_paid' => 'nullable|numeric',
+            'payment_method' => 'nullable|string'
         ]);
         
         try {
             DB::beginTransaction();
             
-            // Generate license key and login URL
-            $licenseKey = 'CRM-LIC-' . Str::upper(Str::random(10));
-            $loginUrl = 'https://crm.example.com/login/' . Str::slug($validated['name']);
-            
-            // Prepare customer data
-            $customerData = [
-                'name' => $validated['name'],
+            // 1. Create Company
+            $companyData = [
+                'name' => $validated['company_name'],
                 'email' => $validated['email'],
                 'phone' => $validated['phone'],
-                'business_name' => $validated['business_name'],
                 'address' => $validated['address'],
                 'status' => $validated['status'],
-                'license_key' => $licenseKey,
-                'login_url' => $loginUrl,
-            ];
-            
-            // Set plan and dates based on subscription type
+                // Slug handled by observer
+            ]; 
+
             if ($request->subscription_type === 'trial') {
-                $customerData['plan'] = 'Trial';
-                $customerData['trial_start_date'] = now();
-                $customerData['trial_end_date'] = now()->addDays(30);
-                $customerData['amount_paid'] = 0;
+                $companyData['trial_ends_at'] = now()->addDays(30);
+                $companyData['is_paid'] = false;
             } else {
-                $customerData['plan'] = 'Paid (₹5000/year)';
-                $customerData['subscription_start_date'] = now();
-                $customerData['subscription_end_date'] = now()->addYear();
-                $customerData['amount_paid'] = 5000;
-                $customerData['payment_method'] = 'credit_card';
+                $companyData['trial_ends_at'] = null; // Or keep it null/past
+                $companyData['is_paid'] = true; // Assuming paid subscription means is_paid = true
             }
+
+            $company = Company::create($companyData);
+
+            // 2. Create Roles for the Company
+            $adminRole = Role::create(['name' => 'admin', 'company_id' => $company->id]);
+            Role::create(['name' => 'employee', 'company_id' => $company->id]);
+            Role::create(['name' => 'client', 'company_id' => $company->id]);
+            // Add other default roles if needed
             
-            // Create customer
-            $customer = Customer::create($customerData);
-            
-            // If it's a paid subscription, create a payment record
+            // 3. Create Admin User
+            $user = User::create([
+                'company_id' => $company->id,
+                'name' => $validated['admin_name'],
+                'email' => $validated['admin_email'],
+                'password' => Hash::make($validated['password']),
+            ]);
+
+            // 4. Assign Admin Role
+            $user->assignRole($adminRole);
+
+            // 5. Create Payment Record if Paid
             if ($request->subscription_type === 'paid') {
-                $paymentData = [
-                    'customer_id' => $customer->id,
-                    'amount' => 5000,
-                    'total_amount' => 5000,
-                    'payment_method' => 'credit_card',
+                 Payment::create([
+                    'customer_id' => $company->id, // Storing company_id in customer_id column
+                    'amount' => $request->amount_paid ?? 5000,
+                    'total_amount' => $request->amount_paid ?? 5000,
+                    'payment_method' => $request->payment_method ?? 'manual',
                     'status' => 'completed',
-                    'notes' => 'Initial subscription payment for ' . $customer->name,
+                    'notes' => 'Initial subscription payment for ' . $company->name,
                     'currency' => 'INR',
                     'payment_date' => now(),
                     'transaction_id' => 'PAY-' . Str::upper(uniqid()),
-                ];
-                
-                // Add subscription_id and payment_type if columns exist
-                if (Schema::hasColumn('payments', 'payment_type')) {
-                    $paymentData['payment_type'] = 'subscription';
-                }
-                
-                // Create payment
-                Payment::create($paymentData);
+                ]);
             }
             
             DB::commit();
             
             return redirect()->route('superadmin.customers.index')
-                ->with('success', 'Customer created successfully!');
+                ->with('success', 'Customer (Company) created successfully!');
                 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Error creating customer: ' . $e->getMessage());
+            return back()->with('error', 'Error creating customer: ' . $e->getMessage())->withInput();
         }
     }
 
-    // Show single customer
-    public function show(Customer $customer)
+    // Show single customer (Company)
+    public function show($id)
     {
+         $id = decrypt($id);
+        $customer = Company::with(['user', 'invoices'])->findOrFail($id); // Eager load relations
+        // We pass it as $customer to keep view variable names compatible mostly
         return view('superadmin.customers.show', compact('customer'));
     }
 
     // Show edit customer form
-    public function edit(Customer $customer)
+    public function edit($id)
     {
+         $id = decrypt($id);
+        $customer = Company::findOrFail($id);
         return view('superadmin.customers.edit', compact('customer'));
     }
 
-    // Update customer
-    public function update(Request $request, Customer $customer)
+    // Update customer (Company)
+    public function update(Request $request, $id)
     {
+        $company = Company::findOrFail($id);
+
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:customers,email,' . $customer->id,
-            'phone' => 'nullable|string',
-            'business_name' => 'nullable|string',
+            'name' => 'required|string|max:255|unique:companies,name,' . $company->id,
+            'email' => 'required|email|unique:companies,email,' . $company->id,
+            'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string',
             'status' => 'required|in:active,trial,expired,pending,cancelled',
-            'plan' => 'required|string',
-            'trial_start_date' => 'nullable|date',
-            'trial_end_date' => 'nullable|date',
-            'subscription_start_date' => 'nullable|date',
-            'subscription_end_date' => 'nullable|date',
-            'amount_paid' => 'nullable|numeric',
-            'payment_method' => 'nullable|string'
+            'admin_name' => 'nullable|string|max:255',
+            'admin_email' => 'nullable|email|unique:users,email,' . ($company->user->id ?? 'NULL'),
         ]);
         
-        $customer->update($validated);
+        $company->update($validated);
         
-        return redirect()->route('superadmin.customers.show', $customer)
+        // Update admin user if provided
+        if ($company->user && ($request->filled('admin_name') || $request->filled('admin_email'))) {
+            $adminData = [];
+            if ($request->filled('admin_name')) {
+                $adminData['name'] = $validated['admin_name'];
+            }
+            if ($request->filled('admin_email')) {
+                $adminData['email'] = $validated['admin_email'];
+            }
+            $company->user->update($adminData);
+        }
+        
+        return redirect()->route('superadmin.customers.show', $company->id)
             ->with('success', 'Customer updated successfully!');
     }
 
-    // Delete customer
-    public function destroy(Customer $customer)
+    // Delete customer (Company)
+    public function destroy($id)
     {
-        $customer->delete();
+         $id = decrypt($id);
+        $company = Company::findOrFail($id);
+        
+        // Optional: Delete related users, payments, etc?
+        // For now, standard delete (soft delete if model has it, or hard delete)
+        $company->delete();
         
         return redirect()->route('superadmin.customers.index')
             ->with('success', 'Customer deleted successfully!');
