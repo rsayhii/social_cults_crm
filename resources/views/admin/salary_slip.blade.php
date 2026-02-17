@@ -21,7 +21,7 @@
 </head>
 <body>
     <div class="header">
-        <div class="company-name">Your Company Name</div>
+        <div class="company-name">{{ $salary->employee?->company?->name ?? 'Company Name' }}</div>
         <div class="salary-month">Salary Slip for {{ date('F Y', strtotime($salary->salary_month)) }}</div>
         <div>Generated on: {{ $salary->created_at->format('d-m-Y') }}</div>
     </div>
@@ -136,7 +136,7 @@
     
     <div style="margin-top: 40px; text-align: center; font-style: italic;">
         <p>This is a computer-generated document and does not require a signature.</p>
-        <p>© {{ date('Y') }} Your Company Name. All rights reserved.</p>
+        <p>&copy; {{ date('Y') }} {{ $salary->employee?->company?->name ?? 'Company Name' }}. All rights reserved.</p>
     </div>
     
     <div style="text-align: center; margin-top: 20px;">

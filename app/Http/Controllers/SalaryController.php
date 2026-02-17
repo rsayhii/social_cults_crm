@@ -215,7 +215,7 @@ class SalaryController extends Controller
     public function showSlip($id)
     {
         $salary = $this->baseSalaryQuery()
-            ->with(['employee', 'details'])
+            ->with(['employee.company', 'details'])
             ->findOrFail($id);
 
         return view('admin.salary_slip', compact('salary'));
@@ -319,5 +319,89 @@ class SalaryController extends Controller
         return \Barryvdh\DomPDF\Facade\Pdf::loadHTML($html)
             ->setPaper('A4', 'landscape')
             ->download("Salary_Report_{$month}_{$year}.pdf");
+    }
+
+    /* =========================================================
+     |  EDIT SALARY
+     ========================================================= */
+    public function edit($id)
+    {
+        $salary = $this->baseSalaryQuery()->with('employee')->findOrFail($id);
+        return view('admin.salary_edit', compact('salary'));
+    }
+
+    /* =========================================================
+     |  UPDATE SALARY
+     ========================================================= */
+    public function update(Request $request, $id)
+    {
+        $salary = $this->baseSalaryQuery()->findOrFail($id);
+        
+        $request->validate([
+            'basic_salary' => 'required|numeric|min:0',
+            'total_allowances' => 'required|numeric|min:0',
+            'total_deductions' => 'required|numeric|min:0',
+            'overtime_amount' => 'required|numeric|min:0',
+            'net_salary' => 'required|numeric|min:0',
+            'status' => 'required|in:pending,paid,approved',
+        ]);
+
+        $salary->update([
+            'basic_salary' => $request->basic_salary,
+            'total_allowances' => $request->total_allowances,
+            'total_deductions' => $request->total_deductions,
+            'overtime_amount' => $request->overtime_amount,
+            'net_salary' => $request->net_salary,
+            'status' => $request->status,
+        ]);
+
+        if ($request->status == 'paid' && !$salary->payment_date) {
+            $salary->update(['payment_date' => now()->toDateString()]);
+        }
+
+        return redirect()->route('salary.list')->with('success', 'Salary updated successfully');
+    }
+
+    /* =========================================================
+     |  RECALCULATE SALARY DATA
+     ========================================================= */
+    public function recalculate($id)
+    {
+        $salary = $this->baseSalaryQuery()->with('employee')->findOrFail($id);
+        
+        $date = Carbon::parse($salary->salary_month);
+        $month = $date->month;
+        $year = $date->year;
+        
+        // Pass existing basic_salary as override in case User profile has no salary set
+        $calculatedData = (new Salary())->calculateSalaryData($salary->employee, $month, $year, $salary->basic_salary);
+        
+        // Include attendance summary for the UI
+        $calculatedData['attendance_summary'] = [
+            'total_present_days' => $calculatedData['total_present_days'],
+            'total_absent_days' => $calculatedData['total_absent_days'],
+            'total_half_days' => $calculatedData['total_half_days'],
+            'total_late_days' => $calculatedData['total_late_days'],
+        ];
+
+        return response()->json([
+            'success' => true,
+            'data' => $calculatedData
+        ]);
+    }
+
+    /* =========================================================
+     |  DELETE SALARY
+     ========================================================= */
+    public function destroy($id)
+    {
+        $salary = $this->baseSalaryQuery()->findOrFail($id);
+        $salary->delete();
+        
+        if (request()->wantsJson()) {
+             return response()->json(['success' => true]);
+        }
+        
+        return redirect()->route('salary.list')->with('success', 'Salary record deleted successfully');
     }
 }

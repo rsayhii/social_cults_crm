@@ -6,6 +6,104 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    @if(isset($companyDetailsMissing) && $companyDetailsMissing)
+    <!-- Setup Mode: Only show styles and the setup form -->
+    <style>
+        .shadow-custom { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+    </style>
+    
+    <div id="company-details-modal" class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+        <div class="sm:mx-auto sm:w-full sm:max-w-md">
+            <div class="flex justify-center">
+                <div class="h-12 w-12 rounded-full bg-indigo-100 flex items-center justify-center">
+                    <i class="fas fa-building text-indigo-600 text-xl"></i>
+                </div>
+            </div>
+            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                Complete Setup
+            </h2>
+            <p class="mt-2 text-center text-sm text-gray-600">
+                {{ $company->name ?? 'Your Company' }}
+            </p>
+        </div>
+
+        <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+            <div class="bg-white py-8 px-4 shadow-2xl sm:rounded-xl sm:px-10 border border-gray-100">
+                <form id="company-details-form" class="space-y-6">
+                    
+                    <!-- Location Section -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700"> Office Location </label>
+                        <div class="mt-2 relative rounded-md shadow-sm">
+                            <button type="button" id="get-location-btn" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
+                                <i class="fas fa-map-marker-alt mr-2 mt-0.5"></i> Get Current Location
+                            </button>
+                        </div>
+                        
+                        <div class="mt-3 grid grid-cols-2 gap-3">
+                            <div class="relative rounded-md shadow-sm">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="text-gray-500 sm:text-sm font-bold">Lat</span>
+                                </div>
+                                <input type="text" id="details_latitude" name="latitude" value="{{ $company->latitude ?? '' }}" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-12 py-3 sm:text-sm border border-gray-300 rounded-lg shadow-sm transition duration-150 ease-in-out" placeholder="0.0000" required>
+                            </div>
+                            <div class="relative rounded-md shadow-sm">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="text-gray-500 sm:text-sm font-bold">Lng</span>
+                                </div>
+                                <input type="text" id="details_longitude" name="longitude" value="{{ $company->longitude ?? '' }}" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-12 py-3 sm:text-sm border border-gray-300 rounded-lg shadow-sm transition duration-150 ease-in-out" placeholder="0.0000" required>
+                            </div>
+                        </div>
+                        <p id="location-error" class="mt-2 text-sm text-red-600 hidden"></p>
+                    </div>
+
+                    <!-- Working Days -->
+                    <div>
+                        <label for="total_working_days" class="block text-sm font-medium text-gray-700 mb-1"> Total Working Days </label>
+                        <div class="relative rounded-md shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-calendar-day text-gray-400"></i>
+                            </div>
+                            <input type="number" step="0.5" name="total_working_days" id="total_working_days" value="{{ $company->total_working_days ?? '' }}" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 py-3 sm:text-sm border border-gray-300 rounded-lg shadow-sm transition duration-150 ease-in-out" placeholder="e.g. 26" required>
+                        </div>
+                    </div>
+
+                    <!-- Office Hours -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="office_start_time" class="block text-sm font-medium text-gray-700 mb-1"> Start Time </label>
+                            <div class="relative rounded-md shadow-sm">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-clock text-gray-400"></i>
+                                </div>
+                                <input type="time" name="office_start_time" id="office_start_time" value="{{ $company->office_start_time ?? '' }}" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 py-3 sm:text-sm border border-gray-300 rounded-lg shadow-sm transition duration-150 ease-in-out" required>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="office_end_time" class="block text-sm font-medium text-gray-700 mb-1"> End Time </label>
+                            <div class="relative rounded-md shadow-sm">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-history text-gray-400"></i>
+                                </div>
+                                <input type="time" name="office_end_time" id="office_end_time" value="{{ $company->office_end_time ?? '' }}" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 py-3 sm:text-sm border border-gray-300 rounded-lg shadow-sm transition duration-150 ease-in-out" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-2">
+                        <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200">
+                            Save & Continue
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    @else
+    <!-- Dashboard Mode: Show standard styles and content -->
     <style>
         @media (max-width: 640px) {
             .container-padding {
@@ -617,7 +715,9 @@
         </div>
     </div>
 
-    <!-- Location Modal -->
+
+
+    @if(!isset($companyDetailsMissing) || !$companyDetailsMissing)
     <div id="location-modal"
         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-2 md:p-4">
         <div class="bg-white rounded-xl shadow-custom p-4 md:p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -691,18 +791,107 @@
             </div>
         </div>
     </div>
-
+    @endif
+    @endif
 
     <script>
+    @if(isset($companyDetailsMissing) && $companyDetailsMissing)
+        // Setup Mode Script
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('company-details-form');
+            const locationBtn = document.getElementById('get-location-btn');
+            const latInput = document.getElementById('details_latitude');
+            const lngInput = document.getElementById('details_longitude');
+            const errorMsg = document.getElementById('location-error');
 
+            locationBtn.addEventListener('click', function() {
+                if (navigator.geolocation) {
+                    locationBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Getting Location...';
+                    locationBtn.disabled = true;
+
+                    navigator.geolocation.getCurrentPosition(
+                        function(position) {
+                            latInput.value = position.coords.latitude.toFixed(6);
+                            lngInput.value = position.coords.longitude.toFixed(6);
+                            errorMsg.classList.add('hidden');
+                            locationBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Location Captured';
+                            locationBtn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+                            locationBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+                            setTimeout(() => {
+                                locationBtn.disabled = false;
+                            }, 2000);
+                        },
+                        function(error) {
+                            console.error("Error getting location:", error);
+                            let msg = "Error getting location.";
+                            switch(error.code) {
+                                case error.PERMISSION_DENIED: msg = "User denied the request for Geolocation."; break;
+                                case error.POSITION_UNAVAILABLE: msg = "Location information is unavailable."; break;
+                                case error.TIMEOUT: msg = "The request to get user location timed out."; break;
+                            }
+                            errorMsg.textContent = msg;
+                            errorMsg.classList.remove('hidden');
+                            locationBtn.innerHTML = '<i class="fas fa-map-marker-alt mr-2"></i> Retry Location';
+                            locationBtn.disabled = false;
+                        }
+                    );
+                } else {
+                    errorMsg.textContent = "Geolocation is not supported by this browser.";
+                    errorMsg.classList.remove('hidden');
+                }
+            });
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData.entries());
+                
+                // Add CSRF token
+                const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+                fetch('{{ route("my-attendance.update-company-details") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': token,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw err; });
+                    }
+                    return response.json();
+                })
+                .then(result => {
+                    if (result.success) {
+                        window.location.reload();
+                    } else {
+                        alert(result.error || result.message || 'Failed to update details');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    let message = error.message || error.error || 'An error occurred while saving details';
+                    if (error.errors) {
+                         message += '\n' + Object.values(error.errors).flat().join('\n');
+                    }
+                    alert(message);
+                });
+            });
+        });
+    @else
+        // Dashboard Mode Script
         const BREAK_STORAGE_KEY = `active_break_${{{ auth()->id() }}}`;
 
 
         // ──────────────────────────────────────────────────────────────────────────────
         // CONSTANTS & CONFIG
         // ──────────────────────────────────────────────────────────────────────────────
-        const OFFICE_LAT = 28.618711;
-        const OFFICE_LON = 77.389686;
+        const OFFICE_LAT = {{ $company->latitude ?? 0 }};
+        const OFFICE_LON = {{ $company->longitude ?? 0 }};
         const ALLOWED_DISTANCE_KM = 1;
         const MAX_BREAK_SECONDS = 3600; // 1 hour maximum break time
 
@@ -1654,5 +1843,75 @@
             document.getElementById('breakDetailsModal').classList.add('hidden');
         }
 
+        // Company Details Modal Logic
+        const companyDetailsForm = document.getElementById('company-details-form');
+        const getLocationBtn = document.getElementById('get-location-btn');
+
+        if (companyDetailsForm) {
+            getLocationBtn.addEventListener('click', () => {
+                if (navigator.geolocation) {
+                    getLocationBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Fetching...';
+                    getLocationBtn.disabled = true;
+                    
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            document.getElementById('details_latitude').value = position.coords.latitude.toFixed(6);
+                            document.getElementById('details_longitude').value = position.coords.longitude.toFixed(6);
+                            getLocationBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Location Set';
+                            getLocationBtn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+                            getLocationBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+                            document.getElementById('location-error').classList.add('hidden');
+                        },
+                        (error) => {
+                            console.error('Error getting location:', error);
+                            document.getElementById('location-error').textContent = 'Could not get location. Please allow location access.';
+                            document.getElementById('location-error').classList.remove('hidden');
+                            getLocationBtn.innerHTML = '<i class="fas fa-map-marker-alt mr-2"></i> Retry Location';
+                            getLocationBtn.disabled = false;
+                        },
+                        { enableHighAccuracy: true }
+                    );
+                } else {
+                    alert('Geolocation is not supported by this browser.');
+                }
+            });
+
+            companyDetailsForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(companyDetailsForm);
+                const data = Object.fromEntries(formData.entries());
+                
+                // Basic validation
+                if (!data.latitude || !data.longitude) {
+                    alert('Please set your location first.');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('{{ route("my-attendance.update-company-details") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                        },
+                        body: JSON.stringify(data)
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        alert('Company details updated successfully!');
+                        location.reload();
+                    } else {
+                        alert(result.error || 'Failed to update details.');
+                    }
+                } catch (error) {
+                    console.error('Error updating details:', error);
+                    alert('An error occurred. Please try again.');
+                }
+            });
+        }
+
+    @endif
     </script>
 @endsection

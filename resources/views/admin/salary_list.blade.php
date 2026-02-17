@@ -661,11 +661,30 @@ function toggleDropdown(id) {
     });
     
     if (menu.classList.contains('hidden')) {
-        const buttonRect = button.getBoundingClientRect();
-        menu.style.position = 'fixed';
-        menu.style.top = `${buttonRect.bottom + window.scrollY + 5}px`;
-        menu.style.left = `${Math.min(buttonRect.right - menu.offsetWidth, window.innerWidth - menu.offsetWidth - 10)}px`;
+        // Show momentarily to get dimensions
+        menu.style.visibility = 'hidden';
         menu.classList.remove('hidden');
+        
+        const buttonRect = button.getBoundingClientRect();
+        const menuWidth = menu.offsetWidth;
+        
+        menu.style.position = 'fixed';
+        // Position relative to viewport (no scrollY needed for fixed)
+        menu.style.top = `${buttonRect.bottom + 5}px`;
+        
+        // Align right edge with button right edge
+        let left = buttonRect.right - menuWidth;
+        
+        // Boundary checks
+        if (left + menuWidth > window.innerWidth - 10) {
+            left = window.innerWidth - menuWidth - 10;
+        }
+        if (left < 10) {
+            left = 10;
+        }
+        
+        menu.style.left = `${left}px`;
+        menu.style.visibility = 'visible';
     } else {
         menu.classList.add('hidden');
     }
