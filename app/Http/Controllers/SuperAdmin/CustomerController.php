@@ -20,7 +20,7 @@ class CustomerController extends Controller
     // Show all customers (Companies)
     public function index()
     {
-        $customers = Company::with('user')->latest()->paginate(10);
+        $customers = Company::with(['user', 'payments'])->latest()->paginate(10);
         return view('superadmin.customers.customers', compact('customers'));
     }
 

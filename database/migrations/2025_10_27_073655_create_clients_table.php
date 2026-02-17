@@ -10,6 +10,7 @@ return new class extends Migration
     {
         Schema::create('clients', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->constrained()->cascadeOnDelete();
             $table->string('company_name');
             $table->string('contact_person');
             $table->string('email');
