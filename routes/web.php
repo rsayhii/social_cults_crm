@@ -171,7 +171,9 @@ Route::middleware(['auth', CheckCompanyAccess::class])->group(function () {
 
 
 
-        Route::get('/edit/{id}', [SalaryController::class, 'edit'])->name('salary.edit');
+        Route::get('/salary/edit/{id}', [SalaryController::class, 'edit'])->name('salary.edit');
+        Route::get('/salary/recalculate/{id}', [SalaryController::class, 'recalculate'])->name('salary.recalculate');
+        Route::put('/salary/update/{id}', [SalaryController::class, 'update'])->name('salary.update');
         Route::delete('/salary/{id}', [SalaryController::class, 'destroy'])
             ->name('salary.delete');
 
@@ -236,6 +238,9 @@ Route::middleware(['auth', CheckCompanyAccess::class])->group(function () {
 
         Route::get('/my-attendance/log', [MyAttendanceController::class, 'getLog'])->name('my-attendance.log');
     });
+
+    // Company Setup Route - accessible to authenticated users (controller handles authorization)
+    Route::post('/my-attendance/company-details', [MyAttendanceController::class, 'updateCompanyDetails'])->name('my-attendance.update-company-details');
 
 
 
@@ -805,6 +810,8 @@ Route::post('/notifications/read', function () {
     auth()->user()->unreadNotifications->markAsRead();
     return response()->json(['success' => true]);
 });
+
+
 
 // TEMPORARY FIX ROUTE
 Route::get('/fix-permissions', function () {

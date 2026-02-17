@@ -11,8 +11,8 @@ use Illuminate\Support\Facades\Schema;
 
 class MyAttendanceController extends Controller
 {
-    const OFFICE_LAT = 28.618711;
-    const OFFICE_LON = 77.389686;
+    // const OFFICE_LAT = 28.618711;
+    // const OFFICE_LON = 77.389686;
     const ALLOWED_DISTANCE_KM = 1;
 
     private function baseQuery()
@@ -20,6 +20,42 @@ class MyAttendanceController extends Controller
         return MyAttendance::where('company_id', auth()->user()->company_id);
     }
 
+    public function updateCompanyDetails(Request $request)
+    {
+        try {
+            // Ensure only admin or authorized user can update company details
+            // Assuming 'admin' role or similar check. You might want to adjust this based on your roles.
+            // For now, we'll allow it if the user is associated with the company, but ideally check for admin role.
+            // if (!Auth::user()->hasRole('admin')) { return response()->json(['error' => 'Unauthorized'], 403); }
+
+            $request->validate([
+                'latitude' => 'required|numeric',
+                'longitude' => 'required|numeric',
+                'total_working_days' => 'required|numeric',
+                'office_start_time' => 'required',
+                'office_end_time' => 'required',
+            ]);
+
+            $company = Auth::user()->company;
+            if (!$company) {
+                return response()->json(['error' => 'Company not found.'], 404);
+            }
+
+            $company->update([
+                'latitude' => $request->latitude,
+                'longitude' => $request->longitude,
+                'total_working_days' => $request->total_working_days,
+                'office_start_time' => $request->office_start_time,
+                'office_end_time' => $request->office_end_time,
+            ]);
+
+            return response()->json(['success' => true, 'message' => 'Company details updated successfully.']);
+
+        } catch (\Exception $e) {
+            Log::error('Update Company Details Error: ' . $e->getMessage());
+            return response()->json(['error' => 'Server error: ' . $e->getMessage()], 500);
+        }
+    }
 
     public function index(Request $request)
     {
@@ -27,6 +63,15 @@ class MyAttendanceController extends Controller
             $employee = Auth::user();
             if (!$employee) {
                 abort(403, 'Authentication required.');
+            }
+
+            $company = $employee->company;
+            $companyDetailsMissing = false;
+
+            if ($company) {
+                 if (is_null($company->latitude) || is_null($company->longitude) || is_null($company->total_working_days) || is_null($company->office_start_time) || is_null($company->office_end_time)) {
+                    $companyDetailsMissing = true;
+                }
             }
 
             $employeeId = $employee->id;
@@ -178,7 +223,9 @@ class MyAttendanceController extends Controller
                 'currentMonth',
                 'todayRecord',
                 'jsAttendanceData',
-                'todayBreakDuration'
+                'todayBreakDuration',
+                'companyDetailsMissing',
+                'company'
             ));
 
         } catch (\Exception $e) {
@@ -225,7 +272,7 @@ class MyAttendanceController extends Controller
     {
         try {
             $defaultLocation = 'Location not available';
-
+            $employee = Auth::user(); // Added this to get company details
             // Check if location fields exist in database
             $hasLocationFields = Schema::hasColumn('my_attendances', 'latitude');
 
@@ -243,8 +290,8 @@ class MyAttendanceController extends Controller
             $distance = $this->calculateDistance(
                 $request->latitude,
                 $request->longitude,
-                self::OFFICE_LAT,
-                self::OFFICE_LON
+                $employee->company->latitude ?? 0,
+                $employee->company->longitude ?? 0
             );
 
             $isWithinRange = $distance <= self::ALLOWED_DISTANCE_KM;

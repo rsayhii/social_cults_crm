@@ -25,6 +25,11 @@ class Company extends Model
         'status',
         'hidden_proposal_templates',
         'logo',
+        'latitude',
+        'longitude',
+        'office_start_time',
+        'office_end_time',
+        'total_working_days',
     ];
 
 
