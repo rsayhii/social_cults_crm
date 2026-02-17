@@ -1,5 +1,30 @@
 @extends('components.layout')
 @section('content')
+    @php
+        // Helper function to format datetime values in history
+        // Declared once at file level to avoid redeclaration in loop
+        if (!function_exists('formatHistoryValue')) {
+            function formatHistoryValue($field, $value)
+            {
+                if ($value === 'N/A' || $value === null || $value === '') {
+                    return 'N/A';
+                }
+
+                try {
+                    if ($field === 'next_follow_up') {
+                        return \Carbon\Carbon::parse($value)->format('d M Y');
+                    }
+                    if ($field === 'follow_up_time') {
+                        return \Carbon\Carbon::parse($value)->format('h:i A');
+                    }
+                } catch (\Exception $e) {
+                    // Return original if parsing fails
+                }
+
+                return $value;
+            }
+        }
+    @endphp
     <div class="min-h-screen bg-gray-50 py-8">
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex justify-between items-center mb-6">
@@ -20,30 +45,6 @@
                                     </div>
                                 </div>
                                 @if($history->changes)
-                                    @php
-                                        // Helper function to format datetime values in history
-                                        function formatHistoryValue($field, $value)
-                                        {
-                                            if ($value === 'N/A' || $value === null || $value === '') {
-                                                return 'N/A';
-                                            }
-
-                                            try {
-                                                // Format date fields (next_follow_up)
-                                                if ($field === 'next_follow_up') {
-                                                    return \Carbon\Carbon::parse($value)->format('d M Y');
-                                                }
-                                                // Format time fields (follow_up_time)
-                                                if ($field === 'follow_up_time') {
-                                                    return \Carbon\Carbon::parse($value)->format('h:i A');
-                                                }
-                                            } catch (\Exception $e) {
-                                                // Return original value if parsing fails
-                                            }
-
-                                            return $value;
-                                        }
-                                    @endphp
                                     <div class="bg-gray-50 p-3 rounded">
                                         <h4 class="font-medium text-sm mb-2">Changes:</h4>
                                         <ul class="text-sm space-y-1">
