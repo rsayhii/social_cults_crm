@@ -1267,7 +1267,7 @@
     }
     function loadEditForm(report) {
         document.getElementById('editReportId').value = report.id;
-        document.getElementById('editDate').value = report.date;
+        document.getElementById('editDate').value = toInputDate(report.date);
         document.getElementById('editSummary').value = report.summary;
         document.getElementById('editStatus').value = report.status;
         document.getElementById('editReportDate').textContent = formatDate(report.date);
@@ -1375,15 +1375,29 @@
         document.getElementById('prevPage').disabled = currentPage === 1;
         document.getElementById('nextPage').disabled = currentPage === totalPages || totalPages === 0;
     }
+    function toInputDate(value) {
+        if (!value) return '';
+        if (typeof value === 'string') {
+            const m = value.match(/^(\d{4}-\d{2}-\d{2})/);
+            if (m) return m[1];
+        }
+        const d = new Date(value);
+        const y = d.getUTCFullYear();
+        const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+        const day = String(d.getUTCDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+    }
+    function parseDateForDisplay(value) {
+        if (!value) return null;
+        if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+            return new Date(value + 'T00:00:00Z');
+        }
+        return new Date(value);
+    }
     function formatDate(dateString) {
         if (!dateString) return '-';
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', {
-            weekday: 'short',
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric'
-        });
+        const date = parseDateForDisplay(dateString);
+        return date.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
     }
     function getStatusText(status) {
         switch(status) {
