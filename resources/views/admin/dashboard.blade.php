@@ -26,14 +26,16 @@
                         <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Users</p>
                         <h3 class="text-base sm:text-lg md:text-xl lg:text-2xl font-bold mt-1 sm:mt-1.5 md:mt-2 text-gray-900 leading-none">{{ $totalUsers }}</h3>
                         <div class="flex items-center mt-1.5 sm:mt-2 md:mt-3">
-                            <span class="text-xs font-semibold text-green-600">↑ 12.5%</span>
+                            @php $isUserPos = $userGrowth >= 0; @endphp
+                            <span class="text-xs font-semibold {{ $isUserPos ? 'text-green-600' : 'text-red-600' }}">
+                                {{ $isUserPos ? '↑' : '↓' }} {{ number_format(abs($userGrowth), 1) }}%
+                            </span>
                             <span class="text-xs text-gray-500 ml-1">vs last month</span>
                         </div>
                     </div>
-                    <div class="p-1.5 sm:p-2 md:p-2.5 lg:p-3 rounded-lg sm:rounded-xl bg-green-100 ml-1 flex-shrink-0">
-                        <svg class="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5 lg:w-6 lg:h-6 text-green-600" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-7 8c0-2.67 5.33-4 7-4s7 1.33 7 4v2H5v-2z"/>
-                            <path opacity="0.6" d="M23 20v-2c0-2.21-3.13-4-7-4-1.85 0-3.44.59-4.59 1.52C10.26 14.39 9.03 14 7.5 14c-3.87 0-7 1.79-7 4v2h10.5c.28-1.05 1.54-1.85 3-1.98 1.46-.13 2.72.57 3 1.98z"/>
+                    <div class="p-3 rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100 border border-emerald-100 shadow-sm ml-2 flex-shrink-0">
+                        <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                         </svg>
                     </div>
                 </div>
@@ -47,16 +49,16 @@
                         <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Present Today</p>
                         <h3 class="text-base sm:text-lg md:text-xl lg:text-2xl font-bold mt-1 sm:mt-1.5 md:mt-2 text-gray-900 leading-none">{{ $presentToday }}</h3>
                         <div class="flex items-center mt-1.5 sm:mt-2 md:mt-3">
-                            <span class="text-xs font-semibold text-green-600">↑ 8.2%</span>
+                            @php $isAttPos = $attendanceGrowth >= 0; @endphp
+                            <span class="text-xs font-semibold {{ $isAttPos ? 'text-green-600' : 'text-red-600' }}">
+                                {{ $isAttPos ? '↑' : '↓' }} {{ number_format(abs($attendanceGrowth), 1) }}%
+                            </span>
                             <span class="text-xs text-gray-500 ml-1">vs yesterday</span>
                         </div>
                     </div>
-                    <div class="p-1.5 sm:p-2 md:p-2.5 lg:p-3 rounded-lg sm:rounded-xl bg-blue-100 ml-1 flex-shrink-0">
-                        <svg class="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5 lg:w-6 lg:h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="9" cy="7" r="4"></circle>
-                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    <div class="p-3 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-100 shadow-sm ml-2 flex-shrink-0">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                     </div>
                 </div>
@@ -70,15 +72,16 @@
                         <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Clients</p>
                         <h3 class="text-base sm:text-lg md:text-xl lg:text-2xl font-bold mt-1 sm:mt-1.5 md:mt-2 text-gray-900 leading-none">{{ $totalClients }}</h3>
                         <div class="flex items-center mt-1.5 sm:mt-2 md:mt-3">
-                            <span class="text-xs font-semibold text-green-600">↑ 15.3%</span>
+                            @php $isClientPos = $clientGrowth >= 0; @endphp
+                            <span class="text-xs font-semibold {{ $isClientPos ? 'text-green-600' : 'text-red-600' }}">
+                                {{ $isClientPos ? '↑' : '↓' }} {{ number_format(abs($clientGrowth), 1) }}%
+                            </span>
                             <span class="text-xs text-gray-500 ml-1">vs last month</span>
                         </div>
                     </div>
-                    <div class="p-1.5 sm:p-2 md:p-2.5 lg:p-3 rounded-lg sm:rounded-xl bg-purple-100 ml-1 flex-shrink-0">
-                        <svg class="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5 lg:w-6 lg:h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                  d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 0h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                            <circle cx="12" cy="10" r="3"/>
+                    <div class="p-3 rounded-2xl bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-100 shadow-sm ml-2 flex-shrink-0">
+                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 0h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                         </svg>
                     </div>
                 </div>
@@ -92,18 +95,16 @@
                         <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Contacts</p>
                         <h3 class="text-base sm:text-lg md:text-xl lg:text-2xl font-bold mt-1 sm:mt-1.5 md:mt-2 text-gray-900 leading-none">{{ $totalContacts }}</h3>
                         <div class="flex items-center mt-1.5 sm:mt-2 md:mt-3">
-                            <span class="text-xs font-semibold text-red-600">↓ 3.1%</span>
+                            @php $isContactPos = $contactGrowth >= 0; @endphp
+                            <span class="text-xs font-semibold {{ $isContactPos ? 'text-green-600' : 'text-red-600' }}">
+                                {{ $isContactPos ? '↑' : '↓' }} {{ number_format(abs($contactGrowth), 1) }}%
+                            </span>
                             <span class="text-xs text-gray-500 ml-1">vs last month</span>
                         </div>
                     </div>
-                    <div class="p-1.5 sm:p-2 md:p-2.5 lg:p-3 rounded-lg sm:rounded-xl bg-orange-100 ml-1 flex-shrink-0">
-                        <svg class="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5 lg:w-6 lg:h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M15 7a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M12 14a5 5 0 0 0 5-5"/>
+                    <div class="p-3 rounded-2xl bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-100 shadow-sm ml-2 flex-shrink-0">
+                        <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                         </svg>
                     </div>
                 </div>
@@ -216,32 +217,16 @@
             const attLabels = @json($attChartLabels);
             const attData   = @json($attChartData);
 
-            // Calculate responsive font sizes based on screen width
-            const getChartFontSize = () => {
-                const width = window.innerWidth;
-                if (width < 640) return 9;   // Mobile
-                if (width < 768) return 10;  // Small tablet
-                if (width < 1024) return 11; // Tablet
-                return 12;                   // Desktop
-            };
-
-            const getTooltipFontSize = () => {
-                const width = window.innerWidth;
-                if (width < 640) return 10;  // Mobile
-                if (width < 768) return 11;  // Small tablet
-                if (width < 1024) return 12; // Tablet
-                return 13;                   // Desktop
-            };
-
-            // Set initial font sizes
-            Chart.defaults.font.size = getChartFontSize();
-            Chart.defaults.plugins.tooltip.bodyFont.size = getTooltipFontSize();
-            Chart.defaults.plugins.tooltip.titleFont.size = getTooltipFontSize();
-
             // Users chart
-            const ctxUsers = document.getElementById('usersChart');
-            if (ctxUsers) {
-                new Chart(ctxUsers.getContext('2d'), {
+            const ctxUsersCanvas = document.getElementById('usersChart');
+            if (ctxUsersCanvas) {
+                const ctxUsers = ctxUsersCanvas.getContext('2d');
+                // Create gradient for Users Chart
+                const gradientUsers = ctxUsers.createLinearGradient(0, 0, 0, 400);
+                gradientUsers.addColorStop(0, 'rgba(59, 130, 246, 0.4)'); 
+                gradientUsers.addColorStop(1, 'rgba(59, 130, 246, 0.0)'); 
+
+                new Chart(ctxUsers, {
                     type: 'line',
                     data: {
                         labels: usersLabels,
@@ -249,151 +234,133 @@
                             label: 'New users',
                             data: usersData,
                             fill: true,
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            backgroundColor: gradientUsers,
                             borderColor: 'rgb(59, 130, 246)',
-                            tension: 0.3,
-                            borderWidth: 2,
+                            borderWidth: 3,
+                            tension: 0.4, // Smooth bezier curve
+                            pointRadius: 0, // Clean look, no points by default
+                            pointHoverRadius: 6,
                             pointBackgroundColor: 'rgb(59, 130, 246)',
                             pointBorderColor: '#fff',
-                            pointBorderWidth: 2,
-                            pointRadius: window.innerWidth < 640 ? 3 : (window.innerWidth < 768 ? 3.5 : 4),
-                            pointHoverRadius: window.innerWidth < 640 ? 4 : (window.innerWidth < 768 ? 5 : 6)
+                            pointBorderWidth: 3,
                         }]
                     },
                     options: {
                         maintainAspectRatio: false,
                         responsive: true,
                         plugins: {
-                            legend: { 
-                                display: false,
-                                labels: {
-                                    font: {
-                                        size: getChartFontSize()
-                                    }
-                                }
-                            },
+                            legend: { display: false },
                             tooltip: {
                                 mode: 'index',
                                 intersect: false,
-                                backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                                padding: window.innerWidth < 640 ? 8 : 10,
-                                titleFont: {
-                                    size: getTooltipFontSize()
-                                },
-                                bodyFont: {
-                                    size: getTooltipFontSize()
-                                }
+                                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                titleColor: '#111827',
+                                bodyColor: '#4b5563',
+                                borderColor: '#e5e7eb',
+                                borderWidth: 1,
+                                padding: 12,
+                                boxPadding: 6,
+                                usePointStyle: true,
+                                titleFont: { size: 13, weight: 'bold' },
+                                bodyFont: { size: 12 }
                             }
                         },
                         scales: {
                             y: { 
                                 beginAtZero: true,
                                 ticks: {
-                                    font: {
-                                        size: getChartFontSize()
-                                    },
-                                    padding: window.innerWidth < 640 ? 4 : 8
+                                    color: '#9ca3af',
+                                    font: { size: 11 },
+                                    padding: 10
                                 },
                                 grid: {
+                                    color: '#f3f4f6',
+                                    borderDash: [4, 4],
                                     drawBorder: false
                                 }
                             },
                             x: {
                                 ticks: {
-                                    maxRotation: window.innerWidth < 640 ? 45 : (window.innerWidth < 768 ? 30 : 0),
-                                    font: {
-                                        size: getChartFontSize()
-                                    },
-                                    padding: window.innerWidth < 640 ? 4 : 8
+                                    color: '#9ca3af',
+                                    font: { size: 11 },
+                                    maxRotation: 0,
+                                    autoSkip: true,
+                                    maxTicksLimit: 6
                                 },
-                                grid: {
-                                    display: false
-                                }
+                                grid: { display: false }
                             }
                         },
                         interaction: {
                             intersect: false,
                             mode: 'nearest'
-                        },
-                        elements: {
-                            line: {
-                                tension: 0.3
-                            }
                         }
                     }
                 });
             }
 
             // Attendance chart
-            const ctxAtt = document.getElementById('attChart');
-            if (ctxAtt) {
-                new Chart(ctxAtt.getContext('2d'), {
+            const ctxAttCanvas = document.getElementById('attChart');
+            if (ctxAttCanvas) {
+                const ctxAtt = ctxAttCanvas.getContext('2d');
+                // Create gradient for Attendance Chart
+                const gradientAtt = ctxAtt.createLinearGradient(0, 0, 0, 400);
+                gradientAtt.addColorStop(0, 'rgba(139, 92, 246, 0.9)'); 
+                gradientAtt.addColorStop(1, 'rgba(139, 92, 246, 0.4)'); 
+
+                new Chart(ctxAtt, {
                     type: 'bar',
                     data: {
                         labels: attLabels,
                         datasets: [{
                             label: 'Attendance entries',
                             data: attData,
-                            backgroundColor: 'rgba(139, 92, 246, 0.7)',
-                            borderColor: 'rgb(139, 92, 246)',
-                            borderWidth: 1,
-                            borderRadius: window.innerWidth < 640 ? 2 : 4
+                            backgroundColor: gradientAtt,
+                            borderRadius: 6,
+                            barThickness: 'flex',
+                            maxBarThickness: 32,
+                            hoverBackgroundColor: 'rgba(139, 92, 246, 1)'
                         }]
                     },
                     options: {
                         maintainAspectRatio: false,
                         responsive: true,
                         plugins: {
-                            legend: { 
-                                display: false,
-                                labels: {
-                                    font: {
-                                        size: getChartFontSize()
-                                    }
-                                }
-                            },
+                            legend: { display: false },
                             tooltip: {
-                                mode: 'index',
-                                intersect: false,
-                                backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                                padding: window.innerWidth < 640 ? 8 : 10,
-                                titleFont: {
-                                    size: getTooltipFontSize()
-                                },
-                                bodyFont: {
-                                    size: getTooltipFontSize()
-                                }
+                                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                titleColor: '#111827',
+                                bodyColor: '#4b5563',
+                                borderColor: '#e5e7eb',
+                                borderWidth: 1,
+                                padding: 12,
+                                cornerRadius: 8,
+                                displayColors: false
                             }
                         },
                         scales: {
                             y: { 
                                 beginAtZero: true,
                                 ticks: {
-                                    font: {
-                                        size: getChartFontSize()
-                                    },
-                                    padding: window.innerWidth < 640 ? 4 : 8
+                                    color: '#9ca3af',
+                                    font: { size: 11 },
+                                    padding: 10
                                 },
                                 grid: {
+                                    color: '#f3f4f6',
+                                    borderDash: [4, 4],
                                     drawBorder: false
                                 }
                             },
                             x: {
                                 ticks: {
-                                    maxRotation: window.innerWidth < 640 ? 45 : (window.innerWidth < 768 ? 30 : 0),
-                                    font: {
-                                        size: getChartFontSize()
-                                    },
-                                    padding: window.innerWidth < 640 ? 4 : 8
+                                    color: '#9ca3af',
+                                    font: { size: 11 },
+                                    maxRotation: 0,
+                                    autoSkip: true,
+                                    maxTicksLimit: 6
                                 },
-                                grid: {
-                                    display: false
-                                }
+                                grid: { display: false }
                             }
-                        },
-                        interaction: {
-                            intersect: false,
-                            mode: 'nearest'
                         }
                     }
                 });

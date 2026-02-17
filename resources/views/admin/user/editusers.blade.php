@@ -76,7 +76,7 @@
                         </div>
 
                         <!-- Salary -->
-                        <div>
+                        <div id="salary-field">
                             <label for="salary" class="block text-sm font-medium text-gray-700 mb-2">Salary</label>
                             <input type="number" name="salary" id="salary" value="{{ old('salary', $user->salary) }}" step="0.01" min="0"
                                    class="block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent @error('salary') border-red-500 @enderror">
@@ -93,7 +93,8 @@
                                     <div class="flex items-center">
                                         <input type="radio" name="roles[]" id="role_{{ $role->id }}" value="{{ $role->id }}"
                                                {{ $user->roles->contains('id', $role->id) ? 'checked' : '' }}
-                                               class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300">
+                                               data-role-name="{{ strtolower($role->name) }}"
+                                               class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 role-radio">
                                         <label for="role_{{ $role->id }}" class="ml-3 block text-sm font-medium text-gray-700">
                                             {{ ucfirst($role->name) }}
                                         </label>
@@ -124,4 +125,31 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const roleRadios = document.querySelectorAll('.role-radio');
+        const salaryField = document.getElementById('salary-field');
+        const salaryInput = document.getElementById('salary');
+
+        function toggleSalaryField() {
+            const selectedRole = document.querySelector('.role-radio:checked');
+            
+            if (selectedRole && selectedRole.dataset.roleName === 'client') {
+                salaryField.style.display = 'none';
+                salaryInput.value = ''; // Clear value if client is selected
+            } else {
+                salaryField.style.display = 'block';
+            }
+        }
+
+        // Initial check on page load
+        toggleSalaryField();
+
+        // Listen for changes
+        roleRadios.forEach(radio => {
+            radio.addEventListener('change', toggleSalaryField);
+        });
+    });
+</script>
 @endsection

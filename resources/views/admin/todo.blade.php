@@ -199,7 +199,7 @@
                         class="bg-indigo-600 text-white py-2.5 px-5 rounded-lg font-medium hover:bg-indigo-700 transition-all duration-300 flex items-center justify-center shadow-sm text-sm sm:text-base w-full"
                         >
                         <i class="fas fa-plus mr-2"></i>
-                        New Task
+                        New Todo
                         </button>
                 </div>
             </div>
@@ -574,7 +574,7 @@
     <div id="taskModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
         <div class="bg-white rounded-xl shadow-lg max-w-md w-full mx-4 fade-in max-h-[90vh] overflow-y-auto">
             <div class="p-6 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white z-10">
-                <h2 class="text-xl font-bold text-gray-800" id="modalTitle">Add New Task</h2>
+                <h2 class="text-xl font-bold text-gray-800" id="modalTitle">Add New Todo</h2>
                 <button id="closeModal" class="text-gray-500 hover:text-gray-700 transition-colors duration-200 cursor-pointer">
                     <i class="fas fa-times text-xl"></i>
                 </button>

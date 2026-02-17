@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules;
 
 class ProfileController extends Controller
 {
@@ -27,14 +29,31 @@ class ProfileController extends Controller
         $user = Auth::user();
         
         $request->validate([
-            'username' => 'required|string|max:255|unique:userlogin,username,' . $user->id,
-            'email' => 'required|string|email|max:255|unique:userlogin,email,' . $user->id,
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'company_name' => 'nullable|string|max:255',
+            'current_password' => 'nullable|required_with:new_password|current_password',
+            'new_password' => 'nullable|confirmed|min:8',
         ]);
 
-       $user->update([
-    'username' => $request->username,
-    'email' => $request->email,
-]);
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+        ]);
+
+        // Update Company Name if provided and user has a company
+        if ($request->filled('company_name') && $user->company) {
+            $user->company->update([
+                'name' => $request->company_name,
+            ]);
+        }
+
+        // Update Password
+        if ($request->filled('new_password')) {
+            $user->update([
+                'password' => Hash::make($request->new_password),
+            ]);
+        }
 
         return redirect()->route('profile.view')->with('success', 'Profile updated successfully!');
     }

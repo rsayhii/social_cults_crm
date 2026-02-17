@@ -165,7 +165,7 @@
 
 
             <!-- Header -->
-            <header class="bg-white shadow-sm border-b border-gray-200">
+            <!-- <header class="bg-white shadow-sm border-b border-gray-200">
                 <div class="flex items-center justify-between px-6 py-4">
                     <div class="flex items-center">
                         <h1 class="text-2xl font-bold text-gray-800">Proposal Management</h1>
@@ -174,7 +174,7 @@
                     </div>
                 </div>
 
-            </header>
+            </header> -->
 
             <div class="container mx-auto px-4 py-8">
                 <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -420,7 +420,7 @@
                                 class="w-full px-5 py-3 border rounded-lg">
                             <textarea id="customDesc" rows="3" placeholder="Short description..."
                                 class="w-full px-5 py-3 border rounded-lg"></textarea>
-                            <select id="customIcon" class="w-full px-5 py-3 border rounded-lg">
+                            <select id="customIcon" class="w-full px-5 py-3 border rounded-lg hidden">
                                 <option value="hashtag">Social Media</option>
                                 <option value="globe">Website</option>
                                 <option value="ad">Google Ads</option>
@@ -429,7 +429,7 @@
                                 <option value="briefcase">Consulting</option>
                                 <option value="chart-line">Analytics</option>
                             </select>
-                            <select id="customColor" class="w-full px-5 py-3 border rounded-lg">
+                            <select id="customColor" class="w-full px-5 py-3 border rounded-lg hidden">
                                 <option value="indigo">Indigo</option>
                                 <option value="blue">Blue</option>
                                 <option value="green">Green</option>
@@ -644,9 +644,9 @@
                                                                                                         <td style="padding: 10px; font-weight: 500;" contenteditable="true">$2,499 / month</td>
                                                                                                     </tr>
                                                                                                     <tr style="background-color: #f9fafb;">
-                                                                                                        <td style="padding: 10px; font-weight: 500;">Total (3 months)</td>
-                                                                                                        <td style="padding: 10px; font-size: 14px; color: #6b7280;">Minimum commitment</td>
-                                                                                                        <td style="padding: 10px; font-weight: bold; font-size: 18px;">$7,497</td>
+                                                                                                        <td style="padding: 10px; font-weight: 500;" contenteditable="true">Total (3 months)</td>
+                                                                                                        <td style="padding: 10px; font-size: 14px; color: #6b7280;" contenteditable="true">Minimum commitment</td>
+                                                                                                        <td style="padding: 10px; font-weight: bold; font-size: 18px;" contenteditable="true">$7,497</td>
                                                                                                     </tr>
                                                                                                 </tbody>
                                                                                             </table>
@@ -737,12 +737,12 @@
                                                                                                     <tr>
                                                                                                         <td style="padding: 10px; font-weight: 500;" contenteditable="true">Website Design & Dev</td>
                                                                                                         <td style="padding: 10px; font-size: 14px; color: #6b7280;" contenteditable="true">Complete site build</td>
-                                                                                                        <td style="padding: 10px; font-weight: 500;" contenteditable="true">$3,500</td>
+                                                                                                        <td style="padding: 10px; font-weight: 500;" contenteditable="true">Rs3,500</td>
                                                                                                     </tr>
                                                                                                     <tr style="background-color: #f9fafb;">
-                                                                                                        <td style="padding: 10px; font-weight: 500;">Total</td>
-                                                                                                        <td style="padding: 10px; font-size: 14px; color: #6b7280;">One-time cost</td>
-                                                                                                        <td style="padding: 10px; font-weight: bold; font-size: 18px;">$3,500</td>
+                                                                                                        <td style="padding: 10px; font-weight: 500;" contenteditable="true">Total</td>
+                                                                                                        <td style="padding: 10px; font-size: 14px; color: #6b7280;" contenteditable="true">One-time cost</td>
+                                                                                                        <td style="padding: 10px; font-weight: bold; font-size: 18px;" contenteditable="true">Rs3,500</td>
                                                                                                     </tr>
                                                                                                 </tbody>
                                                                                             </table>
@@ -816,9 +816,9 @@
                                                                                                         <td style="padding: 10px; font-weight: 500;" contenteditable="true">$1,200 / month</td>
                                                                                                     </tr>
                                                                                                     <tr style="background-color: #f9fafb;">
-                                                                                                        <td style="padding: 10px; font-weight: 500;">Total (3 months)</td>
-                                                                                                        <td style="padding: 10px; font-size: 14px; color: #6b7280;">Minimum term</td>
-                                                                                                        <td style="padding: 10px; font-weight: bold; font-size: 18px;">$3,600</td>
+                                                                                                        <td style="padding: 10px; font-weight: 500;" contenteditable="true">Total (3 months)</td>
+                                                                                                        <td style="padding: 10px; font-size: 14px; color: #6b7280;" contenteditable="true">Minimum term</td>
+                                                                                                        <td style="padding: 10px; font-weight: bold; font-size: 18px;" contenteditable="true">$3,600</td>
                                                                                                     </tr>
                                                                                                 </tbody>
                                                                                             </table>
@@ -895,9 +895,9 @@
                                                                                                         <td style="padding: 10px; font-weight: 500;" contenteditable="true">$1,800 / month</td>
                                                                                                     </tr>
                                                                                                     <tr style="background-color: #f9fafb;">
-                                                                                                        <td style="padding: 10px; font-weight: 500;">Total (6 months)</td>
-                                                                                                        <td style="padding: 10px; font-size: 14px; color: #6b7280;">Recommended period</td>
-                                                                                                        <td style="padding: 10px; font-weight: bold; font-size: 18px;">$10,800</td>
+                                                                                                        <td style="padding: 10px; font-weight: 500;" contenteditable="true">Total (6 months)</td>
+                                                                                                        <td style="padding: 10px; font-size: 14px; color: #6b7280;" contenteditable="true">Recommended period</td>
+                                                                                                        <td style="padding: 10px; font-weight: bold; font-size: 18px;" contenteditable="true">$10,800</td>
                                                                                                     </tr>
                                                                                                 </tbody>
                                                                                             </table>
@@ -1886,6 +1886,10 @@
                     // Remove edit icons and other non-printable elements
                     const editIcons = element.querySelectorAll('.edit-icon');
                     editIcons.forEach(icon => icon.remove());
+
+                    // Remove delete buttons
+                    const deleteButtons = element.querySelectorAll('.delete-block-btn');
+                    deleteButtons.forEach(btn => btn.remove());
 
                     // Remove contenteditable attributes
                     const editableElements = element.querySelectorAll('[contenteditable="true"]');

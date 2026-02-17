@@ -634,7 +634,9 @@
                                                 <option value="idea">Idea</option>
                                                 <option value="campaign">Campaign</option>
                                                 <option value="personal">Personal</option>
+                                                <option value="other">Other</option>
                                             </select>
+                                            <input type="text" id="note-category-other" class="hidden w-full mt-2 border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Specify other category">
                                             <div id="category-error" class="text-red-500 text-sm mt-1 hidden"></div>
                                         </div>
 
@@ -696,7 +698,9 @@
                                                 <option value="HealthPlus Clinic">HealthPlus Clinic</option>
                                                 <option value="EcoStyle Fashion">EcoStyle Fashion</option>
                                                 <option value="Foodies Paradise">Foodies Paradise</option>
+                                                <option value="other">Other</option>
                                             </select>
+                                            <input type="text" id="related-client-other" class="hidden w-full mt-2 border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Specify other client">
                                         </div>
 
                                         <div>
@@ -710,7 +714,9 @@
                                                 <option value="Social Media Ads">Social Media Ads</option>
                                                 <option value="Email Marketing">Email Marketing</option>
                                                 <option value="Brand Awareness">Brand Awareness</option>
+                                                <option value="other">Other</option>
                                             </select>
+                                            <input type="text" id="related-project-other" class="hidden w-full mt-2 border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Specify other project">
                                         </div>
 
                                         <div>
@@ -723,7 +729,9 @@
                                                 <option value="Ad Copywriting">Ad Copywriting</option>
                                                 <option value="Analytics Report">Analytics Report</option>
                                                 <option value="Client Meeting">Client Meeting</option>
+                                                <option value="other">Other</option>
                                             </select>
+                                            <input type="text" id="related-task-other" class="hidden w-full mt-2 border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Specify other task">
                                         </div>
                                     </div>
 
@@ -1008,6 +1016,27 @@
                                 teamContainer.classList.add('hidden');
                             }
                         });
+                    });
+
+                    // Setup "Other" option listeners
+                    const otherFields = ['note-category', 'related-client', 'related-project', 'related-task'];
+                    otherFields.forEach(fieldId => {
+                        const select = document.getElementById(fieldId);
+                        const otherInput = document.getElementById(fieldId + '-other');
+                        
+                        if (select && otherInput) {
+                            select.addEventListener('change', function() {
+                                if (this.value === 'other') {
+                                    otherInput.classList.remove('hidden');
+                                    otherInput.focus();
+                                    otherInput.required = true;
+                                } else {
+                                    otherInput.classList.add('hidden');
+                                    otherInput.value = '';
+                                    otherInput.required = false;
+                                }
+                            });
+                        }
                     });
 
                     // Delete modal
@@ -1558,6 +1587,16 @@
                     document.getElementById('selected-tags').innerHTML = '';
                     selectedTags = [];
 
+                    // Reset "Other" fields
+                    ['note-category', 'related-client', 'related-project', 'related-task'].forEach(fieldId => {
+                        const otherInput = document.getElementById(fieldId + '-other');
+                        if (otherInput) {
+                            otherInput.classList.add('hidden');
+                            otherInput.value = '';
+                            otherInput.required = false;
+                        }
+                    });
+
                     // Clear errors
                     clearFormErrors();
 
@@ -1605,7 +1644,7 @@
                             // Fill form with note data
                             document.getElementById('note-title').value = note.title || '';
                             document.getElementById('note-content-editor').innerHTML = note.content || '';
-                            document.getElementById('note-category').value = note.category || 'client';
+                            setSelectWithOther('note-category', note.category, 'client');
                             document.getElementById('note-pinned').checked = note.pinned || false;
 
                             // Update hidden textarea
@@ -1624,9 +1663,9 @@
                             renderSelectedTags();
 
                             // Set related items
-                            document.getElementById('related-client').value = note.related_client || '';
-                            document.getElementById('related-project').value = note.related_project || '';
-                            document.getElementById('related-task').value = note.related_task || '';
+                            setSelectWithOther('related-client', note.related_client);
+                            setSelectWithOther('related-project', note.related_project);
+                            setSelectWithOther('related-task', note.related_task);
 
                             // Set visibility
                             document.querySelector(`input[name="visibility"][value="${note.visibility || 'private'}"]`).checked = true;
@@ -1757,12 +1796,21 @@
                     const noteId = document.getElementById('note-id').value;
                     const title = document.getElementById('note-title').value.trim();
                     const content = document.getElementById('note-content').value.trim();
-                    const category = document.getElementById('note-category').value;
+                    
+                    let category = document.getElementById('note-category').value;
+                    if (category === 'other') category = document.getElementById('note-category-other').value.trim();
+                    
                     const visibility = document.querySelector('input[name="visibility"]:checked').value;
                     const pinned = document.getElementById('note-pinned').checked;
-                    const relatedClient = document.getElementById('related-client').value;
-                    const relatedProject = document.getElementById('related-project').value;
-                    const relatedTask = document.getElementById('related-task').value;
+                    
+                    let relatedClient = document.getElementById('related-client').value;
+                    if (relatedClient === 'other') relatedClient = document.getElementById('related-client-other').value.trim();
+                    
+                    let relatedProject = document.getElementById('related-project').value;
+                    if (relatedProject === 'other') relatedProject = document.getElementById('related-project-other').value.trim();
+                    
+                    let relatedTask = document.getElementById('related-task').value;
+                    if (relatedTask === 'other') relatedTask = document.getElementById('related-task-other').value.trim();
 
                     // Get selected teams if visibility is team
                     let selectedTeams = [];
@@ -2014,6 +2062,43 @@
                         clearTimeout(timeout);
                         timeout = setTimeout(later, wait);
                     };
+                }
+
+                function setSelectWithOther(selectId, value, defaultValue = '') {
+                    const select = document.getElementById(selectId);
+                    const otherInput = document.getElementById(selectId + '-other');
+                    
+                    if (!select) return;
+                    
+                    // Reset first
+                    select.value = defaultValue;
+                    if (otherInput) {
+                        otherInput.classList.add('hidden');
+                        otherInput.value = '';
+                        otherInput.required = false;
+                    }
+
+                    if (!value) return;
+
+                    // Check if value exists in options
+                    let exists = false;
+                    for (let i = 0; i < select.options.length; i++) {
+                        if (select.options[i].value === value) {
+                            exists = true;
+                            break;
+                        }
+                    }
+
+                    if (exists) {
+                        select.value = value;
+                    } else {
+                        select.value = 'other';
+                        if (otherInput) {
+                            otherInput.classList.remove('hidden');
+                            otherInput.value = value;
+                            otherInput.required = true;
+                        }
+                    }
                 }
             </script>
         </div>

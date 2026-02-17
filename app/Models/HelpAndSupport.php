@@ -154,15 +154,15 @@ class HelpAndSupport extends Model
     }
 
     /**
-     * Get conversations sorted by latest first
+     * Get conversations sorted by oldest first (chronological)
      */
     public function getConversationsAttribute($value)
     {
         $conversations = json_decode($value, true) ?? [];
         
-        // Sort by created_at descending (latest first)
+        // Sort by created_at ascending (oldest first)
         usort($conversations, function ($a, $b) {
-            return strtotime($b['created_at']) - strtotime($a['created_at']);
+            return strtotime($a['created_at']) - strtotime($b['created_at']);
         });
         
         return $conversations;
