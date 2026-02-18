@@ -4,13 +4,12 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     public function up()
     {
         Schema::create('clients', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained()->cascadeOnDelete();
+            // company_id is added by 2026_01_05 migration (after companies table exists)
             $table->string('company_name');
             $table->string('contact_person');
             $table->string('email');
