@@ -82,13 +82,13 @@ class ContactController extends Controller
 
         $contact = Contact::create($validated);
 
-notifyCompany(auth()->user()->company_id, [
-    'title' => 'New Contact Added',
-    'message' => $contact->name . ' was added',
-    'module' => 'contact',
-    'url' => route('contacts.index'),
-    'icon' => 'user',
-]);
+// notifyCompany(auth()->user()->company_id, [
+//     'title' => 'New Contact Added',
+//     'message' => $contact->name . ' was added',
+//     'module' => 'contact',
+//     'url' => route('contacts.index'),
+//     'icon' => 'user',
+// ]);
 
 
         return response()->json([

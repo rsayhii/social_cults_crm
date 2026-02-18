@@ -48,13 +48,13 @@ class TodoController extends Controller
             'assigned_users' => [auth()->id()], // ✅ IMPORTANT
         ]);
 
-        notifyCompany(auth()->user()->company_id, [
-    'title' => 'New Todo Added',
-    'message' =>$request->title . ' was added',
-    'module' => 'todo',
-    'url' => route('todo.index'),
-    'icon' => 'user',
-]);
+//         notifyCompany(auth()->user()->company_id, [
+//     'title' => 'New Todo Added',
+//     'message' =>$request->title . ' was added',
+//     'module' => 'todo',
+//     'url' => route('todo.index'),
+//     'icon' => 'user',
+// ]);
 
         return redirect()->back()->with('success', 'Task created successfully!');
     }
@@ -75,13 +75,13 @@ class TodoController extends Controller
             'completed',
         ]));
 
-        notifyCompany(auth()->user()->company_id, [
-            'title' => 'Todo Updated',
-            'message' => ($todo->title ?? 'Untitled') . ' was updated',
-            'module' => 'todo',
-            'url' => route('todo.index'),
-            'icon' => 'edit',
-        ]);
+        // notifyCompany(auth()->user()->company_id, [
+        //     'title' => 'Todo Updated',
+        //     'message' => ($todo->title ?? 'Untitled') . ' was updated',
+        //     'module' => 'todo',
+        //     'url' => route('todo.index'),
+        //     'icon' => 'edit',
+        // ]);
 
         return redirect()->back()->with('success', 'Task updated successfully!');
     }
@@ -92,13 +92,13 @@ class TodoController extends Controller
        $this->authorize('manage', $todo);
 
         $todo->delete();
-        notifyCompany(auth()->user()->company_id, [
-            'title' => 'Todo Deleted',
-            'message' => ($todo->title ?? 'Untitled') . ' was deleted',
-            'module' => 'todo',
-            'url' => route('todo.index'),
-            'icon' => 'trash',
-        ]);
+        // notifyCompany(auth()->user()->company_id, [
+        //     'title' => 'Todo Deleted',
+        //     'message' => ($todo->title ?? 'Untitled') . ' was deleted',
+        //     'module' => 'todo',
+        //     'url' => route('todo.index'),
+        //     'icon' => 'trash',
+        // ]);
         return redirect()->back()->with('success', 'Task deleted successfully!');
     }
 
@@ -111,13 +111,13 @@ class TodoController extends Controller
         $todo->status = $todo->completed ? 'completed' : 'pending';
         $todo->save();
 
-        notifyCompany(auth()->user()->company_id, [
-            'title' => $todo->completed ? 'Todo Completed' : 'Todo Reopened',
-            'message' => ($todo->title ?? 'Untitled'),
-            'module' => 'todo',
-            'url' => route('todo.index'),
-            'icon' => $todo->completed ? 'check-circle' : 'undo',
-        ]);
+        // notifyCompany(auth()->user()->company_id, [
+        //     'title' => $todo->completed ? 'Todo Completed' : 'Todo Reopened',
+        //     'message' => ($todo->title ?? 'Untitled'),
+        //     'module' => 'todo',
+        //     'url' => route('todo.index'),
+        //     'icon' => $todo->completed ? 'check-circle' : 'undo',
+        // ]);
 
         return response()->json(['success' => true]);
     }

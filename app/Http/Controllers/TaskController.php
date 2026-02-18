@@ -120,19 +120,19 @@ class TaskController extends Controller
                 $task->assignToTeam($roleId);
             }
 
-            try {
-                if (function_exists('notifyCompany')) {
-                    notifyCompany(auth()->user()->company_id, [
-                        'title' => 'Task Assigned',
-                        'message' => 'A new task was assigned',
-                        'module' => 'task',
-                        'url' => route('tasks.index'),
-                        'icon' => 'task',
-                    ]);
-                }
-            } catch (\Exception $e) {
-                \Illuminate\Support\Facades\Log::error('Task Notification Failed: ' . $e->getMessage());
-            }
+            // try {
+            //     if (function_exists('notifyCompany')) {
+            //         notifyCompany(auth()->user()->company_id, [
+            //             'title' => 'Task Assigned',
+            //             'message' => 'A new task was assigned',
+            //             'module' => 'task',
+            //             'url' => route('tasks.index'),
+            //             'icon' => 'task',
+            //         ]);
+            //     }
+            // } catch (\Exception $e) {
+            //     \Illuminate\Support\Facades\Log::error('Task Notification Failed: ' . $e->getMessage());
+            // }
 
             return response()->json([
                 'success' => true,

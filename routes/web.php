@@ -626,7 +626,7 @@ Route::prefix('superadmin')->group(function () {
         Route::post('customers', [CustomerController::class, 'store'])->name('superadmin.customers.store');
         Route::get('customers/{customer}', [CustomerController::class, 'show'])->name('superadmin.customers.show');
         Route::get('customers/{customer}/edit', [CustomerController::class, 'edit'])->name('superadmin.customers.edit');
-        Route::put('customers/{customer}', [CustomerController::class, 'update'])->name('superadmin.customers.update');
+        Route::post('customers/{id}', [CustomerController::class, 'update'])->name('superadmin.customers.update');
         Route::delete('customers/{customer}', [CustomerController::class, 'destroy'])->name('superadmin.customers.destroy');
 
 

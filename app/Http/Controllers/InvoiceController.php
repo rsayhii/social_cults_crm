@@ -197,18 +197,18 @@ if ($search) {
         $invoice = Invoice::with('items')->find($invoice->id);
 
         // ✅ FIX: Add try-catch for notification
-        try {
-            notifyCompany(auth()->user()->company_id, [
-                'title' => 'Invoice Generated',
-                'message' => 'Invoice #' . $invoice->invoice_number . ' created',
-                'module' => 'invoice',
-                'url' => route('invoices.index'),
-                'icon' => 'invoice',
-            ]);
-        } catch (\Exception $e) {
-            Log::warning('Failed to send notification: ' . $e->getMessage());
-            // Don't fail the entire request if notification fails
-        }
+        // try {
+        //     notifyCompany(auth()->user()->company_id, [
+        //         'title' => 'Invoice Generated',
+        //         'message' => 'Invoice #' . $invoice->invoice_number . ' created',
+        //         'module' => 'invoice',
+        //         'url' => route('invoices.index'),
+        //         'icon' => 'invoice',
+        //     ]);
+        // } catch (\Exception $e) {
+        //     Log::warning('Failed to send notification: ' . $e->getMessage());
+        //     // Don't fail the entire request if notification fails
+        // }
         
         return response()->json([
             'success' => true,

@@ -40,11 +40,13 @@
                                             Internal Note
                                         </div>
                                     @endif
-
+@php
+    $msgUser = \App\Models\User::find($message['user_id']);
+@endphp
                                     <div
                                         class="flex items-center gap-2 mb-1 text-xs {{ $message['user_id'] == auth()->id() && !$message['is_internal'] ? 'text-blue-100' : 'text-gray-500' }}">
                                         <span
-                                            class="font-bold">{{ \App\Models\User::find($message['user_id'])->name ?? 'System' }}</span>
+                                            class="font-bold">{{ $msgUser ? $msgUser->name : 'System' }}</span>
                                         <span>{{ \Carbon\Carbon::parse($message['created_at'])->format('M d, h:i A') }}</span>
                                     </div>
 

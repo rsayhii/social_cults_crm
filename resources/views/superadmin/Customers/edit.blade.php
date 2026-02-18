@@ -17,9 +17,9 @@
 </div>
 
 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-    <form action="{{ route('superadmin.customers.update', $customer) }}" method="POST">
+    <form action="{{ route('superadmin.customers.update', encrypt($customer->id)) }}" method="POST">
         @csrf
-        @method('PUT')
+        {{-- @method('PUT') --}}
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
@@ -102,7 +102,7 @@
         </div>
         
         <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
-            <a href="{{ route('superadmin.customers.show', $customer) }}" class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition duration-200 font-medium">
+            <a href="{{ route('superadmin.customers.index') }}" class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition duration-200 font-medium">
                 Cancel
             </a>
             <button type="submit" class="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition duration-200 font-medium">
@@ -113,7 +113,7 @@
     </form>
 </div>
 
-@section('scripts')
+{{-- @section('scripts') --}}
 <script>
     function copyToClipboard(text) {
         navigator.clipboard.writeText(text).then(() => {

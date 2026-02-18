@@ -11,20 +11,7 @@
         <h1 class="text-2xl font-bold text-gray-800">Customer Details</h1>
         <p class="text-gray-600">View and manage customer subscription information</p>
     </div>
-    <div class="flex space-x-2">
-        <a href="{{ route('superadmin.customers.edit', $customer) }}" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition duration-200 font-medium flex items-center">
-            <i class="fas fa-edit mr-2"></i>
-            Edit
-        </a>
-        <form action="{{ route('superadmin.customers.destroy', $customer) }}" method="POST" class="inline">
-            @csrf
-            @method('DELETE')
-            <button type="submit" onclick="return confirm('Are you sure you want to delete this customer?')" class="px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition duration-200 font-medium flex items-center">
-                <i class="fas fa-trash mr-2"></i>
-                Delete
-            </button>
-        </form>
-    </div>
+    
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -198,7 +185,7 @@
                 </div>
             </div>
             
-            <div class="mt-8 pt-6 border-t border-gray-200">
+            {{-- <div class="mt-8 pt-6 border-t border-gray-200">
                 <h3 class="font-medium text-gray-800 mb-3">Danger Zone</h3>
                 <form action="{{ route('superadmin.customers.destroy', $customer->id) }}" method="POST" class="inline">
                     @csrf
@@ -208,12 +195,12 @@
                         Delete Customer Account
                     </button>
                 </form>
-            </div>
+            </div> --}}
         </div>
     </div>
 </div>
 
-@section('scripts')
+
 <script>
     function copyToClipboard(text) {
         navigator.clipboard.writeText(text).then(() => {

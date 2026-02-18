@@ -53,35 +53,39 @@ class TicketRecordController extends Controller
         return view('admin.support.manage_ticket', compact('ticket'));
     }
 
-    public function update(Request $request, $id)
-    {
-        $id = decrypt($id);
-        $ticket = HelpAndSupport::findOrFail($id);
+   public function update(Request $request, $id)
+{
+    $id = decrypt($id);
+    $ticket = HelpAndSupport::findOrFail($id);
 
-        $request->validate([
-            'status' => 'required|in:open,in-progress,completed,closed',
-            'priority' => 'required|in:low,medium,high,urgent',
-            'assigned_team' => 'nullable|string'
-        ]);
+    $request->validate([
+        'status' => 'required|in:open,in-progress,completed,closed',
+        'priority' => 'required|in:low,medium,high,urgent',
+        'assigned_team' => 'nullable|string'
+    ]);
 
-        $oldStatus = $ticket->status;
-        $ticket->update([
-            'status' => $request->status,
-            'priority' => $request->priority,
-            'assigned_team' => $request->assigned_team
-        ]);
+    $oldStatus = $ticket->status;
 
-        // Add system note
-        if ($oldStatus !== $request->status) {
-            $ticket->addConversation(
-                "Status changed from {$oldStatus} to {$request->status} by " . Auth::user()->name,
-                Auth::id(),
-                true // Internal note
-            );
-        }
+    $ticket->update([
+        'status' => $request->status,
+        'priority' => $request->priority,
+        'assigned_team' => $request->assigned_team
+    ]);
 
-        return back()->with('success', 'Ticket updated successfully');
+    // SAFE USER FETCH
+    $user = Auth::user();
+
+    if ($oldStatus !== $request->status) {
+        $ticket->addConversation(
+            "Status changed from {$oldStatus} to {$request->status} by " . ($user?->name ?? 'System'),
+            $user?->id,
+            true
+        );
     }
+
+    return back()->with('success', 'Ticket updated successfully');
+}
+
 
     public function reply(Request $request, $id)
     {

@@ -242,6 +242,6 @@
             animation: fadeInDown 0.3s ease-out forwards;
         }
     </style>
-    @yield('scripts')
+    {{-- @yield('scripts') --}}
 </body>
 </html>

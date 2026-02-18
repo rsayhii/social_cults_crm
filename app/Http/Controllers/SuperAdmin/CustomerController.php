@@ -141,6 +141,8 @@ class CustomerController extends Controller
     // Update customer (Company)
     public function update(Request $request, $id)
     {
+            $id = decrypt($id);
+           
         $company = Company::findOrFail($id);
 
         $validated = $request->validate([
@@ -167,7 +169,7 @@ class CustomerController extends Controller
             $company->user->update($adminData);
         }
         
-        return redirect()->route('superadmin.customers.show', $company->id)
+        return redirect()->route('superadmin.customers.index')
             ->with('success', 'Customer updated successfully!');
     }
 
