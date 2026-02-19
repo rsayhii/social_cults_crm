@@ -42,7 +42,7 @@ class FreeTrialController extends Controller
         // Admin
         'name'           => 'required|string|max:255',
         'admin_email'    => 'required|email|unique:users,email',
-        'password'       => 'required|min:6|confirmed',
+        'password'       => 'required|min:4|confirmed',
     ]);
 
    DB::transaction(function () use ($request) {

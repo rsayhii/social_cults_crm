@@ -469,9 +469,9 @@
             document.getElementById('password').classList.add('input-error');
             document.getElementById('password_error').style.display = 'block';
             isValid = false;
-        } else if (password.length < 8) {
+        } else if (password.length < 4) {
             document.getElementById('password').classList.add('input-error');
-            document.getElementById('password_error').textContent = 'Password must be at least 8 characters long';
+            document.getElementById('password_error').textContent = 'Password must be at least 4 characters long';
             document.getElementById('password_error').style.display = 'block';
             isValid = false;
         }
