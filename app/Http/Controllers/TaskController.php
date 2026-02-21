@@ -48,6 +48,9 @@ class TaskController extends Controller
 
     public function edit(Task $task)
     {
+        if (!auth()->user()->hasRole('admin')) {
+        abort(403);
+    }
         $this->authorize('manage', $task);
 
         $task->load('users', 'role', 'assigner.roles');
@@ -149,6 +152,9 @@ class TaskController extends Controller
 
     public function update(Request $request, Task $task)
     {
+        if (!auth()->user()->hasRole('admin')) {
+        abort(403);
+    }
         $this->authorize('manage', $task);
         // Similar validation to store, but allow partial updates
         $rules = [
@@ -249,6 +255,9 @@ class TaskController extends Controller
     }
     public function destroy(Task $task)
     {
+        if (!auth()->user()->hasRole('admin')) {
+        abort(403);
+    }
         $this->authorize('manage', $task);
         // Clean up attachments
         if ($task->attachments) {

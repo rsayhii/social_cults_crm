@@ -1007,23 +1007,32 @@
                                             @endif
                                         </td>
                                         <td class="py-4 px-4" data-label="Actions">
-                                            <div class="flex items-center space-x-2 actions-mobile hidden md:flex">
-                                                <button
-                                                    class="edit-task text-indigo-600 hover:text-indigo-800 p-2 hover:bg-indigo-50 rounded-lg"
-                                                    data-task-id="{{ $task->id }}" title="Edit">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button
-                                                    class="view-task text-gray-500 hover:text-gray-700 p-2 hover:bg-gray-100 rounded-lg"
-                                                    data-task-id="{{ $task->id }}" title="View">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                                <button
-                                                    class="delete-task text-red-500 hover:text-red-700 p-2 hover:bg-red-50 rounded-lg"
-                                                    data-task-id="{{ $task->id }}" title="Delete">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </div>
+                                          <div class="flex items-center space-x-2 actions-mobile hidden md:flex">
+
+    @role('admin')
+        <button
+            class="edit-task text-indigo-600 hover:text-indigo-800 p-2 hover:bg-indigo-50 rounded-lg"
+            data-task-id="{{ $task->id }}" title="Edit">
+            <i class="fas fa-edit"></i>
+        </button>
+    @endrole
+
+    <button
+        class="view-task text-gray-500 hover:text-gray-700 p-2 hover:bg-gray-100 rounded-lg"
+        data-task-id="{{ $task->id }}" title="View">
+        <i class="fas fa-eye"></i>
+    </button>
+
+    @role('admin')
+        <button
+            class="delete-task text-red-500 hover:text-red-700 p-2 hover:bg-red-50 rounded-lg"
+            data-task-id="{{ $task->id }}" title="Delete">
+            <i class="fas fa-trash"></i>
+        </button>
+    @endrole
+
+</div>
+
                                         </td>
                                     </tr>
                                 @empty

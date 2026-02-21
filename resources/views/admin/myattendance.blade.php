@@ -445,7 +445,7 @@
                         </p>
                         <p class="text-xs text-gray-500 mb-3 md:mb-4 truncate w-full">{{ $profile['company'] }}</p>
 
-                        <div class="w-full border-t border-gray-200 pt-3 md:pt-4">
+                        <!-- <div class="w-full border-t border-gray-200 pt-3 md:pt-4">
                             <div class="flex justify-between mb-1 md:mb-2">
                                 <span class="text-xs md:text-sm text-gray-600">Employee ID:</span>
                                 <span class="text-xs md:text-sm font-medium">{{ $profile['employee_id'] }}</span>
@@ -458,7 +458,7 @@
                                 <span class="text-xs md:text-sm text-gray-600">Join Date:</span>
                                 <span class="text-xs md:text-sm font-medium">{{ $profile['join_date'] }}</span>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
 
@@ -1805,8 +1805,8 @@
 
         function initializeTimersAndUI() {
             if (attendanceData.punchIn) {
-                const punchDate = new Date(attendanceData.punchIn);
-                elements.currentPunchTime.textContent = punchDate.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+                // punchIn is pre-formatted as "h:i A" (e.g. "09:30 AM") by the controller
+                elements.currentPunchTime.textContent = attendanceData.punchIn;
 
                 if (!attendanceData.punchOut) {
                     startWorkTimer();

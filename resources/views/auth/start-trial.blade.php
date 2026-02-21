@@ -35,15 +35,7 @@
         .step-indicator {
             transition: all 0.3s ease;
         }
-        .input-error {
-            border-color: #f87171 !important;
-        }
-        .error-message {
-            color: #ef4444;
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
-            display: none;
-        }
+
     </style>
 </head>
 
@@ -114,7 +106,6 @@
                                         <input type="text" name="company_name" value="{{ old('company_name') }}"
                                                class="w-full border border-gray-300 rounded-xl px-4 py-3.5 form-input focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-700"
                                                placeholder="Enter your company name" required id="company_name">
-                                        <div class="error-message" id="company_name_error">Company name is required</div>
                                     </div>
 
                                     <div>
@@ -122,7 +113,6 @@
                                         <textarea name="address" rows="3"
                                                   class="w-full border border-gray-300 rounded-xl px-4 py-3.5 form-input focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-700"
                                                   placeholder="Enter company address" required id="address">{{ old('address') }}</textarea>
-                                        <div class="error-message" id="address_error">Company address is required</div>
                                     </div>
 
                                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -131,7 +121,6 @@
                                             <input type="email" name="company_email" value="{{ old('company_email') }}"
                                                    class="w-full border border-gray-300 rounded-xl px-4 py-3.5 form-input focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-700"
                                                    placeholder="company@example.com" required id="company_email">
-                                            <div class="error-message" id="company_email_error">Please enter a valid email address</div>
                                         </div>
 
                                         <div>
@@ -139,7 +128,6 @@
                                             <input type="text" name="phone" value="{{ old('phone') }}"
                                                    class="w-full border border-gray-300 rounded-xl px-4 py-3.5 form-input focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-700"
                                                    placeholder="+1 (555) 000-0000" required id="phone">
-                                            <div class="error-message" id="phone_error">Phone number is required</div>
                                         </div>
                                     </div>
 
@@ -153,7 +141,7 @@
                                 </div>
 
                                 <button type="button"
-                                        onclick="validateStep1()"
+                                        onclick="nextStep()"
                                         class="w-full mt-10 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group">
                                     Continue to Admin Setup
                                     <svg class="w-6 h-6 ml-3 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -175,7 +163,6 @@
                                         <input type="text" name="name" value="{{ old('name') }}"
                                                class="w-full border border-gray-300 rounded-xl px-4 py-3.5 form-input focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-700"
                                                placeholder="Enter your full name" required id="admin_name">
-                                        <div class="error-message" id="admin_name_error">Full name is required</div>
                                     </div>
 
                                     <div>
@@ -183,7 +170,6 @@
                                         <input type="email" name="admin_email" value="{{ old('admin_email') }}"
                                                class="w-full border border-gray-300 rounded-xl px-4 py-3.5 form-input focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-700"
                                                placeholder="admin@company.com" required id="admin_email">
-                                        <div class="error-message" id="admin_email_error">Valid email is required</div>
                                         <p class="text-xs text-gray-500 mt-2">This will be your login email</p>
                                     </div>
 
@@ -193,7 +179,6 @@
                                             <input type="password" name="password"
                                                    class="w-full border border-gray-300 rounded-xl px-4 py-3.5 form-input focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-700"
                                                    placeholder="Create a strong password" required id="password">
-                                            <div class="error-message" id="password_error">Password is required</div>
                                         </div>
 
                                         <div>
@@ -201,7 +186,6 @@
                                             <input type="password" name="password_confirmation"
                                                    class="w-full border border-gray-300 rounded-xl px-4 py-3.5 form-input focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-700"
                                                    placeholder="Re-enter your password" required id="password_confirmation">
-                                            <div class="error-message" id="password_confirmation_error">Passwords do not match</div>
                                         </div>
                                     </div>
                                     
@@ -266,87 +250,6 @@
     </div>
 
 <script>
-    function validateStep1() {
-        let isValid = true;
-        
-        // Get input values
-        const companyName = document.getElementById('company_name').value.trim();
-        const address = document.getElementById('address').value.trim();
-        const companyEmail = document.getElementById('company_email').value.trim();
-        const phone = document.getElementById('phone').value.trim();
-        
-        // Reset all error states
-        document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
-        document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
-        
-        // Validate company name (required)
-        if (!companyName) {
-            document.getElementById('company_name').classList.add('input-error');
-            document.getElementById('company_name_error').textContent = 'Company name is required';
-            document.getElementById('company_name_error').style.display = 'block';
-            isValid = false;
-        }
-        
-        // Validate company address (required)
-        if (!address) {
-            document.getElementById('address').classList.add('input-error');
-            document.getElementById('address_error').textContent = 'Company address is required';
-            document.getElementById('address_error').style.display = 'block';
-            isValid = false;
-        }
-        
-        // Validate company email (required)
-        if (!companyEmail) {
-            document.getElementById('company_email').classList.add('input-error');
-            document.getElementById('company_email_error').textContent = 'Company email is required';
-            document.getElementById('company_email_error').style.display = 'block';
-            isValid = false;
-        } else if (!isValidEmail(companyEmail)) {
-            document.getElementById('company_email').classList.add('input-error');
-            document.getElementById('company_email_error').textContent = 'Please enter a valid email address';
-            document.getElementById('company_email_error').style.display = 'block';
-            isValid = false;
-        }
-        
-        // Validate phone number (required)
-        if (!phone) {
-            document.getElementById('phone').classList.add('input-error');
-            document.getElementById('phone_error').textContent = 'Phone number is required';
-            document.getElementById('phone_error').style.display = 'block';
-            isValid = false;
-        } else if (!isValidPhone(phone)) {
-            document.getElementById('phone').classList.add('input-error');
-            document.getElementById('phone_error').textContent = 'Please enter a valid phone number';
-            document.getElementById('phone_error').style.display = 'block';
-            isValid = false;
-        }
-        
-        // If validation passes, proceed to next step
-        if (isValid) {
-            nextStep();
-        } else {
-            // Scroll to first error
-            const firstError = document.querySelector('.input-error');
-            if (firstError) {
-                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                firstError.focus();
-            }
-        }
-        
-        return isValid;
-    }
-    
-    function isValidEmail(email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-    }
-    
-    function isValidPhone(phone) {
-        // Basic phone validation - accepts international formats
-        const phoneRegex = /^[\d\s\-\+\(\)]{10,}$/;
-        return phoneRegex.test(phone);
-    }
-    
     function nextStep() {
         document.getElementById('slider').style.transform = 'translateX(-50%)';
         document.getElementById('step1-indicator').classList.remove('text-gray-800');
@@ -378,130 +281,6 @@
         
         document.getElementById('progress-bar').style.width = '0%';
     }
-    
-    // Add real-time validation for step 1 fields
-    document.getElementById('company_name').addEventListener('blur', function() {
-        const name = this.value.trim();
-        if (!name) {
-            this.classList.add('input-error');
-            document.getElementById('company_name_error').textContent = 'Company name is required';
-            document.getElementById('company_name_error').style.display = 'block';
-        } else {
-            this.classList.remove('input-error');
-            document.getElementById('company_name_error').style.display = 'none';
-        }
-    });
-    
-    document.getElementById('address').addEventListener('blur', function() {
-        const address = this.value.trim();
-        if (!address) {
-            this.classList.add('input-error');
-            document.getElementById('address_error').textContent = 'Company address is required';
-            document.getElementById('address_error').style.display = 'block';
-        } else {
-            this.classList.remove('input-error');
-            document.getElementById('address_error').style.display = 'none';
-        }
-    });
-    
-    document.getElementById('company_email').addEventListener('blur', function() {
-        const email = this.value.trim();
-        if (!email) {
-            this.classList.add('input-error');
-            document.getElementById('company_email_error').textContent = 'Company email is required';
-            document.getElementById('company_email_error').style.display = 'block';
-        } else if (!isValidEmail(email)) {
-            this.classList.add('input-error');
-            document.getElementById('company_email_error').textContent = 'Please enter a valid email address';
-            document.getElementById('company_email_error').style.display = 'block';
-        } else {
-            this.classList.remove('input-error');
-            document.getElementById('company_email_error').style.display = 'none';
-        }
-    });
-    
-    document.getElementById('phone').addEventListener('blur', function() {
-        const phone = this.value.trim();
-        if (!phone) {
-            this.classList.add('input-error');
-            document.getElementById('phone_error').textContent = 'Phone number is required';
-            document.getElementById('phone_error').style.display = 'block';
-        } else if (!isValidPhone(phone)) {
-            this.classList.add('input-error');
-            document.getElementById('phone_error').textContent = 'Please enter a valid phone number';
-            document.getElementById('phone_error').style.display = 'block';
-        } else {
-            this.classList.remove('input-error');
-            document.getElementById('phone_error').style.display = 'none';
-        }
-    });
-    
-    // Add form submission validation for step 2
-    document.querySelector('form').addEventListener('submit', function(e) {
-        // Validate step 2 fields
-        const adminName = document.getElementById('admin_name').value.trim();
-        const adminEmail = document.getElementById('admin_email').value.trim();
-        const password = document.getElementById('password').value;
-        const passwordConfirm = document.getElementById('password_confirmation').value;
-        
-        let isValid = true;
-        
-        // Reset all error states
-        document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
-        document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
-        
-        // Validate admin name
-        if (!adminName) {
-            document.getElementById('admin_name').classList.add('input-error');
-            document.getElementById('admin_name_error').style.display = 'block';
-            isValid = false;
-        }
-        
-        // Validate admin email
-        if (!adminEmail || !isValidEmail(adminEmail)) {
-            document.getElementById('admin_email').classList.add('input-error');
-            document.getElementById('admin_email_error').style.display = 'block';
-            isValid = false;
-        }
-        
-        // Validate password
-        if (!password) {
-            document.getElementById('password').classList.add('input-error');
-            document.getElementById('password_error').style.display = 'block';
-            isValid = false;
-        } else if (password.length < 4) {
-            document.getElementById('password').classList.add('input-error');
-            document.getElementById('password_error').textContent = 'Password must be at least 4 characters long';
-            document.getElementById('password_error').style.display = 'block';
-            isValid = false;
-        }
-        
-        // Validate password confirmation
-        if (password !== passwordConfirm) {
-            document.getElementById('password_confirmation').classList.add('input-error');
-            document.getElementById('password_confirmation_error').style.display = 'block';
-            isValid = false;
-        }
-        
-        // Also validate step 1 fields again (in case user went back and changed them)
-        if (!validateStep1()) {
-            // If step 1 validation fails, go back to step 1
-            e.preventDefault();
-            prevStep();
-            return false;
-        }
-        
-        if (!isValid) {
-            e.preventDefault();
-            // Scroll to first error in step 2
-            const firstError = document.querySelector('.input-error');
-            if (firstError) {
-                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                firstError.focus();
-            }
-            return false;
-        }
-    });
 </script>
 
 </body>

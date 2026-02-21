@@ -124,6 +124,23 @@ class AttendanceRecordController extends Controller
             ->whereYear('date', substr($request->month, 0, 4))
             ->whereMonth('date', substr($request->month, 5, 2))
             ->orderBy('date')
-            ->get();
+            ->get()
+            ->map(function ($record) {
+                return [
+                    'date'             => $record->date instanceof \Carbon\Carbon
+                        ? $record->date->format('Y-m-d')
+                        : $record->date,
+                    'punch_in'         => $record->punch_in
+                        ? \Carbon\Carbon::parse($record->punch_in)->format('h:i A')
+                        : null,
+                    'punch_out'        => $record->punch_out
+                        ? \Carbon\Carbon::parse($record->punch_out)->format('h:i A')
+                        : null,
+                    'work_hours'       => $record->work_hours,
+                    'overtime_seconds' => $record->overtime_seconds,
+                    'status'           => $record->status,
+                ];
+            });
+
     }
 }

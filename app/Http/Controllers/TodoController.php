@@ -13,14 +13,28 @@ class TodoController extends Controller
     }
 
     // SHOW TODO PAGE + FETCH DATA (ONLY AUTH USER)
- public function index()
+public function index()
 {
-    $high = Todo::where('priority', 'high')->latest()->get();
-    $medium = Todo::where('priority', 'medium')->latest()->get();
-    $low = Todo::where('priority', 'low')->latest()->get();
+    $userId = auth()->id();
+
+    $high = Todo::where('priority', 'high')
+        ->whereJsonContains('assigned_users', $userId)
+        ->latest()
+        ->get();
+
+    $medium = Todo::where('priority', 'medium')
+        ->whereJsonContains('assigned_users', $userId)
+        ->latest()
+        ->get();
+
+    $low = Todo::where('priority', 'low')
+        ->whereJsonContains('assigned_users', $userId)
+        ->latest()
+        ->get();
 
     return view('admin.todo', compact('high', 'medium', 'low'));
 }
+
 
 
 

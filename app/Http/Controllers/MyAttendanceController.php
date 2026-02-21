@@ -107,8 +107,12 @@ class MyAttendanceController extends Controller
              | JS DATA
              ────────────────────────────── */
             $jsAttendanceData = [
-                'punchIn' => $todayRecord?->punch_in,
-                'punchOut' => $todayRecord?->punch_out,
+                'punchIn' => $todayRecord?->punch_in
+                    ? Carbon::parse($todayRecord->punch_in)->format('h:i A')
+                    : null,
+                'punchOut' => $todayRecord?->punch_out
+                    ? Carbon::parse($todayRecord->punch_out)->format('h:i A')
+                    : null,
                 'breakRunning' => $todayRecord
                     ? $todayRecord->breaks()->whereNull('break_out')->exists()
                     : false,

@@ -657,9 +657,9 @@
                                 <tbody class="divide-y divide-gray-100">`;
 
                         monthlyData.forEach(function (item) {
-                            let formattedDate = item.date.substring(0, 10);
-                            let punchIn = item.punch_in ? new Date(item.punch_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—';
-                            let punchOut = item.punch_out ? new Date(item.punch_out).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—';
+                            let formattedDate = item.date ? item.date.substring(0, 10) : '—';
+                            let punchIn = item.punch_in || '—';
+                            let punchOut = item.punch_out || '—';
                             let workHours = item.work_hours ? item.work_hours.split(':').slice(0, 2).join(':') : '—';
                             let overtime = item.overtime_seconds ? new Date(item.overtime_seconds * 1000).toISOString().substr(11, 8) : '00:00:00';
 

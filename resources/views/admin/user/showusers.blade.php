@@ -52,10 +52,12 @@
                         <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
                         <p class="text-lg text-gray-900 break-all">{{ $user->email }}</p>
                     </div>
+                    
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Salary</label>
                         <p class="text-lg font-semibold text-gray-900">₹{{ number_format($user->salary, 2) }}</p>
                     </div>
+                    
                     <div class="md:col-span-2 lg:col-span-3">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Roles</label>
                         <div class="flex flex-wrap gap-2">

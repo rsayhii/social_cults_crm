@@ -208,10 +208,7 @@
                 <!-- Actions -->
                 <div class="p-6 bg-gray-50">
                     <div class="flex space-x-4">
-                        <a href="{{ route('tasks.edit', $task->id) }}"
-                            class="bg-indigo-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-indigo-700 transition">
-                            Edit Task
-                        </a>
+                       
                         <a href="{{ route('tasks.index') }}"
                             class="bg-gray-300 text-gray-800 px-6 py-2 rounded-lg font-medium hover:bg-gray-400 transition">
                             Back to List
